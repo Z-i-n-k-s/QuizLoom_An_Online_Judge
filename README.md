@@ -13,7 +13,14 @@ QuizLoom_An_Online_Judge includes educators, students, organizations, developers
 - **Framework**: Laravel
   
 ### Frontend
-- **Framework/Library**: React with Inertia.js
+- **Framework/Library**: React
 
 ### Rendering Method
 - **Client-Side Rendering (CSR)**
+
+### UI Design
+- **Tool**: Figma
+- **Design Link**: Figma.com
+```
+Figma.com
+```
