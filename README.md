@@ -70,7 +70,46 @@ Figma.com
    DELETE /api/teacher/courses/:courseId
    DELETE /api/teacher/courses/:courseId/students/:studentId
    ```
-  
+
+## Milestones
+
+### Milestone 1: Foundation and Core Features (1st Checkpoint)
+- Set up the project environment and initialize the repository.
+- Implement user authentication:
+  - Secure registration and login functionality.
+- Develop the quiz creation module:
+  - Allow admins/educators to create quizzes with multiple-choice questions.
+  - Enable support for different question types (e.g., single and multiple answers).
+- Set up the backend with Laravel and database schema design for quizzes, users, and results.
+- Design a basic frontend with React and Inertia.js for creating and managing quizzes.
+
+---
+
+### Milestone 2: Quiz Participation and Scoring System (2nd Checkpoint)
+- Implement the quiz-taking functionality:
+  - Allow users to participate in quizzes.
+  - Add a real-time timer for time-bound quizzes.
+  - Automatically calculate and display scores after quiz completion.
+- Create a detailed scoreboard:
+  - Show individual user performance and correct/incorrect answers.
+  - Store and retrieve scores from the database.
+- Integrate API endpoints for user participation and quiz submissions.
+- Improve UI/UX for quiz-taking with better designs and responsiveness.
+
+---
+
+### Milestone 3: Advanced Features and Deployment (Final Checkpoint)
+- Add advanced analytics:
+  - Provide insights into user performance, quiz difficulty levels, and participation trends.
+- Implement course management:
+  - Allow users to filter quizzes by course/topic.
+- Enable gamification:
+  - Add leaderboards to display top scorers.
+  - Include badges or achievements for user milestones.
+- Finalize UI/UX designs and optimize for performance.
+- Conduct testing, fix bugs, and prepare the project for deployment.
+- Write complete project documentation and deploy the platform.
+
 ## Team Members
 
 | ID          | Name                   | Email                              | Role              |
