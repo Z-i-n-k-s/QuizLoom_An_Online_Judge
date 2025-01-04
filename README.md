@@ -20,7 +20,7 @@ QuizLoom_An_Online_Judge includes educators, students, organizations, developers
 
 ### UI Design
 - **Tool**: Figma
-- **Design Link**: Figma.com
+- **Design Link**: http.Figma.com
 ```
 Figma.com
 ```
