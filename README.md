@@ -48,11 +48,29 @@ Figma.com
    - Manage Courses, Exam schedules, Student records, and user profiles..
 
 7. **API Endpoints:**
-   ## Admin pannel:-
-   ```plaintext
+   ## Admin pannel:
+   ```
    POST /api/admin/add-teacher
    POST /api/admin/invite-teacher
-
+   ```
+   ## Student Panel:
+   ```
+   POST /api/student/enroll
+   GET /api/student/courses/:courseId/lessons
+   POST /api/student/quizzes/submit
+   GET /api/student/quizzes/:quizId/results
+   ```
+   ## Teacher Panel:
+   ```
+   POST /api/teacher/courses/:courseId/lectures
+   POST /api/teacher/courses/:courseId/quizzes
+   GET /api/teacher/courses/:courseId/results
+   POST /api/teacher/courses
+   PUT /api/teacher/courses/:courseId
+   DELETE /api/teacher/courses/:courseId
+   DELETE /api/teacher/courses/:courseId/students/:studentId
+   ```
+  
 ## Team Members
 
 | ID          | Name                   | Email                              | Role              |
