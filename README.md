@@ -25,8 +25,6 @@ QuizLoom_An_Online_Judge includes educators, students, organizations, developers
 Figma.com
 ```
 # Project Features:
-## Project Features:
-
 1. **wwwwww:**
    - Allow 
    - Record 
