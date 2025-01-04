@@ -9,11 +9,11 @@ QuizLoom is an interactive online judge platform designed to create, manage, and
 QuizLoom_An_Online_Judge includes educators, students, organizations, developers, and event organizers who need an engaging platform for quizzes, assessments, and competitions.
 
 # Tech Stack
-## Backend
+### Backend
 - **Framework**: Laravel
   
-## Frontend
+### Frontend
 - **Framework/Library**: React with Inertia.js
 
-## Rendering Method
+### Rendering Method
 - **Client-Side Rendering (CSR)**
