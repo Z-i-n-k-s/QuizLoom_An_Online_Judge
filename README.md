@@ -81,7 +81,7 @@ Figma.com
   - Allow admins/educators to create quizzes with multiple-choice questions.
   - Enable support for different question types (e.g., single and multiple answers).
 - Set up the backend with Laravel and database schema design for quizzes, users, and results.
-- Design a basic frontend with React and Inertia.js for creating and managing quizzes.
+- Design a basic frontend with React for creating and managing quizzes.
 
 ---
 
