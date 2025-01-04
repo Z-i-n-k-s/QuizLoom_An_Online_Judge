@@ -25,36 +25,33 @@ QuizLoom_An_Online_Judge includes educators, students, organizations, developers
 Figma.com
 ```
 # Project Features:
-1. **wwwwww:**
-   - Allow 
-   - Record 
+1. **Admin Panel:**
+   - Add teachers to specific courses. 
+   - Invite teachers to join the website or enroll in specific courses.
 
-2. **MMMMM**
-   - Doctors 
-   - Users 
+2. **Student Panel**
+   - Enroll in available courses. 
+   - Access course lessons sequentially.
+   - Take quizzes at designated points in the course.
+   - View quiz results, including marks and correct answers.
 
-3. **Service**
-   - Volunteers 
-   - Organizations 
+3. **Teacher Panel**
+   - Create and manage text-based lectures or quizzes for their courses. 
+   - View student results and performance based on specific courses.
+   - Create, update, or remove courses.
+   - Manage students, including removing students from a course. 
 
-4. **Platfrom**
-   - Connect
-   - Record
-
-5. **User Authentication:**
+4. **User Authentication:**
    - Secure registration and login functionality.
 
 6. **CRUD Operations:**
-   - user profiles.
+   - Manage Courses, Exam schedules, Student records, and user profiles..
 
 7. **API Endpoints:**
+   ## Admin pannel:-
    ```plaintext
-   GET    /donations
-   POST   /donations
-   GET    /volunteers
-   POST   /volunteers
-   GET    /blood-donors
-   POST   /blood-donors
+   POST /api/admin/add-teacher
+   POST /api/admin/invite-teacher
 
 ## Team Members
 
