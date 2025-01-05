@@ -115,7 +115,7 @@ Figma.com
 | ID          | Name                   | Email                              | Role              |
 |-------------|------------------------|------------------------------------|-------------------|
 | 20200204050 | Umme Ayesha Rahman        | ummeayesha168@gmail.com | Frontend |
-| 20220104101 | Zishan Rezwan     | zishanrajoan123@gmail.com | Lead              |
+| 20220104101 | Zishan Rezwan     | zishancodes1@gmail.com | Lead              |
 | 20220104015 | Takwa Jahin Feeza  | takwafeeza84@gmail.com | Frontend          |
 | 20220104100 | Sombit Mazumder          | sombitmajumder123@gmail.com           | Backend           |
 
