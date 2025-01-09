@@ -1,10 +1,23 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import React from "react";
+import ReactDOM from "react-dom/client";
 import './index.css'
-import App from './App.jsx'
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+import {
+ 
+  RouterProvider,
+} from "react-router-dom";
+import { router } from "./Routes/Routes";
+import { ThemeProvider } from "./Shared/Navbar/ThemeContext";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+  {/* <div className="max-w-screen-xlmx-auto">
+  <RouterProvider router={router} />
+  </div> */}
+
+  <ThemeProvider>
+  <RouterProvider router={router} />
+  </ThemeProvider>
+
+  </React.StrictMode>
+);
