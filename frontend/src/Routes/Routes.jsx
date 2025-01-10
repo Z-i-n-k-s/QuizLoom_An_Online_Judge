@@ -5,6 +5,9 @@ import Teachers from "../Pages/Admin/Teachers";
 import Dashboard from "../Pages/Admin/Dashboard";
 import LandingPage from "../Pages/Shared/LandingPage/LandingPage";
 import Adminpanel from "../Pages/Admin/AdminPanel";
+import SignUp from "../Pages/Shared/signUp/SignUp";
+
+import LogIn from "../Pages/Shared/login/logIn";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +18,15 @@ export const router = createBrowserRouter([
         path: "/",
         element: <LandingPage />,
       },
+      {
+        path: "login",
+        element : <LogIn />
+    },
+    {
+        path: "sign-up",
+        element: <SignUp />
+    },
+
       {
         path: "admin-panel",
         element: <Adminpanel />,

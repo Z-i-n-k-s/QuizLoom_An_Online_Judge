@@ -23,6 +23,17 @@ const Navbar = () => {
               Admin
             </Link>
           </li>
+          <li>
+            <Link to={"/login"} className="hover:underline">
+              SignIn
+            </Link>
+          </li>
+          <li>
+            <Link to={"/sign-up"} className="hover:underline">
+              SignUp
+            </Link>
+          </li>
+          
         </ul>
       </div>
 
