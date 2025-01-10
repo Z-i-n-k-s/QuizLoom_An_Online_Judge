@@ -19,7 +19,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/teachers" className="hover:underline">
+            <Link to={"/admin-panel/dashboard"} className="hover:underline">
               Admin
             </Link>
           </li>
