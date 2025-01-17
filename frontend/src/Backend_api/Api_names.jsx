@@ -1,10 +1,10 @@
-const backendDomin = "http://127.0.0.1:8000/";
+const backendDomin = "http://127.0.0.1:8000";
 
-const callapi = {
+const Call_Api = {
     register: {
         url: `${backendDomin}/api/register`,
         method: "post",
     }
 };
 
-export default callapi;
+export default Call_Api;
