@@ -1,60 +1,61 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "./ThemeContext";
 import ReactSwitch from "react-switch"; // Import ReactSwitch
+import { ChevronLast, ChevronFirst } from "lucide-react";
+import { useSidebar } from "../../Pages/Shared/Sidebar/SideBar";
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme(); // Access theme and toggleTheme from context
+  const { expanded, setExpanded } = useSidebar(); // Access sidebar state and toggle function
 
   return (
-    <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md">
-      <div className="flex-1">
-        <a className="p-4 text-black dark:text-white text-2xl font-bold">QuizLoom</a>
-      </div>
+    <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md flex justify-between items-center p-4">
+<div>
+        {/* Sidebar Toggle Button */}
+        <button
+        onClick={() => setExpanded(!expanded)}
+        className=" p-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+      >
+        {expanded ? <ChevronFirst /> : <ChevronLast />}
+      </button>
+      <span className="text-2xl font-bold ml-10 ">QuizLoom</span>
+</div>
 
-      <div className="m-5">
-        <ul className="flex space-x-4">
-          <li>
-            <Link to="/" className="hover:underline">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link to={"/admin-panel/dashboard"} className="hover:underline">
-              Admin
-            </Link>
-          </li>
-          <li>
-            <Link to={"/login"} className="hover:underline">
-              SignIn
-            </Link>
-          </li>
-          <li>
-            <Link to={"/sign-up"} className="hover:underline">
-              SignUp
-            </Link>
-          </li>
-          
-        </ul>
-      </div>
-
-      <div className="flex-none gap-6 items-center">
-        {/* Use ReactSwitch to toggle dark/light mode */}
+      {/* Right Section */}
+      <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
         <ReactSwitch
-          checked={theme === "dark"} // Check the current theme
-          onChange={toggleTheme} // Toggle theme when switch is changed
-          offColor="#bbb" // Light mode color
-          onColor="#333" // Dark mode color
-          uncheckedIcon={false} // Optional: You can customize this
-          checkedIcon={false} // Optional: You can customize this
+          checked={theme === "dark"}
+          onChange={toggleTheme}
+          offColor="#bbb"
+          onColor="#333"
+          uncheckedIcon={false}
+          checkedIcon={false}
           className="transition-all"
         />
-        <div className="btn btn-ghost btn-circle avatar">
-          <div className="w-10 rounded-full">
-            <img
-              alt="User Avatar"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-            />
-          </div>
+
+        {/* Navigation Links */}
+        <div className="flex gap-4">
+          <Link to="/" className="hover:underline">
+            Home
+          </Link>
+          <Link to="/admin-panel/dashboard" className="hover:underline">
+            Admin
+          </Link>
+          <Link to="/login" className="hover:underline">
+            SignIn
+          </Link>
+          <Link to="/sign-up" className="hover:underline">
+            SignUp
+          </Link>
+        </div>
+
+        {/* User Avatar */}
+        <div className="w-10 h-10 rounded-full overflow-hidden">
+          <img
+            alt="User Avatar"
+            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+          />
         </div>
       </div>
     </div>

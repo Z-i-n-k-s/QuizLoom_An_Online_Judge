@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { router } from "./Routes/Routes";
 import { ThemeProvider } from "./Shared/Navbar/ThemeContext";
+import { SidebarProvider } from "./Pages/Shared/Sidebar/SideBar";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </div> */}
 
   <ThemeProvider>
-  <RouterProvider router={router} />
+  <SidebarProvider>
+        <RouterProvider router={router} />
+      </SidebarProvider>
   </ThemeProvider>
 
   </React.StrictMode>
