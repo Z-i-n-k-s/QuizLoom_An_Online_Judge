@@ -1,25 +1,25 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "./ThemeContext";
-import ReactSwitch from "react-switch"; // Import ReactSwitch
+import ReactSwitch from "react-switch"; 
 import { ChevronLast, ChevronFirst } from "lucide-react";
 import { useSidebar } from "../../Pages/Shared/Sidebar/SideBar";
 
 const Navbar = () => {
-  const { theme, toggleTheme } = useTheme(); // Access theme and toggleTheme from context
-  const { expanded, setExpanded } = useSidebar(); // Access sidebar state and toggle function
+  const { theme, toggleTheme } = useTheme(); 
+  const { expanded, setExpanded } = useSidebar(); 
 
   return (
     <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md flex justify-between items-center p-4">
-<div>
-        {/* Sidebar Toggle Button */}
-        <button
-        onClick={() => setExpanded(!expanded)}
-        className=" p-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
-      >
-        {expanded ? <ChevronFirst /> : <ChevronLast />}
-      </button>
-      <span className="text-2xl font-bold ml-10 ">QuizLoom</span>
-</div>
+  <div>
+    <button
+      onClick={() => setExpanded(!expanded)}
+      className="p-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+    >
+      {expanded ? <ChevronFirst /> : <ChevronLast />}
+    </button>
+    <span className="text-2xl font-bold ml-10">QuizLoom</span>
+  </div>
+
 
       {/* Right Section */}
       <div className="flex items-center gap-4">

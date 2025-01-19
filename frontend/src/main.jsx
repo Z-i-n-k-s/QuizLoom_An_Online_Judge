@@ -18,6 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
   <ThemeProvider>
   <SidebarProvider>
+
         <RouterProvider router={router} />
       </SidebarProvider>
   </ThemeProvider>

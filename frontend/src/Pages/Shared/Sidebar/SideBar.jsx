@@ -27,15 +27,16 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`mt-20 h-screen fixed top-0 left-0 ${expanded ? "w-64" : "w-16"} bg-white dark:bg-gray-800 dark:text-white border-r shadow-sm transition-width duration-300`}
+      className={`mt-0 h-screen fixed top-0 left-0 ${expanded ? "w-64" : "w-16"} bg-white dark:bg-gray-800 dark:text-white border-r shadow-sm transition-width duration-300 z-50`}
     >
       <nav className="h-full flex flex-col">
         <div className="p-4 pb-2 flex justify-between items-center">
-          <img
-            src="https://img.logoipsum.com/243.svg"
-            className={`overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}
-            alt="Logo"
-          />
+          {/* Replace the logo image with QuizLoom text */}
+          <div
+            className={`overflow-hidden transition-all text-xl font-bold ${expanded ? "w-auto" : "w-0"} whitespace-nowrap`}
+          >
+            QuizLoom
+          </div>
           <button
             onClick={() => setExpanded(!expanded)}
             className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
@@ -48,17 +49,17 @@ export default function Sidebar() {
           <SidebarItem
             icon={<FontAwesomeIcon icon={faClipboard} />}
             text="Dashboard"
-            to="/dashboard"
+            to="dashboard"
           />
           <SidebarItem
             icon={<FontAwesomeIcon icon={faChalkboardUser} />}
             text="Teachers"
-            to="/teachers"
+            to="teachers"
           />
           <SidebarItem
             icon={<FontAwesomeIcon icon={faRightFromBracket} />}
             text="Logout"
-            to="/logout"
+            to="logout"
           />
         </ul>
       </nav>
@@ -70,9 +71,7 @@ function SidebarItem({ icon, text, to }) {
   const { expanded } = useSidebar();
 
   return (
-    <li
-      className="relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group hover:bg-gray-800 hover:text-gray-200 text-gray-600 dark:hover:bg-gray-700 dark:text-gray-300"
-    >
+    <li className="relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-all group hover:bg-gray-800 hover:text-gray-200 text-gray-600 dark:hover:bg-gray-700 dark:text-gray-300">
       <Link to={to} className="flex items-center gap-3 w-full">
         {icon}
         <span
