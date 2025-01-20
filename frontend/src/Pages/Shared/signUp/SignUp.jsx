@@ -1,8 +1,9 @@
 import { useState } from "react";
-import axios from "axios";
+
 import bgImage1 from "../../../assets/signup.webp";
 import { Link } from "react-router-dom";
-import Call_Api from "../../../Backend_api/Api_names";
+
+import apiClient from "../../../api/Api";
 
 const SignUp = () => {
   const [data, setData] = useState({
@@ -29,23 +30,16 @@ const SignUp = () => {
     }
 
     try {
-      const response = await axios({
-        url: Call_Api.register.url,
-        method: Call_Api.register.method,
-        data: {
-          email: data.email,
-          password: data.password,
-          password_confirmation: data.confirmPassword,
-          name: data.name,
-        },
+      const response = await apiClient.register({
+        email: data.email,
+        password: data.password,
+        password_confirmation: data.confirmPassword,
+        name: data.name,
       });
 
-      console.log("Registration Successful", response.data);
+      console.log("Registration Successful", response);
     } catch (error) {
-      console.error(
-        "Error during registration",
-        error.response?.data || error.message
-      );
+      console.error("Error during registration", error);
     }
   };
 

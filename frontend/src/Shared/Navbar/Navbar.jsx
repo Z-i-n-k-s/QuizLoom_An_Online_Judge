@@ -8,7 +8,7 @@ const Navbar = () => {
   return (
     <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md">
       <div className="flex-1">
-        <a className="p-4 text-black dark:text-white text-2xl font-bold">QuizLoom</a>
+        <a className="p-4 text-black dark:text-white text-2xl font-bold ml-12">QuizLoom</a>
       </div>
 
       <div className="m-5">
@@ -33,7 +33,11 @@ const Navbar = () => {
               SignUp
             </Link>
           </li>
-          
+          <li>
+            <Link to={"/student-panel/dashboard"} className="hover:underline">
+              Student
+            </Link>
+          </li>
         </ul>
       </div>
 
