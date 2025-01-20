@@ -1,9 +1,10 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "../Shared/Sidebar/SideBar";
+import Sidebar, { SidebarProvider } from "../Shared/Sidebar/AdminSidebar";
 
 
 const AdminPanel = () => {
   return (
+    <SidebarProvider>
     <div className="flex h-screen">
       {/* Sidebar */}
       <Sidebar />
@@ -13,6 +14,7 @@ const AdminPanel = () => {
         <Outlet />
       </div>
     </div>
+    </SidebarProvider>
   );
 };
 
