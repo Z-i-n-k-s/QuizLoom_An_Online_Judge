@@ -1,23 +1,21 @@
 
 import { Outlet } from 'react-router-dom';
+import Sidebar2, { SidebarProvider2 } from '../Shared/Sidebar/TeacherSidebar';
 
-import  { SidebarProvider1 } from '../Shared/Sidebar/StudentSidebar';
-import Sidebar1 from '../Shared/Sidebar/StudentSidebar';
-
-const StudentPanel = () => {
+const TeacherPanel = () => {
     return (
-        <SidebarProvider1>
+        <SidebarProvider2>
         <div className="flex h-screen">
           {/* Sidebar */}
          
-    <Sidebar1 />
+    <Sidebar2 />
           {/* Main Content */}
           <div className="flex-1 ml-6 p-5 bg-gray-200 dark:bg-gray-900">
-            <Outlet />
+            <Outlet/>
           </div>
         </div>
-        </SidebarProvider1>
+        </SidebarProvider2>
       );
 }
 
-export default StudentPanel
+export default TeacherPanel

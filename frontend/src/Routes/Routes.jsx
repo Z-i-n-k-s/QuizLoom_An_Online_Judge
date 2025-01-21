@@ -9,6 +9,17 @@ import SignUp from "../Pages/Shared/signUp/SignUp";
 
 import LogIn from "../Pages/Shared/login/logIn";
 import StudentPanel from "../Pages/Student/StudentPanel";
+import StudentDashboard from "../Pages/Student/StudentDashboard";
+import MyCourses from "../Pages/Student/MyCourses";
+import Results from "../Pages/Student/Results";
+import Exams from "../Pages/Student/Exams";
+import Announcements from "../Pages/Student/Announcements";
+import TeacherPanel from "../Pages/Teacher/TeacherPanel";
+import Students from "../Pages/Teacher/Students";
+import Courses from "../Pages/Teacher/Courses";
+import TeacherExams from "../Pages/Teacher/TeacherExams";
+import TeacherResult from "../Pages/Teacher/TeacherResult";
+import TeacherAnnouncement from "../Pages/Teacher/TeacherAnnouncement";
 
 export const router = createBrowserRouter([
   {
@@ -21,12 +32,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "login",
-        element : <LogIn />
-    },
-    {
+        element: <LogIn />
+      },
+      {
         path: "sign-up",
         element: <SignUp />
-    },
+      },
 
       {
         path: "admin-panel",
@@ -47,12 +58,54 @@ export const router = createBrowserRouter([
         element: <StudentPanel />,
         children: [
           {
-            path: "dashboard",
-            element: <Dashboard />,
+            path: "student-dashboard",
+            element: <StudentDashboard />,
           },
           {
-            path: "teachers",
-            element: <Teachers />,
+            path: "my-courses",
+            element: <MyCourses />,
+          },
+          {
+            path: "exams",
+            element: <Exams />,
+          },
+          {
+            path: "results",
+            element: <Results />,
+          },
+          {
+            path: "announcements",
+            element: <Announcements />,
+          },
+        ],
+      },
+      {
+        path: "teacher-panel",
+        element: <TeacherPanel />,
+        children: [
+          {
+            path: "teacher-dashboard",
+            element: <StudentDashboard />,
+          },
+          {
+            path: "students",
+            element: <Students />,
+          },
+          {
+            path: "teachers-courses",
+            element: <Courses />,
+          },
+          {
+            path: "teachers-exams",
+            element: <TeacherExams />,
+          },
+          {
+            path: "teachers-results",
+            element: <TeacherResult />,
+          },
+          {
+            path: "teachers-announcements",
+            element: <TeacherAnnouncement />,
           },
         ],
       },

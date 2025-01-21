@@ -2,13 +2,13 @@ import { useContext, createContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboard } from "@fortawesome/free-regular-svg-icons";
-import { faBullhorn,  faChalkboardUser,  faPenToSquare,  faTrophy } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn,  faChalkboardUser,  faPenToSquare,  faTrophy, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
 import { ChevronFirst, ChevronLast } from "lucide-react";
 import PropTypes from "prop-types";
 
 const SidebarContext = createContext();
 
-export function SidebarProvider1({ children }) {
+export function SidebarProvider2({ children }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -18,12 +18,12 @@ export function SidebarProvider1({ children }) {
   );
 }
 
-export function useSidebar1() {
+export function useSidebar2() {
   return useContext(SidebarContext);
 }
 
-export default function Sidebar1() {
-  const { expanded, setExpanded } = useSidebar1();
+export default function Sidebar2() {
+  const { expanded, setExpanded } = useSidebar2();
 
   return (
     <div className="relative">
@@ -58,30 +58,35 @@ export default function Sidebar1() {
           </div>
 
           <ul className="flex-1 px-3 space-y-4">
-            <SidebarItem1
+            <SidebarItem2
               icon={<FontAwesomeIcon icon={faClipboard} />}
               text="Dashboard"
-              to="student-dashboard"
+              to="teacher-dashboard"
             />
-            <SidebarItem1
+            <SidebarItem2
+              icon={<FontAwesomeIcon icon={faUserGraduate} />}
+              text="Students"
+              to="students"
+            />
+            <SidebarItem2
               icon={<FontAwesomeIcon icon={faChalkboardUser} />}
-              text="My Courses"
-              to="my-courses"
+              text="Courses"
+              to="teachers-courses"
             />
-            <SidebarItem1
+            <SidebarItem2
               icon={<FontAwesomeIcon icon={faPenToSquare} />}
               text="Exams"
-              to="exams"
+              to="teachers-exams"
             />
-            <SidebarItem1
+            <SidebarItem2
               icon={<FontAwesomeIcon icon={faTrophy} />}
               text="Results"
-              to="results"
+              to="teachers-results"
             />
-            <SidebarItem1
+            <SidebarItem2
               icon={<FontAwesomeIcon icon={faBullhorn} />}
               text="Announcements"
-              to="announcements"
+              to="teachers-announcements"
             />
           </ul>
         </nav>
@@ -90,13 +95,13 @@ export default function Sidebar1() {
   );
 }
 
-function SidebarItem1({ icon, text, to }) {
-  const { expanded, setExpanded } = useSidebar1();
+function SidebarItem2({ icon, text, to }) {
+  const { expanded, setExpanded } = useSidebar2();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Normalize paths to ensure consistent comparison
-  const normalizePath = (path) => (path.startsWith("/") ? path : `/student-panel/${path}`);
+  const normalizePath = (path) => (path.startsWith("/") ? path : `/teacher-panel/${path}`);
   const isActive = normalizePath(location.pathname) === normalizePath(to);
 
   const handleClick = () => {
@@ -154,12 +159,12 @@ function SidebarItem1({ icon, text, to }) {
   );
 }
 
-SidebarItem1.propTypes = {
+SidebarItem2.propTypes = {
   icon: PropTypes.node.isRequired,
   text: PropTypes.string.isRequired,
   to: PropTypes.string.isRequired,
 };
 
-SidebarProvider1.propTypes = {
+SidebarProvider2.propTypes = {
   children: PropTypes.node.isRequired,
 };
