@@ -19,18 +19,13 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
+            <Link to="/aboutus" className="hover:underline">
+              About Us
+            </Link>
+          </li>
+          <li>
             <Link to={"/admin-panel/dashboard"} className="hover:underline">
               Admin
-            </Link>
-          </li>
-          <li>
-            <Link to={"/login"} className="hover:underline">
-              SignIn
-            </Link>
-          </li>
-          <li>
-            <Link to={"/sign-up"} className="hover:underline">
-              SignUp
             </Link>
           </li>
           <li>
@@ -49,12 +44,12 @@ const Navbar = () => {
       <div className="flex-none gap-6 items-center">
         {/* Use ReactSwitch to toggle dark/light mode */}
         <ReactSwitch
-          checked={theme === "dark"} // Check the current theme
-          onChange={toggleTheme} // Toggle theme when switch is changed
-          offColor="#bbb" // Light mode color
-          onColor="#333" // Dark mode color
-          uncheckedIcon={false} // Optional: You can customize this
-          checkedIcon={false} // Optional: You can customize this
+          checked={theme === "dark"} 
+          onChange={toggleTheme} 
+          offColor="#bbb" 
+          onColor="#333" 
+          uncheckedIcon={false} 
+          checkedIcon={false} 
           className="transition-all"
         />
         <div className="btn btn-ghost btn-circle avatar">
@@ -65,6 +60,11 @@ const Navbar = () => {
             />
           </div>
         </div>
+      
+            <Link to={"/login"} className="hover:underline btn">
+              SignIn
+            </Link>
+        
       </div>
     </div>
   );
