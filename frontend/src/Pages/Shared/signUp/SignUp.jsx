@@ -17,7 +17,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false); // State for loader
   const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Initialize navigate
+ 
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
