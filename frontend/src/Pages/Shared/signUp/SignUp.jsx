@@ -1,8 +1,7 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import bgImage1 from "../../../assets/signup.webp";
 import { Link } from "react-router-dom";
-
 import apiClient from "../../../api/Api";
 
 const SignUp = () => {
@@ -12,6 +11,8 @@ const SignUp = () => {
     name: "",
     confirmPassword: "",
   });
+
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +39,9 @@ const SignUp = () => {
       });
 
       console.log("Registration Successful", response);
+
+      // Navigate to the landing page
+      navigate("/landing-page"); // Replace "/landing-page" with your actual route
     } catch (error) {
       console.error("Error during registration", error);
     }
@@ -68,10 +72,7 @@ const SignUp = () => {
         <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
           Sign Up
         </h2>
-        <form
-          className="w-3/4 max-w-sm"
-          onSubmit={handleSubmit}
-        >
+        <form className="w-3/4 max-w-sm" onSubmit={handleSubmit}>
           {[
             { name: "name", type: "text", placeholder: "Enter your name", label: "UserName" },
             { name: "email", type: "email", placeholder: "Enter your email", label: "Email" },
@@ -107,7 +108,7 @@ const SignUp = () => {
 
           <div className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">
             Already have an account?{" "}
-            <Link to="/sign-in" className="text-blue-500 hover:underline">
+            <Link to="/login" className="text-blue-500 hover:underline">
               Sign In
             </Link>
           </div>

@@ -1,14 +1,16 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import bgImage1 from "../../../assets/login.webp";
 import { Link } from "react-router-dom";
 import apiClient from "../../../api/Api";
-
+import Swal from "sweetalert2"; 
 const LogIn = () => {
   const [data, setData] = useState({
     email: "",
     password: "",
   });
-  console.log(data);
+  const navigate = useNavigate(); 
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setData((prev) => ({
@@ -26,9 +28,38 @@ const LogIn = () => {
         password: data.password,
       });
 
-      console.log("login Successful", response);
+      console.log("Login Successful", response);
+
+      // Display success message with Swal
+      Swal.fire({
+        title: "Welcome back!",
+        showClass: {
+          popup: `
+            animate__animated
+            animate__fadeInUp
+            animate__faster
+          `,
+        },
+        hideClass: {
+          popup: `
+            animate__animated
+            animate__fadeOutDown
+            animate__faster
+          `,
+        },
+      });
+
+      // Navigate to the homepage after successful login
+      navigate("/");
     } catch (error) {
       console.error("Error during login", error);
+
+      // Display error message with Swal
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error.message || "Please check your credentials and try again.",
+      });
     }
   };
 
