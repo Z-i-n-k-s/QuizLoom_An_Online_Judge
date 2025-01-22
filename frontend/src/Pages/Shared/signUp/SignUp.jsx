@@ -1,6 +1,8 @@
 import { useState } from "react";
+
 import bgImage1 from "../../../assets/signup.webp";
 import { Link, useNavigate } from "react-router-dom";
+
 import apiClient from "../../../api/Api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,6 +16,8 @@ const SignUp = () => {
   });
   const [loading, setLoading] = useState(false); // State for loader
   const navigate = useNavigate();
+
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -49,6 +53,7 @@ const SignUp = () => {
           navigate("/student-panel/student-dashboard");
         }, 1000); 
       }
+
     } catch (error) {
       console.error("Error during registration", error);
       toast.error("Registration failed. Please try again.");
@@ -82,6 +87,7 @@ const SignUp = () => {
         <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
           Sign Up
         </h2>
+
 
         {loading ? (
           <div className="flex flex-col items-center">
@@ -118,6 +124,7 @@ const SignUp = () => {
               <button
                 type="submit"
                 className="w-full bg-blue-800 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-800"
+
               >
                 Sign Up
               </button>
@@ -144,8 +151,10 @@ const SignUp = () => {
             >
               Sign in with Google
             </button>
+
           </form>
         )}
+
 
         {/* Toast Container */}
         <ToastContainer position="top-center" autoClose={2000} />
