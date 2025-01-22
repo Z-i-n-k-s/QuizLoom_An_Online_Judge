@@ -1,6 +1,8 @@
 import { useState } from "react";
 import bgImage1 from "../../../assets/login.webp";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import apiClient from "../../../api/Api";
 
 const LogIn = () => {
@@ -8,7 +10,8 @@ const LogIn = () => {
     email: "",
     password: "",
   });
-  console.log(data);
+  const [loading, setLoading] = useState(false);
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setData((prev) => ({
@@ -17,23 +20,70 @@ const LogIn = () => {
     }));
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await apiClient.login({
         email: data.email,
         password: data.password,
       });
+      
+      if (response.success) {
+        console.log("login Successful", response);
+        const { role, name } = response.user_info; 
+        console.log("Role:", role);
+        console.log("Name:", name);
+        
 
-      console.log("login Successful", response);
+        switch (role) {
+          case "admin":
+            toast.success(`Welcome to admin panel`);
+            setTimeout(() => {
+              navigate("/admin-panel/dashboard");
+            }, 1000); 
+            
+            break;
+          case "teacher":
+            toast.success(`Welcome to teacher panel`);
+            setTimeout(() => {
+              navigate("/teacher-panel/teacher-dashboard");
+            }, 1000); 
+            
+            break;
+          case "student":
+            toast.success(`Welcome to student panel`);
+            setTimeout(() => {
+              navigate("/student-panel/student-dashboard");
+            }, 1000); 
+            
+            break;
+          default:
+            console.error("Invalid role");
+        }
+      }else{
+        console.log("login failed", response);
+        const errorMessage = response.message || "wrong!";
+        toast.error(errorMessage, { position: "top-center" });
+      }
     } catch (error) {
-      console.error("Error during login", error);
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong!";
+      toast.error(errorMessage, { position: "top-center" });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex h-screen">
+      {/* Toast Container */}
+      
+      <ToastContainer position="top-center" autoClose={2000} />
+
       {/* Left Section */}
       <div
         className="w-1/2 bg-cover bg-center"
@@ -49,7 +99,12 @@ const LogIn = () => {
       </div>
 
       {/* Right Section */}
-      <div className="w-1/2 flex flex-col justify-center items-center bg-white dark:bg-gray-900">
+      <div className="w-1/2 flex flex-col justify-center items-center bg-white dark:bg-gray-900 relative">
+        {loading && (
+          <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10">
+            <div className="loader border-t-4 border-b-4 border-blue-500 w-12 h-12 rounded-full animate-spin"></div>
+          </div>
+        )}
         <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
           Sign In
         </h2>
