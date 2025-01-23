@@ -9,6 +9,8 @@ const WhyQL = () => {
  --- Why QuizLoom?? ---
 </h1>
 </div>
+
+
         </section>
     )
 }
