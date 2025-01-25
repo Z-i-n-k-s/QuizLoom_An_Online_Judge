@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\TokenController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TestQueryController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,5 +19,10 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/refresh-token', [TokenController::class, 'refresh']);
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1'); // Limit to 5 attempts per minute
+
+Route::get('/logout', [AuthController::class, 'logout']);
+
+Route::get('/test-reports', [TestQueryController::class, 'index']);

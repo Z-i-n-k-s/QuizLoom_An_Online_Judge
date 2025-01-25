@@ -6,9 +6,9 @@ const ThemeContext = createContext(null);
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState("light");
 
-    // Apply the theme to the `body` element
+
     useEffect(() => {
-        document.documentElement.className = theme; // Apply the theme to the root HTML element
+        document.documentElement.className = theme; 
     }, [theme]);
 
     const toggleTheme = () => {

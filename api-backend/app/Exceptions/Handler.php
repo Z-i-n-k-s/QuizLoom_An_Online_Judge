@@ -35,7 +35,18 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+    public function render($request, Throwable $exception)
+    {
+      //  error_log($exception);
+        $message = $exception->getMessage();
 
+        return response()->json([
+            'success' => false,
+            'error'=>true,
+            'message' => $message,
+            'exception' => (string) $exception
+        ], 200);
+    }
     /**
      * Register the exception handling callbacks for the application.
      *

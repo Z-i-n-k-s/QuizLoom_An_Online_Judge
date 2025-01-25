@@ -8,7 +8,7 @@ const Navbar = () => {
   return (
     <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md">
       <div className="flex-1">
-        <a className="p-4 text-black dark:text-white text-2xl font-bold">QuizLoom</a>
+        <a className="p-4 text-black dark:text-white text-2xl font-bold ml-12">QuizLoom</a>
       </div>
 
       <div className="m-5">
@@ -19,33 +19,37 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
+            <Link to="/aboutus" className="hover:underline">
+              About Us
+            </Link>
+          </li>
+          <li>
             <Link to={"/admin-panel/dashboard"} className="hover:underline">
               Admin
             </Link>
           </li>
           <li>
-            <Link to={"/login"} className="hover:underline">
-              SignIn
+            <Link to={"/student-panel/student-dashboard"} className="hover:underline">
+              Student
             </Link>
           </li>
           <li>
-            <Link to={"/sign-up"} className="hover:underline">
-              SignUp
+            <Link to={"/teacher-panel/teacher-dashboard"} className="hover:underline">
+              Teacher
             </Link>
           </li>
-          
         </ul>
       </div>
 
       <div className="flex-none gap-6 items-center">
         {/* Use ReactSwitch to toggle dark/light mode */}
         <ReactSwitch
-          checked={theme === "dark"} // Check the current theme
-          onChange={toggleTheme} // Toggle theme when switch is changed
-          offColor="#bbb" // Light mode color
-          onColor="#333" // Dark mode color
-          uncheckedIcon={false} // Optional: You can customize this
-          checkedIcon={false} // Optional: You can customize this
+          checked={theme === "dark"} 
+          onChange={toggleTheme} 
+          offColor="#bbb" 
+          onColor="#333" 
+          uncheckedIcon={false} 
+          checkedIcon={false} 
           className="transition-all"
         />
         <div className="btn btn-ghost btn-circle avatar">
@@ -56,6 +60,11 @@ const Navbar = () => {
             />
           </div>
         </div>
+      
+            <Link to={"/login"} className="hover:underline btn">
+              SignIn
+            </Link>
+        
       </div>
     </div>
   );

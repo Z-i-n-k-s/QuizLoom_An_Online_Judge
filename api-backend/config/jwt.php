@@ -11,8 +11,11 @@
 
 return [
 
-    'ttl' => env('JWT_TTL', 20), // Default to 60 if not set in .env
-    'refresh_ttl' => env('JWT_REFRESH_TTL', 360), // Default to 14 days if not set in .env
+    // Access Token TTL
+    'ttl' => env('JWT_TTL', 30), // Default to 30 minutes
+
+    // Refresh Token TTL (You can use a custom claim for this)
+    'refresh_ttl' => env('JWT_REFRESH_TTL', 300), // 5 hours = 300 minutes
 
 
     /*
@@ -105,7 +108,7 @@ return [
     |
     */
 
-    'ttl' => env('JWT_TTL', 60),
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -124,7 +127,7 @@ return [
     |
     */
 
-    'refresh_ttl' => env('JWT_REFRESH_TTL', 20160),
+    
 
     /*
     |--------------------------------------------------------------------------

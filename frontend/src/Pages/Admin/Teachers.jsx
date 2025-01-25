@@ -1,16 +1,9 @@
-// import { Link } from "react-router-dom";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faClipboard } from "@fortawesome/free-regular-svg-icons";
-// import { faChalkboardUser, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 const Teachers = () => {
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       
-
-
-      {/* Right part */}
-      <div className="ml-[1%] w-full p-10 bg-gray-100 dark:bg-gray-900">
+      <div className=" w-full p-10 bg-gray-100 dark:bg-gray-900">
         <div className="flex items-center justify-between mt-16">
           <h1 className="text-3xl font-bold mb-6">Teachers</h1>
           <button className="px-4 py-2 bg-blue-900 text-white dark:bg-blue-400 dark:text-black rounded-md">
