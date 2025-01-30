@@ -5,7 +5,6 @@ import Dashboard from "../Pages/Admin/Dashboard";
 import LandingPage from "../Pages/Shared/LandingPage/LandingPage";
 import Adminpanel from "../Pages/Admin/AdminPanel";
 import SignUp from "../Pages/Shared/signUp/SignUp";
-
 import LogIn from "../Pages/Shared/login/logIn";
 import StudentPanel from "../Pages/Student/StudentPanel";
 import StudentDashboard from "../Pages/Student/StudentDashboard";
@@ -16,11 +15,11 @@ import Announcements from "../Pages/Student/Announcements";
 import TeacherPanel from "../Pages/Teacher/TeacherPanel";
 import Students from "../Pages/Teacher/Students";
 import Courses from "../Pages/Teacher/Courses";
+import ViewCourse from "../Pages/Teacher/viewCourse/ViewCourse"; // Import ViewCourse component
 import TeacherExams from "../Pages/Teacher/TeacherExams";
 import TeacherResult from "../Pages/Teacher/TeacherResult";
 import TeacherAnnouncement from "../Pages/Teacher/TeacherAnnouncement";
 import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
-
 
 export const router = createBrowserRouter([
   {
@@ -31,22 +30,18 @@ export const router = createBrowserRouter([
         path: "/",
         element: <LandingPage />,
       },
-
       {
-        path:"aboutus",
-        element:<AboutUs></AboutUs>
-
+        path: "aboutus",
+        element: <AboutUs />,
       },
-  
       {
         path: "login",
-        element: <LogIn />
+        element: <LogIn />,
       },
       {
         path: "sign-up",
-        element: <SignUp />
+        element: <SignUp />,
       },
-
       {
         path: "admin-panel",
         element: <Adminpanel />,
@@ -102,6 +97,10 @@ export const router = createBrowserRouter([
           {
             path: "teachers-courses",
             element: <Courses />,
+          },
+          {
+            path: "teachers-courses/:id", 
+            element: <ViewCourse />,
           },
           {
             path: "teachers-exams",
