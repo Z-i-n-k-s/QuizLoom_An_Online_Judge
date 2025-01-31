@@ -18,21 +18,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validate the incoming request data
-        $validator = Validator($request->all(), [
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:4|confirmed',
-            'name' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'error' => true,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422); // 422 Unprocessable Entity status code
-        }
+       
 
         $validated = $request->validate([
             'email' => 'required|email|unique:users,email',
@@ -43,7 +29,7 @@ class AuthController extends Controller
         // Pass validated data to the AuthService for registration
         $user = $this->authService->register($validated);
 
-        // $token = JWTAuth::fromUser($user);
+        
 
         // Generate Access Token (30 minutes as per config)
         $accessToken = JWTAuth::customClaims(['type' => 'access'])->fromUser($user);
@@ -56,7 +42,7 @@ class AuthController extends Controller
 
         $cookieOptions = [
             'httpOnly' => true,
-            'secure' => false, // (set to false for local testing if not using HTTPS)
+            'secure' => true, // (set to false for local testing if not using HTTPS)
             'sameSite' => 'Strict',
         ];
 
