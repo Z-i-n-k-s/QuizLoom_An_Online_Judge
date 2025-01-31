@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\TestQueryController;
 
 use Illuminate\Support\Facades\Route;
@@ -26,3 +28,24 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,
 Route::get('/logout', [AuthController::class, 'logout']);
 
 Route::get('/test-reports', [TestQueryController::class, 'index']);
+
+Route::get('/courses', [CourseController::class, 'index']);
+Route::get('/courses/{id}', [CourseController::class, 'show']);
+Route::post('/courses', [CourseController::class, 'store']);
+Route::put('/courses/{id}', [CourseController::class, 'update']);
+Route::delete('/courses/{id}', [CourseController::class, 'destroy']);
+
+Route::post('/courses/{courseId}/lectures', [CourseController::class, 'addLecture']);
+Route::put('/lectures/{lectureId}', [CourseController::class, 'updateLecture']);
+Route::delete('/lectures/{lectureId}', [CourseController::class, 'deleteLecture']);
+
+
+Route::get('/exams', [ExamController::class, 'index']);
+Route::get('/exams/{id}', [ExamController::class, 'show']);
+Route::post('/exams', [ExamController::class, 'store']);
+Route::put('/exams/{id}', [ExamController::class, 'update']);
+Route::delete('/exams/{id}', [ExamController::class, 'destroy']);
+
+Route::post('/exams/{examId}/questions', [ExamController::class, 'addQuestion']);
+Route::put('/questions/{questionId}', [ExamController::class, 'updateQuestion']);
+Route::delete('/questions/{questionId}', [ExamController::class, 'deleteQuestion']);

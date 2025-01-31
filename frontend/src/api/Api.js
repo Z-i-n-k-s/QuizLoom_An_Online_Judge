@@ -7,24 +7,22 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true, // Ensure cookies are included in requests
     });
   }
 
- 
-
   async register(userData) {
     try {
-      const response = await this.client.post('api/register', userData);
+      const response = await this.client.post('/api/register', userData);
       return response.data;
     } catch (error) {
-      return error.response?.data || error.message;
+      throw error.response?.data || error.message;
     }
   }
 
   async login(credentials) {
     try {
-      const response = await this.client.post('api/login', credentials);
-      
+      const response = await this.client.post('/api/login', credentials);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -33,8 +31,10 @@ class ApiClient {
 
   async logout() {
     try {
+
       const response = await this.client.get('api/logout');
      
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
