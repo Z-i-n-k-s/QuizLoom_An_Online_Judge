@@ -31,7 +31,10 @@ class ApiClient {
 
   async logout() {
     try {
-      const response = await this.client.post('/api/logout');
+
+      const response = await this.client.get('api/logout');
+     
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
