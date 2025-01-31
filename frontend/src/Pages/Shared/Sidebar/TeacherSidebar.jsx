@@ -2,7 +2,7 @@ import { useContext, createContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboard } from "@fortawesome/free-regular-svg-icons";
-import { faBullhorn,  faChalkboardUser,  faPenToSquare,  faTrophy, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn,  faChalkboardUser,  faPenToSquare,  faRightFromBracket,  faTrophy, faUserGraduate } from "@fortawesome/free-solid-svg-icons";
 import { ChevronFirst, ChevronLast } from "lucide-react";
 import PropTypes from "prop-types";
 
@@ -87,6 +87,11 @@ export default function Sidebar2() {
               icon={<FontAwesomeIcon icon={faBullhorn} />}
               text="Announcements"
               to="teachers-announcements"
+            />
+            <SidebarItem2
+              icon={<FontAwesomeIcon icon={faRightFromBracket} />}
+              text="Logout"
+              to="teacher-logout"
             />
           </ul>
         </nav>

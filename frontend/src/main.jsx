@@ -12,7 +12,7 @@ import { AuthProvider } from "./Shared/AuthContext/AuthContext";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <ThemeProvider> {/* Wrap your app with ThemeProvider */}
+      <ThemeProvider> 
         <RouterProvider router={router} />
       </ThemeProvider>
     </AuthProvider>

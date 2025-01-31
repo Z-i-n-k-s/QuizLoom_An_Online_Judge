@@ -20,6 +20,8 @@ import TeacherExams from "../Pages/Teacher/TeacherExams";
 import TeacherResult from "../Pages/Teacher/TeacherResult";
 import TeacherAnnouncement from "../Pages/Teacher/TeacherAnnouncement";
 import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
+import LogOut from "../Pages/Shared/logout/Logout";
+
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +44,7 @@ export const router = createBrowserRouter([
         path: "sign-up",
         element: <SignUp />,
       },
+      
       {
         path: "admin-panel",
         element: <Adminpanel />,
@@ -53,6 +56,10 @@ export const router = createBrowserRouter([
           {
             path: "teachers",
             element: <Teachers />,
+          },
+          {
+            path: "admin-logout",
+            element: <LogOut/>,
           },
         ],
       },
@@ -79,6 +86,10 @@ export const router = createBrowserRouter([
           {
             path: "announcements",
             element: <Announcements />,
+          },
+          {
+            path: "student-logout",
+            element: <LogOut/>,
           },
         ],
       },
@@ -113,6 +124,10 @@ export const router = createBrowserRouter([
           {
             path: "teachers-announcements",
             element: <TeacherAnnouncement />,
+          },
+          {
+            path: "teacher-logout",
+            element: <LogOut/>,
           },
         ],
       },

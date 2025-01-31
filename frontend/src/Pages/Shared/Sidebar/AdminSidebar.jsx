@@ -76,7 +76,7 @@ export default function Sidebar() {
             <SidebarItem
               icon={<FontAwesomeIcon icon={faRightFromBracket} />}
               text="Logout"
-              to="logout"
+              to="admin-logout"
             />
           </ul>
         </nav>
