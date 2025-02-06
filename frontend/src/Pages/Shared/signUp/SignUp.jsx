@@ -47,7 +47,7 @@ const SignUp = () => {
       });
 
       if (response.success) {
-        console.log("Registration Successful", response);
+      
         toast.success("Registration Successful!");
         setTimeout(() => {
           navigate("/student-panel/student-dashboard");
@@ -132,7 +132,7 @@ const SignUp = () => {
 
             <div className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">
               Already have an account?{" "}
-              <Link to="/sign-in" className="text-blue-500 hover:underline">
+              <Link to="/login" className="text-blue-500 hover:underline">
                 Sign In
               </Link>
             </div>

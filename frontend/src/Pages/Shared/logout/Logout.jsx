@@ -8,17 +8,21 @@ import apiClient from "../../../api/Api";
 const LogOut = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const handleLogout = async () => {
+      if (isLoggingOut) return; // Prevent multiple calls
+
+      setIsLoggingOut(true);
       try {
         setLoading(true); // Show the loader
         const response = await apiClient.logout();
 
         if (response?.success) {
-            console.log("Logout Successful", response);
-          toast.success("Logged out successfully",{ position: "top-center" });
-          setTimeout(() => {
+          
+          toast.success("Logged out successfully", { toastId: "logoutSuccess" });
+            setTimeout(() => {
             navigate("/");
           }, 1000);
         } else {
@@ -34,7 +38,7 @@ const LogOut = () => {
     };
 
     handleLogout();
-  }, [navigate]);
+  },  [navigate, isLoggingOut]);
 
   return (
     <>

@@ -36,10 +36,8 @@ const LogIn = () => {
       });
       
       if (response.success) {
-        console.log("login Successful", response);
-        const { role, name } = response.user_info; 
-        console.log("Role:", role);
-        console.log("Name:", name);
+        
+        const { role } = response.user_info; 
         
 
 

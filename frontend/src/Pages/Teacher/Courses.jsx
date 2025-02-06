@@ -172,13 +172,13 @@ const Courses = () => {
         <table className="table w-full border rounded-lg mb-20">
           <thead>
             <tr className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white">
-              <th className="px-4 py-2">Sl No</th>
-              <th className="px-4 py-2">Course Name</th>
-              <th className="px-4 py-2">Total Enroll</th>
-              <th className="px-4 py-2">Number of Lectures</th>
-              <th className="px-4 py-2">Course Duration</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Actions</th>
+              <th className="px-4 py-2 text-center">Sl No</th>
+              <th className="px-4 py-2 text-center">Course Name</th>
+              <th className="px-4 py-2 text-center">Total Enroll</th>
+              <th className="px-4 py-2 text-center">Number of Lectures</th>
+              <th className="px-4 py-2 text-center">Course Duration</th>
+              <th className="px-4 py-2 text-center">Status</th>
+              <th className="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>

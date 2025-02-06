@@ -21,6 +21,7 @@ import TeacherResult from "../Pages/Teacher/TeacherResult";
 import TeacherAnnouncement from "../Pages/Teacher/TeacherAnnouncement";
 import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
 import LogOut from "../Pages/Shared/logout/Logout";
+import TeacherDashboard from "../Pages/Teacher/TeacherDashboard";
 
 
 export const router = createBrowserRouter([
@@ -99,7 +100,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "teacher-dashboard",
-            element: <StudentDashboard />,
+            element: <TeacherDashboard />,
           },
           {
             path: "students",

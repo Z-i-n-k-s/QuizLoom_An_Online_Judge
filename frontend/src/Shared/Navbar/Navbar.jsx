@@ -19,14 +19,10 @@ const Navbar = () => {
       </div>
 
       <div className="flex-none gap-6 items-center">
-        {/* Show Home and About Us links only when logged out and on the Home page */}
+        {/* Show  About Us links only when logged out and on the Home page */}
         {!user && isHomePage && (
           <ul className="flex space-x-4">
-            <li>
-              <Link to="/" className="hover:underline">
-                Home
-              </Link>
-            </li>
+            
             <li>
               <Link to="/aboutus" className="hover:underline">
                 About Us
