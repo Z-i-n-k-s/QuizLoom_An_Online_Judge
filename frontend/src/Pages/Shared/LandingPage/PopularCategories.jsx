@@ -74,7 +74,7 @@ const PopularCourses = () => {
     <section className="bg-white dark:bg-gray-800">
       <div className="container mx-auto pb-14 pt-16 text-center">
        {/* Section Title */}
-<h1 className="text-4xl font-bold pb-10 border-b-2 border-secondary inline-block py-4 mb-8 dark:text-secondary">
+<h1 className="text-4xl font-bold pb-10 border-b-2 border-btnbg dark:border-secondary inline-block py-4 mb-8 dark:text-secondary">
  --- Popular Categories ---
 </h1>
 
@@ -91,7 +91,7 @@ const PopularCourses = () => {
            className="bg-gray-100 rounded-2xl flex flex-col gap-4 items-center justify-center p-4 py-7 hover:bg-gray-300 hover:scale-110 duration-300  dark:bg-gray-600 dark:hover:shadow-xl dark:hover:shadow-gray-500"
          >
            {/* Icon */}
-           <div className="text-4xl text-secondary mb-4">{course.icon}</div>
+           <div className="text-4xl text-btnbg mb-4 dark:text-secondary">{course.icon}</div>
          
            {/* Title */}
            <h1 className="text-lg font-semibold text-center">{course.title}</h1>

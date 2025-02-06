@@ -42,7 +42,7 @@ const Announcements = () => {
                 </td>
                 <td className="p-7">
                   <div className="bg-blue-100 text-black py-2 px-2 rounded-lg">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
                   </div>
                 </td>
               </tr>
@@ -66,7 +66,7 @@ const Announcements = () => {
                 </td>
                 <td className="p-7">
                   <div className="bg-blue-100 text-black py-3 px-4 rounded-lg">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
                   </div>
                 </td>
               </tr>
