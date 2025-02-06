@@ -3,13 +3,10 @@
 namespace App\Services;
 
 use App\Models\Admin;
-use App\Models\User;
 use App\Models\Student;
 use App\Models\Teacher;
-use Illuminate\Support\Facades\Cookie;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\UnauthorizedException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
@@ -48,48 +45,45 @@ class AuthService
         return $user; // Return the user object after registration
     }
 
-    public function login($data)
-    {
-        // Fetch the user by email
+    public function login($data){
         $user = User::where('email', $data['email'])->first();
 
         // Check if the user exists
         if (!$user) {
             return response()->json(['error' => 'Invalid email address'], 401); // Unauthorized
         }
-
+ 
         // Validate the password
         if (!Hash::check($data['password'], $user->password)) {
             return response()->json(['error' => 'Incorrect password'], 401); // Unauthorized
         }
-
-        // Return the authenticated user
         return $user;
+ 
     }
 
-    public function logout()
-    {
-        // Retrieve the token from the request
-        $token = JWTAuth::getToken();
+    // public function logout()
+    // {
+    //     // Retrieve the token from the request
+    //     $token = JWTAuth::getToken();
     
-        if (!$token) {
-            return response()->json([
-                'success' => false,
-                'error' => true,
-                'message' => 'Token not provided',
-            ], 401);
-        }
+    //     if (!$token) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'error' => true,
+    //             'message' => 'Token not provided',
+    //         ], 401);
+    //     }
     
-        try {
-            // Invalidate the access token
-            JWTAuth::invalidate($token);
+    //     try {
+    //         // Invalidate the access token
+    //         JWTAuth::invalidate($token);
     
-            // Clear access and refresh tokens from cookies
-            return true;
+    //         // Clear access and refresh tokens from cookies
+    //         return true;
             
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            throw new UnauthorizedException('Failed to log out');
+    //     } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+    //         throw new UnauthorizedException('Failed to log out');
            
-        }
-    }
+    //     }
+    // }
 }

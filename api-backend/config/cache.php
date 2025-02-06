@@ -72,26 +72,6 @@ return [
                 ],
             ],
         ],
-
-        'redis' => [
-            'driver' => 'redis',
-            'connection' => 'cache',
-            'lock_connection' => 'default',
-        ],
-
-        'dynamodb' => [
-            'driver' => 'dynamodb',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-            'table' => env('DYNAMODB_CACHE_TABLE', 'cache'),
-            'endpoint' => env('DYNAMODB_ENDPOINT'),
-        ],
-
-        'octane' => [
-            'driver' => 'octane',
-        ],
-
     ],
 
     /*
@@ -99,12 +79,12 @@ return [
     | Cache Key Prefix
     |--------------------------------------------------------------------------
     |
-    | When utilizing the APC, database, memcached, Redis, or DynamoDB cache
-    | stores there might be other applications using the same cache. For
-    | that reason, you may prefix every cache key to avoid collisions.
+    | When utilizing a RAM based store such as APC or Memcached, there might
+    | be other applications utilizing the same cache. So, we'll specify a
+    | value to get prefixed to all our keys so we can avoid collisions.
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
+    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'),
 
 ];

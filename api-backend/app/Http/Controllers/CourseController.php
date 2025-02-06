@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Services\CourseService;
 use Illuminate\Http\Request;
 
@@ -45,25 +44,5 @@ class CourseController extends Controller {
 
     public function destroy($id) {
         return response()->json(['deleted' => $this->courseService->deleteCourse($id)]);
-    }
-
-    public function addLecture(Request $request, $courseId) {
-        $data = $request->validate([
-            'title' => 'required|string',
-            'lecture_data' => 'required|string',
-        ]);
-        return response()->json($this->courseService->addLecture($courseId, $data));
-    }
-
-    public function updateLecture(Request $request, $lectureId) {
-        $data = $request->validate([
-            'title' => 'sometimes|string',
-            'lecture_data' => 'sometimes|string',
-        ]);
-        return response()->json($this->courseService->updateLecture($lectureId, $data));
-    }
-
-    public function deleteLecture($lectureId) {
-        return response()->json(['deleted' => $this->courseService->deleteLecture($lectureId)]);
     }
 }

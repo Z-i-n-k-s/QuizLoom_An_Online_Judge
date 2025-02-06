@@ -48,31 +48,15 @@ class ExamController extends Controller {
         return response()->json(['deleted' => $this->examService->deleteExam($id)]);
     }
 
-    public function addQuestion(Request $request, $examId) {
-        $data = $request->validate([
-            'question' => 'required|string',
-            'option_a' => 'required|string',
-            'option_b' => 'required|string',
-            'option_c' => 'required|string',
-            'option_d' => 'required|string',
-            'correct_option' => 'required|in:A,B,C,D',
-        ]);
-        return response()->json($this->examService->addQuestion($examId, $data));
-    }
-
-    public function updateQuestion(Request $request, $questionId) {
-        $data = $request->validate([
-            'question' => 'sometimes|string',
-            'option_a' => 'sometimes|string',
-            'option_b' => 'sometimes|string',
-            'option_c' => 'sometimes|string',
-            'option_d' => 'sometimes|string',
-            'correct_option' => 'sometimes|in:A,B,C,D',
-        ]);
-        return response()->json($this->examService->updateQuestion($questionId, $data));
-    }
-
-    public function deleteQuestion($questionId) {
-        return response()->json(['deleted' => $this->examService->deleteQuestion($questionId)]);
+    /**
+     * Feature: Students can view their upcoming exams.
+     * This method assumes that the ExamService filters exams based on the current date
+     * and further restricts them to courses the student is enrolled in.
+     *
+     * @param int $studentId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function upcomingExamsForStudent($studentId) {
+        return response()->json($this->examService->getUpcomingExamsForStudent($studentId));
     }
 }

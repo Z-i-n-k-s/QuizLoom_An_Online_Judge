@@ -7,55 +7,26 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    /**
-     * A list of exception types with their corresponding custom log levels.
-     *
-     * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
-     */
-    protected $levels = [
-        //
-    ];
 
     /**
-     * A list of the exception types that are not reported.
+     * The render method is responsible for rendering the exception as an HTTP response. 
+     * You can customize this method to return a custom response (such as JSON or a specific view)
+     * when an exception occurs.
      *
-     * @var array<int, class-string<\Throwable>>
+     * @param \Illuminate\Http\Request $request
+     * @param \Throwable $exception
+     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected $dontReport = [
-        //
-    ];
-
-    /**
-     * A list of the inputs that are never flashed to the session on validation exceptions.
-     *
-     * @var array<int, string>
-     */
-    protected $dontFlash = [
-        'current_password',
-        'password',
-        'password_confirmation',
-    ];
     public function render($request, Throwable $exception)
     {
-      //  error_log($exception);
+        error_log($exception);
         $message = $exception->getMessage();
 
         return response()->json([
             'success' => false,
-            'error'=>true,
             'message' => $message,
             'exception' => (string) $exception
-        ], 200);
+        ], 400);
     }
-    /**
-     * Register the exception handling callbacks for the application.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
-    }
+
 }

@@ -3,13 +3,12 @@
 namespace App\Services;
 
 use App\Models\Course;
-use App\Models\Lecture;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CourseService {
-    
+
     public function getAllCourses() {
+        // Returns all courses with their lectures.
         return Course::with('lectures')->get();
     }
 
@@ -30,21 +29,5 @@ class CourseService {
     public function deleteCourse($id) {
         $course = Course::findOrFail($id);
         return $course->delete();
-    }
-
-    public function addLecture($courseId, $lectureData) {
-        $course = Course::findOrFail($courseId);
-        return $course->lectures()->create($lectureData);
-    }
-
-    public function updateLecture($lectureId, $lectureData) {
-        $lecture = Lecture::findOrFail($lectureId);
-        $lecture->update($lectureData);
-        return $lecture;
-    }
-
-    public function deleteLecture($lectureId) {
-        $lecture = Lecture::findOrFail($lectureId);
-        return $lecture->delete();
     }
 }
