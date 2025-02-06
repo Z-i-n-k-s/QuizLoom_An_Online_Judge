@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TestQueryController;
-
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,14 +13,6 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-// Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-Route::post('/register', [AuthController::class, 'register']);
-
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1'); // Limit to 5 attempts per minute
-
-Route::get('/logout', [AuthController::class, 'logout']);
-
-Route::get('/test-reports', [TestQueryController::class, 'index']);
+//Route::get('/test', [TestController::class, 'getTestHuman']);
+Route::get('/test/{id}', [TestController::class, 'getTestHumanWithId']);
+Route::get('/test', [TestController::class, 'getTestHuman'])->middleware('test.middleware');
