@@ -50,6 +50,8 @@ Route::post('/courses', [CourseController::class, 'store']);
 Route::put('/courses/{id}', [CourseController::class, 'update']);
 Route::delete('/courses/{id}', [CourseController::class, 'destroy']);
 
+Route::get('teachers/{teacherId}/courses', [CourseController::class, 'getCoursesByTeacher']);
+
 // ---------------------
 // Lectures Routes
 // ---------------------

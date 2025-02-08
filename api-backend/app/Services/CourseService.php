@@ -30,4 +30,9 @@ class CourseService {
         $course = Course::findOrFail($id);
         return $course->delete();
     }
+
+    // New method to get courses by teacher id
+    public function getCoursesByTeacherId($teacherId) {
+        return Course::with('lectures')->where('teacher_id', $teacherId)->get();
+    }
 }

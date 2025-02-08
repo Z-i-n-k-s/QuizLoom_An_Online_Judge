@@ -45,4 +45,9 @@ class CourseController extends Controller {
     public function destroy($id) {
         return response()->json(['deleted' => $this->courseService->deleteCourse($id)]);
     }
+
+    // New method to fetch courses by teacher id
+    public function getCoursesByTeacher($teacherId) {
+        return response()->json($this->courseService->getCoursesByTeacherId($teacherId));
+    }
 }
