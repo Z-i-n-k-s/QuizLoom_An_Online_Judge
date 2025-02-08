@@ -22,6 +22,7 @@ import TeacherAnnouncement from "../Pages/Teacher/TeacherAnnouncement";
 import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
 import LogOut from "../Pages/Shared/logout/Logout";
 import TeacherDashboard from "../Pages/Teacher/TeacherDashboard";
+import QuizUpload from "../Pages/Teacher/viewCourse/QuizUpload";
 
 
 export const router = createBrowserRouter([
@@ -117,6 +118,10 @@ export const router = createBrowserRouter([
           {
             path: "teachers-exams",
             element: <TeacherExams />,
+          },
+          {
+            path: "teachers-quizupload",
+            element: <QuizUpload></QuizUpload>
           },
           {
             path: "teachers-results",
