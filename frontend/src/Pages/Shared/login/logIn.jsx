@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import bgImage1 from "../../../assets/login.webp";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";

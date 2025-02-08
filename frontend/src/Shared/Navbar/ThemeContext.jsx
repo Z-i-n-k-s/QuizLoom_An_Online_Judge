@@ -22,7 +22,6 @@ export const ThemeProvider = ({ children }) => {
     );
 };
 
-// Prop validation for children
 ThemeProvider.propTypes = {
     children: PropTypes.node.isRequired,
 };

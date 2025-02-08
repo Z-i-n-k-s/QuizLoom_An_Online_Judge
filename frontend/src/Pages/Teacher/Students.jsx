@@ -2,7 +2,10 @@
 
 const Students = () => {
   return (
-    <div>Students</div>
+    <div className="mt-20 ml-10">
+    <h1>Student</h1>
+    </div>
+   
   )
 }
 
