@@ -26,7 +26,9 @@ Route::get('/logout', [AuthController::class, 'logout']);
 // ---------------------
 
  // This route returns the profile (full details) of the authenticated user
- Route::get('/users/profile', [UserController::class, 'profile']);
+ Route::get('/users/profile/{id}', [UserController::class, 'profile']);
+
+
 
  // This route allows an admin to see all users with limited details
  Route::get('/users', [UserController::class, 'index']);

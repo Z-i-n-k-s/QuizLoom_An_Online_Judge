@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\JwtService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     protected $userService;
-
-    public function __construct(UserService $userService)
+    protected  $jwtService;
+    public function __construct(UserService $userService,JwtService $jwtService)
     {
         $this->userService = $userService;
+        $this->jwtService = $jwtService;
         // Ensure the user is authenticated, e.g.:
         // $this->middleware('auth:api');
     }
@@ -23,11 +25,11 @@ class UserController extends Controller
      *
      * Route Example: GET /users/profile
      */
-    public function profile(Request $request)
+    public function profile(Request $request, $id)
     {
-        $user = $request->user(); // Assumes the user is authenticated
-        return response()->json($this->userService->getUserById($user->id));
+        return response()->json($this->userService->getUserById($id));
     }
+    
 
     /**
      * For admins only: list all users with limited details (name, email, role).

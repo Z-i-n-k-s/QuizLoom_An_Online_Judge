@@ -28,45 +28,45 @@ const LogIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       const response = await apiClient.login({
         email: data.email,
         password: data.password,
       });
-      
+  
+      console.log("response", response);
       if (response.success) {
-        
-        const { role } = response.user_info; 
-        
-
-
+        // Save tokens to local storage
+        const { access_token, refresh_token } = response.tokens;
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("refresh_token", refresh_token);
+        localStorage.setItem("user_id", response.user_info.id);
+        const { role } = response.user_info;
+  
         switch (role) {
           case "admin":
             toast.success(`Welcome to admin panel`);
             setTimeout(() => {
               navigate("/admin-panel/dashboard");
-            }, 1000); 
-            
+            }, 1000);
             break;
           case "teacher":
             toast.success(`Welcome to teacher panel`);
             setTimeout(() => {
               navigate("/teacher-panel/teacher-dashboard");
-            }, 1000); 
-            
+            }, 1000);
             break;
           case "student":
             toast.success(`Welcome to student panel`);
             setTimeout(() => {
               navigate("/student-panel/student-dashboard");
-            }, 1000); 
-            
+            }, 1000);
             break;
           default:
             console.error("Invalid role");
         }
-      }else{
+      } else {
         console.log("login failed", response);
         const errorMessage = response.message || "wrong!";
         toast.error(errorMessage, { position: "top-center" });
@@ -77,10 +77,9 @@ const LogIn = () => {
       toast.error(errorMessage, { position: "top-center" });
     } finally {
       setLoading(false);
-
-
     }
   };
+  
 
   return (
     <div className="flex h-screen">

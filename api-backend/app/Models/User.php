@@ -25,7 +25,15 @@ class User extends Model
     {
         return $this->hasOne(Student::class);
     }
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
 
+    public function admin()
+    {
+        return $this->hasOne(Admin::class);
+    }
     
 }
 

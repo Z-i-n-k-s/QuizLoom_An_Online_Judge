@@ -9,9 +9,9 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth(); // Access user data
   const location = useLocation();
-  console.log("User Data from AuthContext:", user);
+ ;
   const isHomePage = location.pathname === "/"; // Check if current page is Home
-
+  
   return (
     <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md">
       <div className="flex-1">
@@ -27,6 +27,9 @@ const Navbar = () => {
               <Link to="/aboutus" className="hover:underline">
                 About Us
               </Link>
+              <Link to={"/login"} className="hover:underline btn">
+            Sign In
+          </Link>
             </li>
           </ul>
         )}
@@ -44,21 +47,7 @@ const Navbar = () => {
 
         
          {/* User Profile Avatar */}
-         {user !== null ? (
-          <div className="btn btn-ghost btn-circle avatar">
-            <div className="w-10 rounded-full">
-              <img
-                alt="User Avatar"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
-            </div>
-          </div>
-        ) : (
-          /* Sign In Button when logged out */
-          <Link to={"/login"} className="hover:underline btn">
-            Sign In
-          </Link>
-        )}
+         
       </div>
     </div>
   );

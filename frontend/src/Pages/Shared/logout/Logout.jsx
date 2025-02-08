@@ -12,17 +12,20 @@ const LogOut = () => {
 
   useEffect(() => {
     const handleLogout = async () => {
-      if (isLoggingOut) return; // Prevent multiple calls
-
+      if (isLoggingOut) return;
+  
       setIsLoggingOut(true);
       try {
-        setLoading(true); // Show the loader
+        setLoading(true);
         const response = await apiClient.logout();
-
+  
         if (response?.success) {
-          
+          // Remove tokens from local storage if still present
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+  
           toast.success("Logged out successfully", { toastId: "logoutSuccess" });
-            setTimeout(() => {
+          setTimeout(() => {
             navigate("/");
           }, 1000);
         } else {
@@ -33,12 +36,14 @@ const LogOut = () => {
         const errorMessage = error.response?.data?.message || "Something went wrong!";
         toast.error(errorMessage, { position: "top-center" });
       } finally {
-        setLoading(false); // Hide the loader after the logout process
+        setLoading(false);
       }
     };
-
+  
     handleLogout();
-  },  [navigate, isLoggingOut]);
+  }, [navigate, isLoggingOut]);
+  
+  
 
   return (
     <>

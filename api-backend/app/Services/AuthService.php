@@ -6,17 +6,28 @@ use App\Models\Admin;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
+
+
+    protected $jwtService;
+
+    public function __construct(JwtService $jwtService)
+    {
+        $this->jwtService = $jwtService;
+    }
+
     public function register(array $data)
     {
         // Save the user data to the `users` table, always defaulting to 'student' role
         $user = User::create([
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'student', // Default role
+            'role' => 'teacher', // Default role
         ]);
 
         // Check user role and save to the appropriate table
@@ -61,29 +72,19 @@ class AuthService
  
     }
 
-    // public function logout()
-    // {
-    //     // Retrieve the token from the request
-    //     $token = JWTAuth::getToken();
-    
-    //     if (!$token) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'error' => true,
-    //             'message' => 'Token not provided',
-    //         ], 401);
-    //     }
-    
-    //     try {
-    //         // Invalidate the access token
-    //         JWTAuth::invalidate($token);
-    
-    //         // Clear access and refresh tokens from cookies
-    //         return true;
+    public function logout($token)
+    {
+        try {
+            $decodedToken = $this->jwtService->parseJwtToken($token);
             
-    //     } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-    //         throw new UnauthorizedException('Failed to log out');
-           
-    //     }
-    // }
+            if (!$decodedToken) {
+                return false;
+            }
+
+            // Add logic to blacklist token if needed (database or cache)
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }
