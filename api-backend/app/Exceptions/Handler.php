@@ -26,7 +26,7 @@ class Handler extends ExceptionHandler
             'success' => false,
             'message' => $message,
             'exception' => (string) $exception
-        ], 200);
+        ], 400);
     }
 
 }

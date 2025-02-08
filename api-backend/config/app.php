@@ -12,6 +12,7 @@ return [
     | any other location as required by the application or its packages.
     |
     */
+    'jwt_secret' => env('JWT_SECRET', 'default-secret-key'),
 
     'name' => env('APP_NAME', 'Laravel'),
 
