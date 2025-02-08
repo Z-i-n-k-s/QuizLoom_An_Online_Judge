@@ -77,6 +77,29 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
+  async getCourses(id) {
+  
+  console.log("Fetching courses data for id:", id);
+    try {
+   
+      const response = await this.client.get(`/api/teachers/${id}/courses`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async enrollCourses(id) {
+  
+    console.log("Fetching courses data for id:", id);
+      try {
+     
+        const response = await this.client.post(`/api//students/${id}/enroll`);
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    }
+  
 }
 
 
