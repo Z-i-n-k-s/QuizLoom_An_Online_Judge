@@ -67,7 +67,19 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
+  async addCourse(courseData) {
+
+    try {
+      const response = await this.client.post("/api/courses", courseData, {
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
 }
+
+
 
   
 

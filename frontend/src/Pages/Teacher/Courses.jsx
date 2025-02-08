@@ -57,7 +57,7 @@ const Courses = () => {
         
       };
       
-      const response = await apiClient.post("/api/courses", courseData);
+      const response = await apiClient.addCourse(courseData);
 
       if (response) {
         console.log("Course added successfully (response):", response);
@@ -66,7 +66,7 @@ const Courses = () => {
         setCourses((prevCourses) => [
           ...prevCourses,
           {
-            id: response.data.id || prevCourses.length + 1,
+            id: response. teacher_id || prevCourses.length + 1,
             name: newCourse.name,
             enroll: 0,
             lectures: newCourse.number_of_lectures,
