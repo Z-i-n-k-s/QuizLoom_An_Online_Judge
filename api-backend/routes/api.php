@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
@@ -117,3 +118,4 @@ Route::get('/results/{id}', [ResultController::class, 'show']);
 Route::post('/results', [ResultController::class, 'store']);
 Route::put('/results/{id}', [ResultController::class, 'update']);
 Route::delete('/results/{id}', [ResultController::class, 'destroy']);
+

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
+
 
 const QuizUpload = () => {
   const [quizSettings, setQuizSettings] = useState({
@@ -48,6 +50,26 @@ const QuizUpload = () => {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
+
+  const handleSubmit = () => {
+    console.log("Submitting quiz:", {
+      quizSettings,
+      questions,
+    });
+    Swal.fire({
+      title: "Quiz Submitted!",
+      text: "Your quiz has been successfully uploaded.",
+      icon: "success",
+      draggable: true,
+      confirmButtonColor: "#3085d6",
+      confirmButtonText: "OK",
+    });
+  
+
+    // Here, you can make an API request to store the quiz in the backend
+  };
+
+  const isLastQuestion = currentQuestionIndex + 1 === Number(quizSettings.totalQuestions);
 
   return (
     <div className="mt-20 ml-10 min-h-screen flex justify-center items-center p-6 dark:bg-gray-900">
@@ -99,9 +121,8 @@ const QuizUpload = () => {
           </div>
         </div>
 
-        {/* Question and Options Section with Border */}
+        {/* Question and Options Section */}
         <div className="p-10 border-2 border-gray-300 dark:border-gray-600 rounded-lg">
-          {/* Question Input */}
           <label className="block text-2xl text-center font-semibold text-gray-800 dark:text-gray-200 mb-2">
             Question {currentQuestionIndex + 1}:
           </label>
@@ -113,7 +134,6 @@ const QuizUpload = () => {
             placeholder="Enter your question"
           />
 
-          {/* Options */}
           <label className="block text-lg font-semibold text-gray-800 dark:text-gray-200 mt-4">
             Options:
           </label>
@@ -131,7 +151,6 @@ const QuizUpload = () => {
           </div>
         </div>
 
-        {/* Correct Answer Input */}
         <label className="block text-lg font-semibold text-white dark:text-gray-200 mt-4">
           Correct Answer:
         </label>
@@ -144,20 +163,35 @@ const QuizUpload = () => {
         />
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-6">
-          <button
-            onClick={handlePrev}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-black dark:text-white rounded-md shadow-md disabled:opacity-50"
-            disabled={currentQuestionIndex === 0}
-          >
-            Prev
-          </button>
-          <button
-            onClick={handleNext}
-            className="px-4 py-2 bg-btnbg dark:bg-secondary text-white rounded-md shadow-md"
-          >
-            Next
-          </button>
+        <div className="flex justify-start mt-6 space-x-4">
+        <button
+  onClick={handlePrev}
+  className={`px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md ${
+    currentQuestionIndex === 0
+      ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+      : "bg-gray-400 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+  }`}
+  disabled={currentQuestionIndex === 0}
+>
+  Prev
+</button>
+
+{isLastQuestion ? (
+  <button
+    onClick={handleSubmit}
+    className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500"
+  >
+    Submit
+  </button>
+) : (
+  <button
+    onClick={handleNext}
+    className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-gray-400  text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+  >
+    Next
+  </button>
+)}
+
         </div>
       </div>
     </div>
