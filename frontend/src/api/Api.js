@@ -88,24 +88,25 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
-  async enrollCourses(id) {
   
-    console.log("Fetching courses data for id:", id);
+  async enrollByCourseCode(studentId, courseCode) {
+    try {
+      const response = await this.client.post(`api/students/${studentId}/enroll`, courseCode);
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  
+    async getEnrolledCourses(studentId) {
       try {
-     
-        const response = await this.client.post(`/api//students/${id}/enroll`);
+        const response = await this.client.get(`api/students/${studentId}/courses`);
         return response.data;
       } catch (error) {
-        throw error.response?.data || error.message;
+        return error.response?.data || error.message;
       }
     }
-  
 }
-
-
-
-  
-
 
 // Exporting an instance of the client
 const apiClient = new ApiClient("http://127.0.0.1:8000");

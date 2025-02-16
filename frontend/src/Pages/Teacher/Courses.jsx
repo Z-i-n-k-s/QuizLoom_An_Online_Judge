@@ -52,7 +52,7 @@ const Courses = () => {
     try {
       const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
       const teacherId = teacherInfo.teacher.id;
-
+      
       const courseData = {
         ...newCourse,
         teacher_id: teacherId,
