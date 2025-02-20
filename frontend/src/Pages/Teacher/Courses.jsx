@@ -93,7 +93,7 @@ const Courses = () => {
   };
 
   return (
-    <div>
+    <div className="bg-white">
       {/* Dashboard Cards */}
       <div className="flex flex-wrap justify-center mt-20">
         {/* Card 1 */}

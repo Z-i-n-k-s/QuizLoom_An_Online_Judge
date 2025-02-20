@@ -11,6 +11,7 @@ use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\TokenMiddleware;
 use Illuminate\Support\Facades\Route;
 
 // ---------------------
@@ -27,7 +28,8 @@ Route::get('/logout', [AuthController::class, 'logout']);
 // ---------------------
 
  // This route returns the profile (full details) of the authenticated user
- Route::get('/users/profile/{id}', [UserController::class, 'profile']);
+ Route::get('/users/profile', [UserController::class, 'profile'])
+ ->middleware(TokenMiddleware::class);
 
 
 
