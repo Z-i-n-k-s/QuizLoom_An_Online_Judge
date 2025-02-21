@@ -18,11 +18,12 @@ import Courses from "../Pages/Teacher/Courses";
 import ViewCourse from "../Pages/Teacher/viewCourse/ViewCourse"; // Import ViewCourse component
 import TeacherExams from "../Pages/Teacher/TeacherExams";
 import TeacherResult from "../Pages/Teacher/TeacherResult";
-import TeacherAnnouncement from "../Pages/Teacher/TeacherAnnouncement";
+
 import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
 import LogOut from "../Pages/Shared/logout/Logout";
 import TeacherDashboard from "../Pages/Teacher/TeacherDashboard";
 import QuizUpload from "../Pages/Teacher/viewCourse/QuizUpload";
+import TeacherAnnouncements from "../Pages/Teacher/TeacherAnnouncements";
 
 
 export const router = createBrowserRouter([
@@ -129,7 +130,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "teachers-announcements",
-            element: <TeacherAnnouncement />,
+            element: <TeacherAnnouncements />,
           },
           {
             path: "teacher-logout",

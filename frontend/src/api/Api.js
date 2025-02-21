@@ -94,6 +94,17 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
+
+async getTeacherCourses(teacherId) {
+  try {
+    // Adjust the URL as needed if your API prefix differs.
+    const response = await this.client.get(`/api/teachers/${teacherId}/courses`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+}
+
   async addCourse(courseData) {
     try {
       const response = await this.client.post("/api/courses", courseData, {});
@@ -102,6 +113,52 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
+  async addAnnouncements(courseId, announcementsData) {
+    try {
+      console.log("backend send ",courseId,announcementsData)
+      const response = await this.client.post(`/api/courses/${courseId}/announcements`, announcementsData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async getTeacherAnnouncements(teacherId) {
+    try {
+      const response = await this.client.get(`/api/teachers/${teacherId}/announcements`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  async updateAnnouncement(id, updateData) {
+    try {
+      const response = await this.client.put(`/api/announcements/${id}`, updateData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  
+  async deleteAnnouncement(id) {
+    try {
+      const response = await this.client.delete(`/api/announcements/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  async getStudentAnnouncements(studentId) {
+    try {
+      const response = await this.client.get(`/api/students/${studentId}/announcements`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  
+
   async getCourses(id) {
     console.log("Fetching courses data for id:", id);
     try {

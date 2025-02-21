@@ -93,7 +93,8 @@ Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
 Route::post('/courses/{courseId}/announcements', [AnnouncementController::class, 'store']);
 Route::put('/announcements/{id}', [AnnouncementController::class, 'update']);
 Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
-
+Route::get('teachers/{teacherId}/announcements', [AnnouncementController::class, 'getAnnouncementsByTeacher']);
+Route::get('/students/{studentId}/announcements', [AnnouncementController::class, 'getAnnouncementsForStudent']);
 // ---------------------
 // Enrollments Routes
 // ---------------------
