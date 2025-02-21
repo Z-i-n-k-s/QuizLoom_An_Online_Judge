@@ -1,11 +1,13 @@
+import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import Swal from "sweetalert2";
 
-
 const QuizUpload = () => {
+  const location = useLocation();
+  const examDetails = location.state?.examDetails;
+
   const [quizSettings, setQuizSettings] = useState({
     totalQuestions: "",
-    timeLimit: "",
     totalMarks: "",
   });
 
@@ -64,7 +66,6 @@ const QuizUpload = () => {
       confirmButtonColor: "#3085d6",
       confirmButtonText: "OK",
     });
-  
 
     // Here, you can make an API request to store the quiz in the backend
   };
@@ -75,11 +76,11 @@ const QuizUpload = () => {
     <div className="mt-20 ml-10 min-h-screen flex justify-center items-center p-6 dark:bg-gray-900">
       <div className="w-[90%] dark:bg-gray-800 rounded-lg p-6">
         <h1 className="text-3xl font-bold text-center text-btnbg dark:text-secondary mb-6">
-          Upload Quiz Questions
+          Upload Quiz Questions for {examDetails.examName}
         </h1>
 
         {/* Quiz Settings */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
               Total Questions:
@@ -91,19 +92,6 @@ const QuizUpload = () => {
               onChange={handleSettingsChange}
               className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
               placeholder="Enter total questions"
-            />
-          </div>
-          <div>
-            <label className="block text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              Time Limit (mins):
-            </label>
-            <input
-              type="number"
-              name="timeLimit"
-              value={quizSettings.timeLimit}
-              onChange={handleSettingsChange}
-              className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-              placeholder="Enter time limit"
             />
           </div>
           <div>
@@ -164,34 +152,33 @@ const QuizUpload = () => {
 
         {/* Navigation Buttons */}
         <div className="flex justify-start mt-6 space-x-4">
-        <button
-  onClick={handlePrev}
-  className={`px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md ${
-    currentQuestionIndex === 0
-      ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-      : "bg-gray-400 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-  }`}
-  disabled={currentQuestionIndex === 0}
->
-  Prev
-</button>
+          <button
+            onClick={handlePrev}
+            className={`px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md ${
+              currentQuestionIndex === 0
+                ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                : "bg-gray-400 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+            }`}
+            disabled={currentQuestionIndex === 0}
+          >
+            Prev
+          </button>
 
-{isLastQuestion ? (
-  <button
-    onClick={handleSubmit}
-    className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500"
-  >
-    Submit
-  </button>
-) : (
-  <button
-    onClick={handleNext}
-    className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-gray-400  text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-  >
-    Next
-  </button>
-)}
-
+          {isLastQuestion ? (
+            <button
+              onClick={handleSubmit}
+              className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500"
+            >
+              Submit
+            </button>
+          ) : (
+            <button
+              onClick={handleNext}
+              className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-gray-400  text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
     </div>

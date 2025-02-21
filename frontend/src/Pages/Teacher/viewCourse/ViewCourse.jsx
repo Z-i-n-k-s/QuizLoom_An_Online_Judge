@@ -1,68 +1,78 @@
-import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const ViewCourse = () => {
-  const { id } = useParams(); // Get course ID from URL
-  const navigate = useNavigate(); // Navigation function
+  const navigate = useNavigate();
 
-  // Sample data for demonstration
+  const [showUploadOptions, setShowUploadOptions] = useState(false);
+  const [examDetails, setExamDetails] = useState({
+    examName: "",
+    examDate: "",
+    duration: "",
+    topic: "",
+  });
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [lectures, setLectures] = useState([
     {
-      title: "Lecture 1: Introduction to Course",
+      title: "Lecture 1: Introduction to React",
       type: "Text",
     },
     {
-      title: "Lecture 2: Advanced Topics",
+      title: "Lecture 2: Advanced React Topics",
       type: "Quiz",
     },
   ]);
-
-  const [selectedLecture, setSelectedLecture] = useState(null);
-  const [showUploadOptions, setShowUploadOptions] = useState(false);
-  const [lectureType, setLectureType] = useState('');
   const [expandedLectureIndex, setExpandedLectureIndex] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false); // Initially hidden
-
-  const [currentLectureIndex, setCurrentLectureIndex] = useState(0); // Track current lecture index
 
   const handleUploadClick = () => {
     setShowUploadOptions(true);
   };
 
-  const handleLectureClick = (lectureIndex) => {
-    if (expandedLectureIndex === lectureIndex) {
-      setExpandedLectureIndex(null);
-    } else {
-      setExpandedLectureIndex(lectureIndex);
-    }
+  const handleExamDetailsChange = (e) => {
+    const { name, value } = e.target;
+    setExamDetails({ ...examDetails, [name]: value });
   };
 
-  const handleLectureTypeSelect = (type) => {
-    setLectureType(type);
+  // Handle the click of Add Question button and navigate to QuizUpload
+  const handleAddQuestionClick = () => {
+    // Check if any field is empty
+    if (
+      !examDetails.examName ||
+      !examDetails.examDate ||
+      !examDetails.duration ||
+      !examDetails.topic
+    ) {
+      Swal.fire({
+        title: "Error",
+        text: "Please fill all the fields before proceeding.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     setShowUploadOptions(false);
-
-    if (type === "Quiz") {
-      navigate("/teacher-panel/teachers-quizupload");
-    }
+    // Pass exam details to QuizUpload page using navigate
+    navigate("/teacher-panel/teachers-quizupload", { state: { examDetails } });
   };
 
-  const handleNextLecture = () => {
-    if (currentLectureIndex < lectures.length - 1) {
-      setCurrentLectureIndex(currentLectureIndex + 1);
-    }
+  const toggleLectureContents = () => {
+    setDrawerOpen((prev) => !prev);
   };
 
-  const handlePrevLecture = () => {
-    if (currentLectureIndex > 0) {
-      setCurrentLectureIndex(currentLectureIndex - 1);
-    }
+  const handleLectureClick = (lectureIndex) => {
+    setExpandedLectureIndex(
+      expandedLectureIndex === lectureIndex ? null : lectureIndex
+    );
   };
 
   return (
     <div className="mt-20 ml-10">
       <div className="w-full">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">{`Course ID: ${id}`}</h2>
+          <h2 className="text-2xl font-semibold">Course ID: Example Course</h2>
           <div className="flex gap-4">
             <button
               onClick={handleUploadClick}
@@ -71,46 +81,43 @@ const ViewCourse = () => {
               Upload
             </button>
             <button
-              onClick={() => setDrawerOpen(!drawerOpen)}
+              onClick={toggleLectureContents}
               className="btn border-none bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600"
             >
               {drawerOpen ? "Hide Lectures" : "Show Lectures"}
             </button>
           </div>
-          
         </div>
 
-        {/* Main Container */}
         <div className="flex">
-          {/* Left Section (Fixed Height and Scrollable) */}
           <div className="flex-[3] p-6 bg-white dark:bg-gray-800 shadow-lg border border-gray-400 mb-10 h-[500px] overflow-auto">
-          <div>
-          {selectedLecture ? (
-              <>
-                <h3 className="text-lg font-bold border-b pb-4 ">{selectedLecture.title}</h3>
-                <p className="text-md mt-4 border p-4">{selectedLecture.type} Lecture</p>
-              </>
-            ) : (
-              <p className="text-md text-gray-500">Select a lecture to view its content.</p>
-            )}
-            
+            <div>
+              {expandedLectureIndex !== null ? (
+                <>
+                  <h3 className="text-lg font-bold border-b pb-4">
+                    {lectures[expandedLectureIndex].title}
+                  </h3>
+                  <p className="text-md mt-4 border p-4">
+                    {lectures[expandedLectureIndex].type} Lecture
+                  </p>
+                </>
+              ) : (
+                <p className="text-md text-gray-500">Select a lecture to view its content.</p>
+              )}
+            </div>
           </div>
-        
 
-          </div>
-          
-
-          {/* Right Section */}
           {drawerOpen && (
             <div className="flex-[2] p-6 bg-white dark:bg-gray-800 shadow-lg ml-4">
               <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2">Lectures</h2>
               {lectures.length > 0 ? (
                 lectures.map((lecture, index) => (
-                  <div key={index} className="mb-4 pb-4 border-b cursor-pointer">
-                    <div
-                      className="flex justify-between items-center"
-                      onClick={() => handleLectureClick(index)}
-                    >
+                  <div
+                    key={index}
+                    className="mb-4 pb-4 border-b cursor-pointer"
+                    onClick={() => handleLectureClick(index)}
+                  >
+                    <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold">{lecture.title}</h3>
                       <button
                         className="text-sm text-blue-500"
@@ -129,37 +136,54 @@ const ViewCourse = () => {
         </div>
       </div>
 
-      {/* Upload Options Modal */}
       {showUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Select Lecture Type To Upload</h3>
+            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Enter Exam Details</h3>
+            <input
+              type="text"
+              name="examName"
+              value={examDetails.examName}
+              onChange={handleExamDetailsChange}
+              placeholder="Exam Name"
+              className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
+            />
+            <input
+              type="date"
+              name="examDate"
+              value={examDetails.examDate}
+              onChange={handleExamDetailsChange}
+              className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
+            />
+            <input
+              type="number"
+              name="duration"
+              value={examDetails.duration}
+              onChange={handleExamDetailsChange}
+              placeholder="Duration (mins)"
+              className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
+            />
+            <input
+              type="text"
+              name="topic"
+              value={examDetails.topic}
+              onChange={handleExamDetailsChange}
+              placeholder="Topic"
+              className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
+            />
             <button
-              onClick={() => handleLectureTypeSelect("Text")}
-              className="w-full mb-2 px-4 py-2 border hover:bg-btnbg text-black dark:hover:bg-secondary dark:text-white rounded-md"
+              onClick={handleAddQuestionClick}
+              className="w-full px-4 py-2 bg-blue-500 text-white rounded-md mt-4"
             >
-              Text Lecture
-            </button>
-            <button
-              onClick={() => handleLectureTypeSelect("Quiz")}
-              className="w-full px-4 py-2  border hover:bg-btnbg text-black dark:hover:bg-secondary dark:text-white rounded-md"
-            >
-              Quiz
+              Add Question
             </button>
             <button
               onClick={() => setShowUploadOptions(false)}
-              className="w-full mt-4 px-4 py-2 bg-red-500 text-white dark:hover:bg-secondary  rounded-md"
+              className="w-full mt-2 px-4 py-2 bg-red-500 text-white rounded-md"
             >
               Close
             </button>
           </div>
-        </div>
-      )}
-
-      {lectureType && (
-        <div className="mt-4 p-4 bg-blue-100 dark:bg-blue-800 rounded-md">
-          <h3 className="text-lg font-semibold">Uploaded Lecture</h3>
-          <p>Lecture Type: {lectureType}</p>
         </div>
       )}
     </div>

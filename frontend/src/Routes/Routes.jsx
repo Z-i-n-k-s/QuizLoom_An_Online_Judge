@@ -23,6 +23,8 @@ import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
 import LogOut from "../Pages/Shared/logout/Logout";
 import TeacherDashboard from "../Pages/Teacher/TeacherDashboard";
 import QuizUpload from "../Pages/Teacher/viewCourse/QuizUpload";
+import ViewCourseStu from "../Pages/Student/viewCourse/ViewCourseStu";
+import TextQuizStu from "../Pages/Student/viewCourse/TextQuizStu";
 
 
 export const router = createBrowserRouter([
@@ -76,6 +78,15 @@ export const router = createBrowserRouter([
           {
             path: "my-courses",
             element: <MyCourses />,
+          },
+          {
+            path:'view-courses-stu/:id',
+            element:<ViewCourseStu></ViewCourseStu>
+          },
+          {
+
+            path:'text-quiz-stu/:id',
+            element: <TextQuizStu></TextQuizStu>
           },
           {
             path: "exams",
