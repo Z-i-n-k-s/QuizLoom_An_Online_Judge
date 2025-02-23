@@ -1,20 +1,32 @@
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
+import apiClient from "../../../api/Api";
 
 const QuizUpload = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const examDetails = location.state?.examDetails;
 
-  const [quizSettings, setQuizSettings] = useState({
-    totalQuestions: "",
-    totalMarks: "",
-  });
+  // Load saved data from localStorage
+  const savedQuizSettings = JSON.parse(localStorage.getItem("quizSettings")) || { totalQuestions: "" };
+  const savedQuestions = JSON.parse(localStorage.getItem("questions")) || [{ question: "", options: ["", "", "", ""], correctAnswer: "" }];
 
-  const [questions, setQuestions] = useState([
-    { question: "", options: ["", "", "", ""], correctAnswer: "" },
-  ]);
+  const [quizSettings, setQuizSettings] = useState(savedQuizSettings);
+  const [questions, setQuestions] = useState(savedQuestions);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  //const examId = localStorage.getItem("exam_id");
+  const examId = location.state?.examId;
+  const courseId = location.state?.courseId;
+  console.log("Exam ID from storage:", examId);
+  // Save to localStorage whenever quizSettings or questions change
+  useEffect(() => {
+    localStorage.setItem("quizSettings", JSON.stringify(quizSettings));
+  }, [quizSettings]);
+
+  useEffect(() => {
+    localStorage.setItem("questions", JSON.stringify(questions));
+  }, [questions]);
 
   const handleSettingsChange = (e) => {
     setQuizSettings({ ...quizSettings, [e.target.name]: e.target.value });
@@ -33,10 +45,22 @@ const QuizUpload = () => {
   };
 
   const handleCorrectAnswerChange = (e) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[currentQuestionIndex].correctAnswer = e.target.value;
-    setQuestions(updatedQuestions);
+    const value = e.target.value.toUpperCase();
+    if (["A", "B", "C", "D"].includes(value) || value === "") {
+      const updatedQuestions = [...questions];
+      updatedQuestions[currentQuestionIndex].correctAnswer = value;
+      setQuestions(updatedQuestions);
+    } else {
+      Swal.fire({
+        title: "Invalid Input",
+        text: "Please enter only A, B, C, or D as the correct answer.",
+        icon: "warning",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
+      });
+    }
   };
+  
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -53,30 +77,52 @@ const QuizUpload = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting quiz:", {
-      quizSettings,
-      questions,
-    });
+  const handleSubmit = async () => {
+    try{
+
+    console.log("Submitting quiz:", { quizSettings, questions });
+  // Loop through all questions and add each one using the API
+  for (let i = 0; i < questions.length; i++) {
+    const question = questions[i];
+    const questionData = {
+      question: String(question.question),
+      option_a: String(question.options[0]),
+      option_b: String(question.options[1]),
+      option_c: String(question.options[2]),
+      option_d: String(question.options[3]),
+      correct_option: question.correctAnswer , 
+    };
+    await apiClient.addQuestionToExam(examId, questionData);
+  }
     Swal.fire({
       title: "Quiz Submitted!",
       text: "Your quiz has been successfully uploaded.",
       icon: "success",
-      draggable: true,
       confirmButtonColor: "#3085d6",
       confirmButtonText: "OK",
-    });
+    },
+    navigate(`/teacher-panel/teachers-courses/${courseId}`)
+  );
 
-    // Here, you can make an API request to store the quiz in the backend
+    localStorage.removeItem("quizSettings");
+    localStorage.removeItem("questions");
+  } catch (error) {
+    Swal.fire({
+      title: "Error!",
+      text: "An error occurred while uploading the quiz.",
+      icon: "error",
+      confirmButtonColor: "#3085d6",
+      confirmButtonText: "OK",
+    });    
   };
-
+  };
   const isLastQuestion = currentQuestionIndex + 1 === Number(quizSettings.totalQuestions);
 
   return (
     <div className="mt-20 ml-10 min-h-screen flex justify-center items-center p-6 dark:bg-gray-900">
       <div className="w-[90%] dark:bg-gray-800 rounded-lg p-6">
         <h1 className="text-3xl font-bold text-center text-btnbg dark:text-secondary mb-6">
-          Upload Quiz Questions for {examDetails.examName}
+          Upload Quiz Questions for {examDetails?.examName}
         </h1>
 
         {/* Quiz Settings */}
@@ -92,19 +138,6 @@ const QuizUpload = () => {
               onChange={handleSettingsChange}
               className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
               placeholder="Enter total questions"
-            />
-          </div>
-          <div>
-            <label className="block text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              Total Marks:
-            </label>
-            <input
-              type="number"
-              name="totalMarks"
-              value={quizSettings.totalMarks}
-              onChange={handleSettingsChange}
-              className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-              placeholder="Enter total marks"
             />
           </div>
         </div>
@@ -127,14 +160,17 @@ const QuizUpload = () => {
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {questions[currentQuestionIndex].options.map((option, index) => (
+               <div key={index} className="flex items-center space-x-2">
+                <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
               <input
                 key={index}
                 type="text"
                 value={option}
                 onChange={(e) => handleOptionChange(index, e.target.value)}
                 className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                placeholder={`Option ${index + 1}`}
+                placeholder={`Option `}
               />
+            </div>
             ))}
           </div>
         </div>
@@ -174,7 +210,7 @@ const QuizUpload = () => {
           ) : (
             <button
               onClick={handleNext}
-              className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-gray-400  text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+              className="px-5 py-2 font-semibold rounded-lg transition duration-300 shadow-md bg-gray-400 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
             >
               Next
             </button>

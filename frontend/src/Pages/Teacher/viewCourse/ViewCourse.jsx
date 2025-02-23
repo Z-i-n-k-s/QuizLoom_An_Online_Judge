@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import apiClient from "../../../api/Api";
 
 const ViewCourse = () => {
+  const { id: courseId } = useParams(); // Using "id" to match route definition
+  
   const navigate = useNavigate();
 
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const [examDetails, setExamDetails] = useState({
-    examName: "",
-    examDate: "",
+    name: "",
+    date: "",
     duration: "",
-    topic: "",
+    total_marks: "",
   });
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -36,26 +39,58 @@ const ViewCourse = () => {
   };
 
   // Handle the click of Add Question button and navigate to QuizUpload
-  const handleAddQuestionClick = () => {
-    // Check if any field is empty
-    if (
-      !examDetails.examName ||
-      !examDetails.examDate ||
-      !examDetails.duration ||
-      !examDetails.topic
-    ) {
-      Swal.fire({
-        title: "Error",
-        text: "Please fill all the fields before proceeding.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
+  const handleAddQuestionClick = async () => {
+    try {
+      const teacherInfo = await apiClient.getUserById(
+        localStorage.getItem("user_id")
+      );
 
-    setShowUploadOptions(false);
-    // Pass exam details to QuizUpload page using navigate
-    navigate("/teacher-panel/teachers-quizupload", { state: { examDetails } });
+      const teacherId = teacherInfo.teacher.id;
+
+      const examData = {
+        ...examDetails,
+        teacher_id: teacherId,
+        course_id: courseId,
+      };
+      // Check if any field is empty
+      if (
+        !examDetails.name ||
+        !examDetails.date ||
+        !examDetails.duration ||
+        !examDetails.total_marks
+      ) {
+        Swal.fire({
+          title: "Error",
+          text: "Please fill all the fields before proceeding.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+      const response = await apiClient.addExam(examData);
+
+      if (response) {
+        console.log("exam added successfully:", response);
+      const examId=response.id;
+     // localStorage.setItem("exam_id", examId);
+
+        // Reset the input fields and close the modal
+        setExamDetails({
+          name: "",
+          date: "",
+          duration: "",
+          total_marks: "",
+        });
+
+        setShowUploadOptions(false);
+        // Pass exam details to QuizUpload page using navigate
+        navigate("/teacher-panel/teachers-quizupload", {
+          state: { examId,examDetails,courseId },
+        });
+      }
+    } catch (error) {
+      console.error("Error adding question:", error);
+    }
   };
 
   const toggleLectureContents = () => {
@@ -102,14 +137,18 @@ const ViewCourse = () => {
                   </p>
                 </>
               ) : (
-                <p className="text-md text-gray-500">Select a lecture to view its content.</p>
+                <p className="text-md text-gray-500">
+                  Select a lecture to view its content.
+                </p>
               )}
             </div>
           </div>
 
           {drawerOpen && (
             <div className="flex-[2] p-6 bg-white dark:bg-gray-800 shadow-lg ml-4">
-              <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2">Lectures</h2>
+              <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2">
+                Lectures
+              </h2>
               {lectures.length > 0 ? (
                 lectures.map((lecture, index) => (
                   <div
@@ -129,7 +168,9 @@ const ViewCourse = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-md text-gray-500">No lectures uploaded yet.</p>
+                <p className="text-md text-gray-500">
+                  No lectures uploaded yet.
+                </p>
               )}
             </div>
           )}
@@ -139,19 +180,21 @@ const ViewCourse = () => {
       {showUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Enter Exam Details</h3>
+            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">
+              Enter Exam Details
+            </h3>
             <input
               type="text"
-              name="examName"
-              value={examDetails.examName}
+              name="name"
+              value={examDetails.name}
               onChange={handleExamDetailsChange}
               placeholder="Exam Name"
               className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
             />
             <input
               type="date"
-              name="examDate"
-              value={examDetails.examDate}
+              name="date"
+              value={examDetails.date}
               onChange={handleExamDetailsChange}
               className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
             />
@@ -164,11 +207,11 @@ const ViewCourse = () => {
               className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
             />
             <input
-              type="text"
-              name="topic"
-              value={examDetails.topic}
+              type="number"
+              name="total_marks"
+              value={examDetails.total_marks}
               onChange={handleExamDetailsChange}
-              placeholder="Topic"
+              placeholder="Total marks"
               className="w-full mb-4 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
             />
             <button

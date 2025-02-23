@@ -74,9 +74,10 @@ class ApiClient {
       });
 
       // Clear local storage on successful logout
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user_id");
+      // localStorage.removeItem("access_token");
+      // localStorage.removeItem("refresh_token");
+      // localStorage.removeItem("user_id");
+      localStorage.clear();
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -132,6 +133,24 @@ class ApiClient {
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
+    }
+  }
+  async addExam(courseData) {
+    try {
+      const response = await this.client.post("/api/exams", courseData, {});
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+ 
+
+  async addQuestionToExam(examId, questionData) {
+    try {
+      const response = await this.client.post(`api/exams/${examId}/questions`, questionData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
     }
   }
 }
