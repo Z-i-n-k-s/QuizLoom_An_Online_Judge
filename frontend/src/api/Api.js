@@ -153,6 +153,15 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
+  async giveExam(examId) {
+    try {
+      const response = await this.client.post(`api/exams/${examId}/questions`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
 }
 
 // Exporting an instance of the client
