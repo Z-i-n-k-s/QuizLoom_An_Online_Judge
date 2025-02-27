@@ -6,29 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTeachersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
-{
-    Schema::create('teachers', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        $table->string('name');
-        $table->string('contact_info')->nullable();
-        $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('teachers', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
+            $table->string('name');
+            $table->string('contact_info');
+            $table->string('status'); // pending, approved, rejected
+            $table->timestamps();
 
+            $table->foreign('user_id')->references('id')->on('users')
+                  ->onDelete('cascade');
+        });
+    }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('teachers');
