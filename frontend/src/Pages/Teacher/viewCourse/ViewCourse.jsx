@@ -192,6 +192,11 @@ const ViewCourse = () => {
     }
   };
 
+  // Handle clicking on Text Lecture to navigate to TextUpload
+  const handleTextLectureClick = () => {
+    navigate("/teacher-panel/teacher-textupload"); // Navigate to the TextUpload page
+  };
+
   return (
     <div className="mt-20 ml-10">
       {isLoading && (
@@ -280,7 +285,7 @@ const ViewCourse = () => {
                               ) : (
                                 <button
                                   onClick={handleUploadClick}
-                                  className="text-sm text-blue-500"
+                                  className="text-sm text-blue-500 ml-20"
                                 >
                                   + Add Content
                                 </button>
@@ -339,7 +344,7 @@ const ViewCourse = () => {
               Select Lecture Type To Upload
             </h3>
             <button
-              onClick={() => handleLectureTypeSelect("Text")}
+              onClick={ navigate("/teacher-panel/teacher-textupload")}
               className="w-full mb-2 px-4 py-2 border hover:bg-btnbg text-black dark:hover:bg-secondary dark:text-white rounded-md"
             >
               Text Lecture

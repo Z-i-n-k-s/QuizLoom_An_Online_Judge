@@ -25,6 +25,7 @@ import TeacherDashboard from "../Pages/Teacher/TeacherDashboard";
 import QuizUpload from "../Pages/Teacher/viewCourse/QuizUpload";
 import ViewCourseStu from "../Pages/Student/viewCourse/ViewCourseStu";
 import TextQuizStu from "../Pages/Student/viewCourse/TextQuizStu";
+import TextUpload from "../Pages/Teacher/viewCourse/TextUpload";
 
 
 export const router = createBrowserRouter([
@@ -133,6 +134,10 @@ export const router = createBrowserRouter([
           {
             path: "teachers-quizupload",
             element: <QuizUpload></QuizUpload>
+          },
+          {
+            path: "teacher-textupload",
+            element: <TextUpload />,
           },
           {
             path: "teachers-results",
