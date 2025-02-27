@@ -23,7 +23,13 @@ import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
 import LogOut from "../Pages/Shared/logout/Logout";
 import TeacherDashboard from "../Pages/Teacher/TeacherDashboard";
 import QuizUpload from "../Pages/Teacher/viewCourse/QuizUpload";
+
+import ViewCourseStu from "../Pages/Student/viewCourse/ViewCourseStu";
+import TextQuizStu from "../Pages/Student/viewCourse/TextQuizStu";
+import TextUpload from "../Pages/Teacher/viewCourse/TextUpload";
+
 import TeacherAnnouncements from "../Pages/Teacher/TeacherAnnouncements";
+
 
 
 export const router = createBrowserRouter([
@@ -79,6 +85,15 @@ export const router = createBrowserRouter([
             element: <MyCourses />,
           },
           {
+            path:'view-courses-stu/:id',
+            element:<ViewCourseStu></ViewCourseStu>
+          },
+          {
+
+            path:'text-quiz-stu/:id',
+            element: <TextQuizStu></TextQuizStu>
+          },
+          {
             path: "exams",
             element: <Exams />,
           },
@@ -123,6 +138,10 @@ export const router = createBrowserRouter([
           {
             path: "teachers-quizupload",
             element: <QuizUpload></QuizUpload>
+          },
+          {
+            path: "teacher-textupload",
+            element: <TextUpload />,
           },
           {
             path: "teachers-results",

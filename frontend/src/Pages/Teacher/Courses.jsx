@@ -51,6 +51,7 @@ const Courses = () => {
   const handleAddCourse = async () => {
     try {
       const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      
       const teacherId = teacherInfo.teacher.id;
       
       const courseData = {

@@ -31,8 +31,9 @@ const MyCourses = () => {
   };
 
   const handleViewCourse = (id) => {
-    navigate(`/teacher-panel/teachers-courses/${id}`);
+    navigate(`/student-panel/view-courses-stu/${id}`);
   };
+  
 
   const handleAddCourse = async () => {
     try {
