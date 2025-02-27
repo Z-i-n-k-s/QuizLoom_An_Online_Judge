@@ -11,8 +11,8 @@ class CreateLecturesTable extends Migration
         Schema::create('lectures', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('course_id');
-            $table->string('title');
-            $table->text('lecture_data');
+            $table->string('title')->nullable();
+            $table->text('lecture_data')->nullable();
             $table->timestamps();
 
             $table->foreign('course_id')->references('id')->on('courses')

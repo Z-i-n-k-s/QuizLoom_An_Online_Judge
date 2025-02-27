@@ -12,9 +12,9 @@ class CreateCoursesTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('teacher_id');
             $table->string('course_code')->unique(); // Unique code for each course
-            $table->string('name');
-            $table->integer('completion_time'); // Time in hours
-            $table->integer('number_of_lectures');
+            $table->string('name')->nullable();
+            $table->integer('completion_time')->nullable(); // Time in hours
+            $table->integer('number_of_lectures')->nullable();
             $table->timestamps();
 
             $table->foreign('teacher_id')->references('id')->on('teachers')

@@ -11,11 +11,11 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
-            $table->string('name');
-            $table->string('contact_number');
-            $table->string('gender');
-            $table->string('blood_group');
-            $table->string('enrollment_status'); // active, inactive
+            $table->string('name')->nullable();
+            $table->string('contact_number')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('blood_group')->nullable();
+            $table->string('enrollment_status')->nullable(); // active, inactive
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')

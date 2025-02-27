@@ -11,9 +11,9 @@ class CreateTeachersTable extends Migration
         Schema::create('teachers', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
-            $table->string('name');
-            $table->string('contact_info');
-            $table->string('status'); // pending, approved, rejected
+            $table->string('name')->nullable();
+            $table->string('contact_info')->nullable();
+            $table->string('status')->default('pending')->nullable(); // pending, approved, rejected
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')

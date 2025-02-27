@@ -12,8 +12,8 @@ class CreateAnnouncementsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('course_id');
             $table->unsignedInteger('teacher_id');
-            $table->string('title');
-            $table->text('message');
+            $table->string('title')->nullable();
+            $table->text('message')->nullable();
             $table->timestamps();
 
             $table->foreign('course_id')->references('id')->on('courses')

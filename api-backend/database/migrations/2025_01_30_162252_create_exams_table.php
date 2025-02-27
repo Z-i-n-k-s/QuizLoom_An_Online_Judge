@@ -11,10 +11,10 @@ class CreateExamsTable extends Migration
         Schema::create('exams', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('lecture_id');
-            $table->string('name');
-            $table->integer('total_marks');
-            $table->integer('duration'); // Duration in minutes
-            $table->date('date');
+            $table->string('name')->nullable();
+            $table->integer('total_marks')->nullable();
+            $table->integer('duration')->nullable(); // Duration in minutes
+            $table->date('date')->nullable();
             $table->timestamps();
 
             $table->foreign('lecture_id')->references('id')->on('lectures')

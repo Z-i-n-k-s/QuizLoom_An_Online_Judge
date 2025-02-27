@@ -12,8 +12,8 @@ class CreateResultsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('student_id');
             $table->unsignedInteger('exam_id');
-            $table->integer('obtained_marks');
-            $table->string('status'); // passed, failed
+            $table->integer('obtained_marks')->nullable();
+            $table->string('status')->nullable(); // passed, failed
             $table->timestamps();
 
             $table->foreign('student_id')->references('id')->on('students')
