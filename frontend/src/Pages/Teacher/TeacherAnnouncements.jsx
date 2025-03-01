@@ -6,7 +6,7 @@ import apiClient from "../../api/Api";
 
 const TeacherAnnouncements = () => {
   const user = useSelector((state) => state?.user?.user);
-  console.log("Teacher ID:", user.teacher.id);
+  // console.log("Teacher ID:", user);
 
   // Announcements will be fetched from the backend.
   const [announcements, setAnnouncements] = useState([]);
