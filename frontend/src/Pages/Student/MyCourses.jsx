@@ -19,6 +19,7 @@ const MyCourses = () => {
       const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
       const studentId = studentInfo.student.id;
       const enrolledCourses = await apiClient.getEnrolledCourses(studentId);
+      console.log("Enrolled courses:", enrolledCourses);
       setCourses(enrolledCourses);
     } catch (error) {
       console.error("Error fetching enrolled courses:", error);
@@ -30,8 +31,8 @@ const MyCourses = () => {
     setNewCourse({ ...newCourse, [name]: value });
   };
 
-  const handleViewCourse = (id) => {
-    navigate(`/student-panel/view-courses-stu/${id}`);
+  const handleViewCourse = (course) => {
+    navigate(`/student-panel/view-courses-stu/${course.id}`, { state: { courseName: course.name } });
   };
   
 
@@ -145,7 +146,7 @@ const MyCourses = () => {
                 <td className="px-4 py-2 text-center">{new Date(course.created_at).toLocaleDateString()}</td>
                 <td className="px-4 py-2 text-center">
                   <button 
-                    onClick={() => handleViewCourse(course.id)}
+                    onClick={() => handleViewCourse(course)}
                     className="btn btn-sm bg-btnbg text-white mr-2 dark:bg-secondary dark:hover:bg-btnbg"
                   >
                     View

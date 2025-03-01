@@ -218,7 +218,22 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
-
+  async addLecture(courseId, lectureData) {
+    try {
+      const response = await this.client.post(`api/courses/${courseId}/lectures`, lectureData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async getLectureId(courseId) {
+    try {
+      const response = await this.client.get(`api/courses/${courseId}/lectures`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
 }
 
 // Exporting an instance of the client

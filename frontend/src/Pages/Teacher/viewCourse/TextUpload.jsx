@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import apiClient from "../../../api/Api";
 
 const TextUpload = () => {
   const [lectureTitle, setLectureTitle] = useState("");
   const [lectureContent, setLectureContent] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // State to control modal visibility
-  const navigate = useNavigate(); // This hook will allow us to navigate
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lectureResponse, setLectureResponse] = useState(null);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const courseId = location.state?.courseId;
+  const courseName = location.state?.courseName;
+  console.log("Course ID from storage:", courseId);
+  console.log("Course Name from storages:", courseName);
   const handleTitleChange = (e) => {
     setLectureTitle(e.target.value);
   };
@@ -15,7 +22,7 @@ const TextUpload = () => {
     setLectureContent(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!lectureTitle || !lectureContent) {
@@ -23,32 +30,42 @@ const TextUpload = () => {
       return;
     }
 
-    // Submit lecture data (you can call an API or save locally here)
     const lectureData = {
       title: lectureTitle,
-      content: lectureContent,
+      lecture_data: lectureContent,
     };
 
-    console.log("Lecture submitted:", lectureData);
+    try {
+       await apiClient.addLecture(courseId, lectureData);
+       const response1 = await apiClient.getLectureId(courseId);
+      console.log("Response1:", response1);
+      console.log("Lecture submitted:", lectureData);
+      // Store the response so that we can pass it to the ViewCourse page.
+      setLectureResponse(response1);
 
-    // Reset the form after submission
-    setLectureTitle("");
-    setLectureContent("");
+      // Reset the form
+      setLectureTitle("");
+      setLectureContent("");
 
-    // Show the success modal
-    setShowSuccessModal(true);
+      // Show success modal
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error uploading lecture:", error);
+    }
   };
 
   const handleCloseModal = () => {
     setShowSuccessModal(false);
-    navigate(-1, { replace: true }); // This ensures we replace the current entry in history
+    // Pass the lectureResponse to the ViewCourse page via navigate state.
+    navigate(`/teacher-panel/teachers-courses/${courseId}`, {
+      state: { lectureResponse , name: courseName }
+    });
   };
-  
+
   return (
     <div className="p-6 min-h-screen bg-white dark:bg-gray-800 flex justify-center items-center mt-10">
       <div className="w-full max-w-5xl bg-white dark:bg-gray-800 rounded-lg">
         <h2 className="text-2xl font-semibold text-center mb-6">Upload Lecture</h2>
-
         <form onSubmit={handleSubmit}>
           {/* Lecture Title Input */}
           <div className="mb-4">
@@ -60,11 +77,10 @@ const TextUpload = () => {
               value={lectureTitle}
               onChange={handleTitleChange}
               placeholder="Enter the lecture title"
-              className="w-full p-4 border rounded-md  bg-gray-200 dark:bg-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border rounded-md bg-gray-200 dark:bg-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-
           {/* Lecture Content Textarea */}
           <div className="mb-6">
             <label className="block text-gray-700 dark:text-white font-semibold mb-2">
@@ -79,7 +95,6 @@ const TextUpload = () => {
               required
             ></textarea>
           </div>
-
           {/* Submit Button */}
           <button
             type="submit"
