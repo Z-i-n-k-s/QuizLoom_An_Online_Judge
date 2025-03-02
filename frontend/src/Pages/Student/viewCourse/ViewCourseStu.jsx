@@ -1,28 +1,33 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import apiClient from "../../../api/Api";
+import TextQuizStu from "./TextQuizStu";
 
 const ViewCourse = () => {
   const { id: courseId } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lectures, setLectures] = useState([]);
+  // Controls which lecture slot is expanded in the side drawer
   const [expandedLectureIndex, setExpandedLectureIndex] = useState(null);
+  // Controls which lecture is active in the main panel
+  const [activeLectureIndex, setActiveLectureIndex] = useState(null);
+  // Determines whether to show "Text" or "Quiz" in the main panel
+  const [activeTab, setActiveTab] = useState("Text");
+  // Mapping of lecture id to exam id (if available)
+  const [examMapping, setExamMapping] = useState({});
 
-  // If you still need the courseName from location.state
-  const courseName = location.state?.courseName  ||"undifined";
-console.log("courseName",courseName)
-  // Fetch lectures on mount or course change
+  const courseName = location.state?.courseName || "undefined";
+  console.log("courseName", courseName);
+
   useEffect(() => {
     const fetchLecturesFromBackend = async () => {
       try {
         setIsLoading(true);
         const response = await apiClient.getLectureId(courseId);
-        // Expecting response as an array of { id, title, lecture_data, type }
+        // Expecting response as an array of lecture objects
         if (response && Array.isArray(response)) {
           const mappedLectures = response.map((lecture) => ({
             id: lecture.id,
@@ -45,26 +50,55 @@ console.log("courseName",courseName)
     fetchLecturesFromBackend();
   }, [courseId]);
 
-  // Toggles the entire drawer
+  // Toggle the side drawer for lectures
   const toggleLectureContents = () => {
     setDrawerOpen((prev) => !prev);
   };
 
-  // Toggle expand/collapse for a specific lecture
+  // Toggle expansion of a lecture slot in the drawer
   const handleLectureClick = (lectureIndex) => {
     setExpandedLectureIndex(
       expandedLectureIndex === lectureIndex ? null : lectureIndex
     );
   };
 
-  // Show the "Text" tab in the main panel
+  // Set active lecture and show text content
   const handleShowText = (lectureIndex) => {
-    setExpandedLectureIndex(lectureIndex);
+    setActiveLectureIndex(lectureIndex);
+    setActiveTab("Text");
   };
 
-  // Show the "Quiz" tab in the main panel
-  const handleShowQuiz = (lectureIndex) => {
-    setExpandedLectureIndex(lectureIndex);
+  // Set active lecture, show quiz, and fetch exam id if available
+  const handleShowQuiz = async (lectureIndex) => {
+    setActiveLectureIndex(lectureIndex);
+    setActiveTab("Quiz");
+    try {
+      // Fetch all exams from your backend
+      const exams = await apiClient.getexamId();
+      const lectureId = lectures[lectureIndex].id;
+      // Find the exam that corresponds to this lecture id
+      const examForLecture = exams.find(
+        (exam) => exam.lecture_id === lectureId
+      );
+
+      if (examForLecture) {
+        console.log(
+          "Exam found for lecture:",
+          lectureId,
+          "with exam id:",
+          examForLecture.id
+        );
+        // Save the exam id in the mapping for this lecture id
+        setExamMapping((prev) => ({
+          ...prev,
+          [lectureId]: examForLecture.id,
+        }));
+      } else {
+        console.log("No exam found for lecture:", lectureId);
+      }
+    } catch (error) {
+      console.error("Error fetching exam id:", error);
+    }
   };
 
   return (
@@ -87,19 +121,31 @@ console.log("courseName",courseName)
         </div>
 
         <div className="flex">
-          {/* Main content area (left side) */}
+          {/* Main content area */}
           <div className="flex-[3] p-6 bg-white dark:bg-gray-800 shadow-lg border border-gray-400 mb-10 h-[500px] overflow-auto">
-            {expandedLectureIndex !== null ? (
+            {activeLectureIndex !== null ? (
               <>
                 <h3 className="text-lg font-bold border-b pb-4">
-                  {lectures[expandedLectureIndex].title}
+                  {lectures[activeLectureIndex].title}
                 </h3>
-                <p className="text-md mt-4 border p-4">
-                  {lectures[expandedLectureIndex].type} Lecture
-                </p>
-                <p className="text-md mt-4 border p-4 whitespace-pre-wrap">
-                  {lectures[expandedLectureIndex].content}
-                </p>
+                {activeTab === "Text" && (
+                  <>
+                    <p className="text-md mt-4 border p-4">
+                      {lectures[activeLectureIndex].type} Lecture
+                    </p>
+                    <p className="text-md mt-4 border p-4 whitespace-pre-wrap">
+                      {lectures[activeLectureIndex].content}
+                    </p>
+                  </>
+                )}
+                {activeTab === "Quiz" && (
+                  <TextQuizStu
+                    type="quiz"
+                    lectureId={lectures[activeLectureIndex].id}
+                    examId={examMapping[lectures[activeLectureIndex].id]}
+                    onFinishQuiz={() => console.log("Quiz finished")}
+                  />
+                )}
               </>
             ) : (
               <p className="text-md text-gray-500">
@@ -140,7 +186,7 @@ console.log("courseName",courseName)
                         </button>
                       </div>
 
-                      {/* If expanded, show the sub-items (Text, Quiz) */}
+                      {/* Expanded lecture options */}
                       {isExpanded && (
                         <div className="mt-2 ml-8 space-y-2">
                           <button

@@ -7,12 +7,12 @@ const ViewCourse = () => {
   const { id: courseId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const [QuizUploadOptions, setQuizUploadOptions] = useState(false);
   const [selectedLectureId, setSelectedLectureId] = useState(null);
-  const courseName =location.state?.name ;
+  const courseName = location.state?.name;
   console.log("Course Name:", courseName);
   const [examDetails, setExamDetails] = useState({
     name: "",
@@ -26,7 +26,10 @@ const ViewCourse = () => {
   const [lectures, setLectures] = useState([
     { title: "", type: "Text", isEditing: false, selected: false }
   ]);
+
+  // State to control expansion (for side drawer options) and content selection (for left panel)
   const [expandedLectureIndex, setExpandedLectureIndex] = useState(null);
+  const [selectedLectureIndexForContent, setSelectedLectureIndexForContent] = useState(null);
 
   // Ref to prevent double-processing location.state in Strict Mode
   const processedRef = useRef(false);
@@ -126,16 +129,14 @@ const ViewCourse = () => {
       return newLectures;
     });
 
-     // Preserve course name when clearing location.state
-  const preservedState = { name: location.state?.name };
-  navigate(location.pathname, { replace: true, state: preservedState });
+    // Preserve course name when clearing location.state
+    const preservedState = { name: location.state?.name };
+    navigate(location.pathname, { replace: true, state: preservedState });
   }, [location, navigate]);
 
   // -------------------------------
   // LECTURE EDIT / SAVE LOGIC
   // -------------------------------
-  
-
   const handleLectureTitleChange = (index, newValue) => {
     setLectures((prev) => {
       const newLectures = [...prev];
@@ -143,8 +144,6 @@ const ViewCourse = () => {
       return newLectures;
     });
   };
-
- 
 
   // -------------------------------
   // QUIZ & UPLOAD LOGIC
@@ -154,7 +153,6 @@ const ViewCourse = () => {
   };
 
   const handleQuizUploadClick = () => {
-    
     setQuizUploadOptions(true);
     setShowUploadOptions(false);
   };
@@ -174,7 +172,7 @@ const ViewCourse = () => {
     try {
       const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
       const teacherId = teacherInfo.teacher.id;
-      
+
       const examData = {
         ...examDetails,
         teacher_id: teacherId,
@@ -228,7 +226,7 @@ const ViewCourse = () => {
     setDrawerOpen((prev) => !prev);
   };
 
-  // Toggle expand/collapse for the entire lecture
+  // Toggle expand/collapse for showing sub-items (Text, Quiz) in the side drawer
   const handleLectureClick = (lectureIndex) => {
     if (!lectures[lectureIndex].isEditing) {
       setExpandedLectureIndex(
@@ -237,19 +235,20 @@ const ViewCourse = () => {
     }
   };
 
-  // Show the "Text" content in left panel
+  // When clicking the "Text" button, set the selected lecture for left panel content
   const handleShowText = (lectureIndex) => {
-    setExpandedLectureIndex(lectureIndex);
+    setSelectedLectureIndexForContent(lectureIndex);
   };
 
-  // Show the "Quiz" content in left panel
+  // Optionally, you can adjust the behavior for "Quiz" button if needed:
   const handleShowQuiz = (lectureIndex) => {
-    setExpandedLectureIndex(lectureIndex);
+    // For now, it can be similar to handleShowText or implement different behavior
+    setSelectedLectureIndexForContent(lectureIndex);
   };
 
   // For adding a new text lecture
   const handleTextLectureClick = () => {
-    navigate("/teacher-panel/teacher-textupload", { state: { courseId ,courseName} });
+    navigate("/teacher-panel/teacher-textupload", { state: { courseId, courseName } });
   };
 
   return (
@@ -276,17 +275,17 @@ const ViewCourse = () => {
         <div className="flex">
           {/* Main content area (left side) */}
           <div className="flex-[3] p-6 bg-white dark:bg-gray-800 shadow-lg border border-gray-400 mb-10 h-[500px] overflow-auto">
-            {expandedLectureIndex !== null ? (
+            {selectedLectureIndexForContent !== null ? (
               <>
                 <h3 className="text-lg font-bold border-b pb-4">
-                  {lectures[expandedLectureIndex].title || "Untitled Lecture"}
+                  {lectures[selectedLectureIndexForContent].title || "Untitled Lecture"}
                 </h3>
                 {/* Show the type and content of this lecture */}
                 <p className="text-md mt-4 border p-4">
-                  {lectures[expandedLectureIndex].type} Lecture
+                  {lectures[selectedLectureIndexForContent].type} Lecture
                 </p>
                 <p className="text-md mt-4 border p-4 whitespace-pre-wrap">
-                  {lectures[expandedLectureIndex].content}
+                  {lectures[selectedLectureIndexForContent].content}
                 </p>
               </>
             ) : (
@@ -328,7 +327,6 @@ const ViewCourse = () => {
                                 placeholder="Enter Lecture Title"
                                 className="w-full mb-2 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
                               />
-                              
                             </div>
                           ) : (
                             <>
@@ -423,7 +421,6 @@ const ViewCourse = () => {
             <h3 className="text-lg font-semibold mb-4">
               Select Lecture Type To Upload
             </h3>
-           
             <button
               onClick={handleQuizUploadClick}
               className="w-full px-4 py-2 border hover:bg-btnbg text-black dark:hover:bg-secondary dark:text-white rounded-md"
