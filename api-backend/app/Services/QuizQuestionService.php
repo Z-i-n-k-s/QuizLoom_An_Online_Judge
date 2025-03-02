@@ -19,7 +19,7 @@ class QuizQuestionService {
 
     public function createQuestion($examId, $data) {
         $exam = Exam::findOrFail($examId);
-        return $exam->questions()->create($data);
+        return $exam->quizQuestions()->create($data);
     }
 
     public function updateQuestion($id, $data) {

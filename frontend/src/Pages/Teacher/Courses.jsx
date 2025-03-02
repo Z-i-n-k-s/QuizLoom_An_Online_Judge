@@ -44,8 +44,8 @@ const Courses = () => {
     setNewCourse({ ...newCourse, [name]: value });
   };
 
-  const handleViewCourse = (id) => {
-    navigate(`/teacher-panel/teachers-courses/${id}`);
+  const handleViewCourse = (id,name) => {
+    navigate(`/teacher-panel/teachers-courses/${id}`, { state: { cou: id,name } });
   };
 
   const handleAddCourse = async () => {
@@ -199,7 +199,7 @@ const Courses = () => {
                 <td className="px-4 py-2 text-center">{course.status || "Ongoing"}</td>
                 <td className="px-4 py-2 text-center">
                   <button
-                    onClick={() => handleViewCourse(course.id)}
+                    onClick={() => handleViewCourse(course.id,course.name)}
                     className="btn btn-sm bg-btnbg text-white mr-2"
                   >
                     View

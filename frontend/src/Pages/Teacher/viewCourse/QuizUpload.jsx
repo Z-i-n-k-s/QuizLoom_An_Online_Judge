@@ -18,7 +18,7 @@ const QuizUpload = () => {
   //const examId = localStorage.getItem("exam_id");
   const examId = location.state?.examId;
   const courseId = location.state?.courseId;
-  console.log("Exam ID from storage:", examId);
+  const courseName = location.state?.courseName;
   // Save to localStorage whenever quizSettings or questions change
   useEffect(() => {
     localStorage.setItem("quizSettings", JSON.stringify(quizSettings));
@@ -92,6 +92,7 @@ const QuizUpload = () => {
       option_d: String(question.options[3]),
       correct_option: question.correctAnswer , 
     };
+    console.log("Adding question:", questionData);
     await apiClient.addQuestionToExam(examId, questionData);
   }
     Swal.fire({
@@ -101,12 +102,14 @@ const QuizUpload = () => {
       confirmButtonColor: "#3085d6",
       confirmButtonText: "OK",
     },
-    navigate(`/teacher-panel/teachers-courses/${courseId}`)
+    navigate(`/teacher-panel/teachers-courses/${courseId}`, { 
+      state:{ name: courseName }})
   );
 
     localStorage.removeItem("quizSettings");
     localStorage.removeItem("questions");
   } catch (error) {
+    console.error("Error uploading quiz:", error);
     Swal.fire({
       title: "Error!",
       text: "An error occurred while uploading the quiz.",
