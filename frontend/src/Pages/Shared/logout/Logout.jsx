@@ -3,9 +3,12 @@ import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import apiClient from "../../../api/Api";
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "../../../store/userSlice";
 
 
 const LogOut = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -20,6 +23,7 @@ const LogOut = () => {
         const response = await apiClient.logout();
   
         if (response?.success) {
+          dispatch(setUserDetails(null));
           // Remove tokens from local storage if still present
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
@@ -41,7 +45,7 @@ const LogOut = () => {
     };
   
     handleLogout();
-  }, [navigate, isLoggingOut]);
+  }, [navigate, isLoggingOut,dispatch]);
   
   
 

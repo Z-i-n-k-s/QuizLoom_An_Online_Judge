@@ -25,10 +25,15 @@ class UserController extends Controller
      *
      * Route Example: GET /users/profile
      */
-    public function profile(Request $request, $id)
+    public function profile(Request $request)
     {
+        // Retrieve the user ID set in the middleware.
+        $id = $request->attributes->get('user_id');
+        error_log($id);
+    
         return response()->json($this->userService->getUserById($id));
     }
+    
     
 
     /**

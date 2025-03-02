@@ -6,26 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateStudentsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('students', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('name');
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
+            $table->string('name')->nullable();
             $table->string('contact_number')->nullable();
-            $table->enum('gender', ['male', 'female', 'other']);
+            $table->string('gender')->nullable();
             $table->string('blood_group')->nullable();
-            $table->enum('enrollment_status', ['active', 'inactive'])->default('active');
+            $table->string('enrollment_status')->nullable(); // active, inactive
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')
+                  ->onDelete('cascade');
         });
     }
-    
-
 
     public function down()
     {
