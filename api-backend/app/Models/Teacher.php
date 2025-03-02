@@ -27,8 +27,8 @@ class Teacher extends Model
     }
 
     // Additional relationship: Teacher has many courses
-    // public function courses()
-    // {
-    //     return $this->hasMany(Course::class);
-    // }
+    public function courses()
+    {
+        return $this->hasMany(Course::class);
+    }
 }

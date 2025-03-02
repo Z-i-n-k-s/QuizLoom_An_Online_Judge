@@ -1,13 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "./ThemeContext";
 import ReactSwitch from "react-switch";
-import { useAuth } from "../AuthContext/AuthContext";
+//import { useAuth } from "../AuthContext/AuthContext";
 
 
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
-  const { user } = useAuth(); // Access user data
+ // const { user } = useAuth(); // Access user data
   const location = useLocation();
  ;
   const isHomePage = location.pathname === "/"; // Check if current page is Home
@@ -20,7 +20,7 @@ const Navbar = () => {
 
       <div className="flex-none gap-6 items-center">
         {/* Show  About Us links only when logged out and on the Home page */}
-        {!user && isHomePage && (
+        { isHomePage && (
           <ul className="flex space-x-4">
             
             <li>

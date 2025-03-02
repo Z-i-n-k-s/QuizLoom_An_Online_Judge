@@ -10,11 +10,11 @@ use Carbon\Carbon;
 class ExamService {
 
     public function getAllExams() {
-        return Exam::with('course', 'questions')->get();
+        return Exam::with('lecture.course', 'quizQuestions')->get();
     }
 
     public function getExamById($id) {
-        return Exam::with('course', 'questions')->findOrFail($id);
+        return Exam::with('lecture.course', 'quizQuestions')->findOrFail($id);
     }
 
     public function createExam($data) {
@@ -34,7 +34,7 @@ class ExamService {
 
     public function addQuestion($examId, $data) {
         $exam = Exam::findOrFail($examId);
-        return $exam->questions()->create($data);
+        return $exam->quizQuestions()->create($data);
     }
 
     public function updateQuestion($questionId, $data) {
@@ -50,15 +50,18 @@ class ExamService {
 
     /**
      * Returns upcoming exams for a given student.
-     * Assumes the student is enrolled in courses, and the exam's date is compared with today's date.
+     * The exam's lecture must belong to one of the courses the student is enrolled in,
+     * and the exam date must be today or in the future.
      */
     public function getUpcomingExamsForStudent($studentId) {
         // Get all course IDs where the student is enrolled.
         $courseIds = Enrollment::where('student_id', $studentId)->pluck('course_id')->toArray();
         $today = Carbon::today()->toDateString();
 
-        return Exam::with('course', 'questions')
-            ->whereIn('course_id', $courseIds)
+        return Exam::with('lecture.course', 'quizQuestions')
+            ->whereHas('lecture', function($query) use ($courseIds) {
+                $query->whereIn('course_id', $courseIds);
+            })
             ->where('date', '>=', $today)
             ->get();
     }

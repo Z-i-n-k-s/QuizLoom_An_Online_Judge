@@ -22,6 +22,7 @@ class QuizQuestionController extends Controller {
     }
 
     public function store(Request $request, $examId) {
+       
         $data = $request->validate([
             'question' => 'required|string',
             'option_a' => 'required|string',
@@ -34,6 +35,7 @@ class QuizQuestionController extends Controller {
     }
 
     public function update(Request $request, $id) {
+     
         $data = $request->validate([
             'question' => 'sometimes|string',
             'option_a' => 'sometimes|string',

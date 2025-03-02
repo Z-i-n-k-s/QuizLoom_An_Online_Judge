@@ -6,15 +6,17 @@ import {
 } from "react-router-dom";
 import { router } from "./Routes/Routes";
 import { ThemeProvider } from "./Shared/Navbar/ThemeContext"; // Your theme context
-import { AuthProvider } from "./Shared/AuthContext/AuthContext";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
+
  // Import the AuthProvider
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-   <AuthProvider>
+  <Provider store={store}>
       <ThemeProvider> 
         <RouterProvider router={router} />
       </ThemeProvider>
-    </AuthProvider>
+</Provider>
   </React.StrictMode>
 );

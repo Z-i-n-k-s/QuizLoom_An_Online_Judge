@@ -1,88 +1,59 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../api/Api";
 
 const MyCourses = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      name: "Math 101",
-      enroll: 120,
-      lectures: 20,
-      duration: "130 days",
-      status: "Finished",
-    },
-    {
-      id: 2,
-      name: "Database",
-      enroll: 120,
-      lectures: 20,
-      duration: "130 days",
-      status: "Ongoing",
-    },
-  ]);
+  const [courses, setCourses] = useState([]);
   const [newCourse, setNewCourse] = useState({
-    name: "",
-    duration: "",
+    course_code: "",
   });
 
-  // Handle input changes for the modal form
+  useEffect(() => {
+    fetchEnrolledCourses();
+  }, []);
+
+  const fetchEnrolledCourses = async () => {
+    try {
+      const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const studentId = studentInfo.student.id;
+      const enrolledCourses = await apiClient.getEnrolledCourses(studentId);
+      console.log("Enrolled courses:", enrolledCourses);
+      setCourses(enrolledCourses);
+    } catch (error) {
+      console.error("Error fetching enrolled courses:", error);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCourse({ ...newCourse, [name]: value });
-    console.log("Input Changed:", { ...newCourse, [name]: value });
   };
 
-    const handleViewCourse = (id) => {
-    navigate(`/teacher-panel/teachers-courses/${id}`);
+  const handleViewCourse = (course) => {
+    navigate(`/student-panel/view-courses-stu/${course.id}`, { state: { courseName: course.name } });
   };
+  
 
-  // Add course and update the course list
   const handleAddCourse = async () => {
-    console.log("Attempting to add course:", newCourse);
-
     try {
-      // POST request to the backend
-      const response = await fetch("http://127.0.0.1:8000/api/addCourse", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newCourse),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add course");
+      const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const studentId = studentInfo.student.id;
+      const courseCode = newCourse.course_code;
+      if (!courseCode) {
+        console.error("Course code is missing!");
+        return;
       }
-
-      const result = await response.json();
-      console.log("Course added successfully (response):", result);
-
-      // Update the courses state
-      setCourses((prevCourses) => {
-        const updatedCourses = [
-          ...prevCourses,
-          {
-            id: result.id || prevCourses.length + 1, // Fallback for ID if not returned by API
-            name: newCourse.name,
-            enroll: 0,
-            lectures: 0,
-            duration: newCourse.duration,
-            status: "Ongoing",
-          },
-        ];
-        console.log("Updated courses list:", updatedCourses);
-        return updatedCourses;
-      });
-
-      // Reset the form and close the modal
-      setNewCourse({ name: "", duration: "" });
+      await apiClient.enrollByCourseCode(studentId, { course_code: courseCode });
+      await fetchEnrolledCourses();
+      setNewCourse({ course_code: "" });
       setIsModalOpen(false);
     } catch (error) {
-      console.error("Error adding course:", error);
+      console.error("Error enrolling in course:", error);
     }
   };
+  
   return (
     <div className="p-8">
       <div className="flex flex-wrap justify-center mt-10 gap-8">
@@ -149,46 +120,42 @@ const MyCourses = () => {
       </div>
 
       {/* Table */}
+      
+
       <div className="overflow-x-auto mt-8 ml-8">
         <table className="table w-full border rounded-lg mb-20">
           <thead>
             <tr className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white">
               <th className="px-4 py-2 text-center">Sl No</th>
+              <th className="px-4 py-2 text-center">Course Code</th>
               <th className="px-4 py-2 text-center">Course Name</th>
               <th className="px-4 py-2 text-center">Number of Lectures</th>
-              <th className="px-4 py-2 text-center">Completed Lectures</th>
-              <th className="px-4 py-2 text-center">Course Duration</th>
+              <th className="px-4 py-2 text-center">Completion Time</th>
               <th className="px-4 py-2 text-center">Enrolled on</th>
-              <th className="px-4 py-2 text-center">Progress</th>
               <th className="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {courses.map((course, index) => (
-              <tr
-                key={course.id}
-                className="hover:bg-gray-100 dark:hover:bg-gray-600"
-              >
+              <tr key={course.id} className="hover:bg-gray-100 dark:hover:bg-gray-600">
                 <td className="px-4 py-2 text-center">{index + 1}</td>
+                <td className="px-4 py-2 text-center">{course.course_code}</td>
                 <td className="px-4 py-2 text-center">{course.name}</td>
-                <td className="px-4 py-2 text-center">{course.enroll}</td>
-                <td className="px-4 py-2 text-center">{course.lectures}</td>
-                <td className="px-4 py-2 text-center">{course.duration}</td>
-                <td className="px-4 py-2 text-center">{course.status}</td>
-                <td className="px-4 py-2 text-center">50%</td>
+                <td className="px-4 py-2 text-center">{course.number_of_lectures}</td>
+                <td className="px-4 py-2 text-center">{course.completion_time} hrs</td>
+                <td className="px-4 py-2 text-center">{new Date(course.created_at).toLocaleDateString()}</td>
                 <td className="px-4 py-2 text-center">
-                  <button  onClick={() => handleViewCourse(course.id)} 
-                    className="btn btn-sm bg-btnbg text-white mr-2 borded-none dark:bg-secondary dark:hover:bg-btnbg"
+                  <button 
+                    onClick={() => handleViewCourse(course)}
+                    className="btn btn-sm bg-btnbg text-white mr-2 dark:bg-secondary dark:hover:bg-btnbg"
                   >
                     View
                   </button>
                   <button
                     className="btn btn-sm btn-error"
-                    onClick={() => {
-                      console.log("Delete course clicked:", course);
-                    }}
+                    onClick={() => console.log("Unenroll clicked for:", course)}
                   >
-                    Unenroll 
+                    Unenroll
                   </button>
                 </td>
               </tr>
@@ -196,6 +163,7 @@ const MyCourses = () => {
           </tbody>
         </table>
       </div>
+
 
       {/* enroll in New Course Modal */}
       {isModalOpen && (
@@ -207,8 +175,8 @@ const MyCourses = () => {
             <div className="flex flex-col space-y-4">
               <input
                 type="text"
-                name="name"
-                value={newCourse.name}
+                name="course_code"
+                value={newCourse.course_code}
                 onChange={handleInputChange}
                 placeholder="Course code"
                 className="input input-bordered  w-full text-white"

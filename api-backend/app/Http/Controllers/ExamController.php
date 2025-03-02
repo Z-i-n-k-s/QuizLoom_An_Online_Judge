@@ -22,24 +22,22 @@ class ExamController extends Controller {
 
     public function store(Request $request) {
         $data = $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'teacher_id' => 'required|exists:teachers,id',
-            'name' => 'required|string',
-            'total_marks' => 'required|integer',
-            'duration' => 'required|integer',
-            'date' => 'required|date',
+            'lecture_id'   => 'required|exists:lectures,id',
+            'name'         => 'required|string',
+            'total_marks'  => 'required|integer',
+            'duration'     => 'required|integer',
+            'date'         => 'required|date',
         ]);
         return response()->json($this->examService->createExam($data));
     }
 
     public function update(Request $request, $id) {
         $data = $request->validate([
-            'course_id' => 'sometimes|exists:courses,id',
-            'teacher_id' => 'sometimes|exists:teachers,id',
-            'name' => 'sometimes|string',
-            'total_marks' => 'sometimes|integer',
-            'duration' => 'sometimes|integer',
-            'date' => 'sometimes|date',
+            'lecture_id'   => 'sometimes|exists:lectures,id',
+            'name'         => 'sometimes|string',
+            'total_marks'  => 'sometimes|integer',
+            'duration'     => 'sometimes|integer',
+            'date'         => 'sometimes|date',
         ]);
         return response()->json($this->examService->updateExam($id, $data));
     }

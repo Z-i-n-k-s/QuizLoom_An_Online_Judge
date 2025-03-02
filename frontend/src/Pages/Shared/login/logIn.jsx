@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import bgImage1 from "../../../assets/login.webp";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import apiClient from "../../../api/Api";
+import Context from "../../../context";
 
 const LogIn = () => {
+  const { fetchUserDetails } = useContext(Context);
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -36,6 +38,7 @@ const LogIn = () => {
   
       console.log("response", response);
       if (response.success) {
+        fetchUserDetails();
         // Save tokens to local storage
         const { access_token, refresh_token } = response.tokens;
         localStorage.setItem("access_token", access_token);

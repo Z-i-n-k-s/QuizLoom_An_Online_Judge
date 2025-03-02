@@ -18,11 +18,18 @@ import Courses from "../Pages/Teacher/Courses";
 import ViewCourse from "../Pages/Teacher/viewCourse/ViewCourse"; // Import ViewCourse component
 import TeacherExams from "../Pages/Teacher/TeacherExams";
 import TeacherResult from "../Pages/Teacher/TeacherResult";
-import TeacherAnnouncement from "../Pages/Teacher/TeacherAnnouncement";
+
 import AboutUs from "../Pages/Shared/aboutUs/AboutUs";
 import LogOut from "../Pages/Shared/logout/Logout";
 import TeacherDashboard from "../Pages/Teacher/TeacherDashboard";
 import QuizUpload from "../Pages/Teacher/viewCourse/QuizUpload";
+
+import ViewCourseStu from "../Pages/Student/viewCourse/ViewCourseStu";
+import TextQuizStu from "../Pages/Student/viewCourse/TextQuizStu";
+import TextUpload from "../Pages/Teacher/viewCourse/TextUpload";
+
+import TeacherAnnouncements from "../Pages/Teacher/TeacherAnnouncements";
+
 
 
 export const router = createBrowserRouter([
@@ -78,6 +85,15 @@ export const router = createBrowserRouter([
             element: <MyCourses />,
           },
           {
+            path:'view-courses-stu/:id',
+            element:<ViewCourseStu></ViewCourseStu>
+          },
+          {
+
+            path:'text-quiz-stu/:id',
+            element: <TextQuizStu></TextQuizStu>
+          },
+          {
             path: "exams",
             element: <Exams />,
           },
@@ -124,12 +140,16 @@ export const router = createBrowserRouter([
             element: <QuizUpload></QuizUpload>
           },
           {
+            path: "teacher-textupload",
+            element: <TextUpload />,
+          },
+          {
             path: "teachers-results",
             element: <TeacherResult />,
           },
           {
             path: "teachers-announcements",
-            element: <TeacherAnnouncement />,
+            element: <TeacherAnnouncements />,
           },
           {
             path: "teacher-logout",

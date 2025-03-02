@@ -20,7 +20,7 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 ">
       {/* Dashboard Cards Section */}
       <div className="flex flex-wrap justify-center mt-10 gap-8">
         {/* Card 1 */}
@@ -91,7 +91,7 @@ const StudentDashboard = () => {
             Class Schedule
           </h2>
           
-          <div className="flex flex-col items-center justify-center h-full">
+          <div className="flex flex-col items-center justify-center h-full ">
   <Calendar />
   <div className="mt-4">
     <p>8:30 PM - Quiz 1</p>
