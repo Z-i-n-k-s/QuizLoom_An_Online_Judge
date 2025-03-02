@@ -45,7 +45,7 @@ const SignUp = () => {
         password_confirmation: data.confirmPassword,
         name: data.name,
       });
-      
+
       if (response.success) {
         const { access_token, refresh_token } = response.tokens;
         localStorage.setItem("access_token", access_token);
