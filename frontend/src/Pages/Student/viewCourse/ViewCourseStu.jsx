@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import apiClient from "../../../api/Api";
 import TextQuizStu from "./TextQuizStu";
 
 const ViewCourse = () => {
   const { id: courseId } = useParams();
   const location = useLocation();
+  const user = useSelector((state) => state?.user?.user);
 
   const [isLoading, setIsLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -16,93 +18,141 @@ const ViewCourse = () => {
   const [activeLectureIndex, setActiveLectureIndex] = useState(null);
   // Determines whether to show "Text" or "Quiz" in the main panel
   const [activeTab, setActiveTab] = useState("Text");
-  // Mapping of lecture id to exam id (if available)
-  const [examMapping, setExamMapping] = useState({});
+  // Flag for displaying the quiz info popup
+  const [showQuizPopup, setShowQuizPopup] = useState(false);
 
   const courseName = location.state?.courseName || "undefined";
-  console.log("courseName", courseName);
-
-  useEffect(() => {
-    const fetchLecturesFromBackend = async () => {
-      try {
-        setIsLoading(true);
-        const response = await apiClient.getLectureId(courseId);
-        // Expecting response as an array of lecture objects
-        if (response && Array.isArray(response)) {
-          const mappedLectures = response.map((lecture) => ({
-            id: lecture.id,
-            title: lecture.title || "Untitled Lecture",
-            type: lecture.type || "Text",
-            content: lecture.lecture_data || "",
-          }));
-          setLectures(mappedLectures);
-        } else {
-          setLectures([]);
+  const fetchLecturesFromBackend = async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.getLectureId(courseId);
+      console.log(response);
+      // Map each lecture and include exam details (and results) if available.
+      if (response && Array.isArray(response)) {
+        const mappedLectures = response.map((lecture) => ({
+          id: lecture.id,
+          title: lecture.title || "Untitled Lecture",
+          type: lecture.type || "Text",
+          content: lecture.lecture_data || "",
+          examDetails: lecture.exam
+            ? {
+                id: lecture.exam.id, // Include exam id here
+                duration: lecture.exam.duration, // in minutes
+                totalMarks: lecture.exam.total_marks, // e.g., 60
+                name: lecture.exam.name,
+                quizQuestions:
+                  lecture.exam.quiz_questions &&
+                  Array.isArray(lecture.exam.quiz_questions)
+                    ? lecture.exam.quiz_questions
+                    : [],
+                results: lecture.exam.results || [], // previous quiz results, if any
+              }
+            : null,
+        }));
+        setLectures(mappedLectures);
+        // Set first lecture as active by default if available.
+        if (mappedLectures.length > 0) {
+          setActiveLectureIndex(0);
+          setActiveTab("Text");
         }
-      } catch (error) {
-        console.error("Error fetching lectures:", error);
+      } else {
         setLectures([]);
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching lectures:", error);
+      setLectures([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    
 
     fetchLecturesFromBackend();
   }, [courseId]);
 
-  // Toggle the side drawer for lectures
+  // Toggle the side drawer for lectures.
   const toggleLectureContents = () => {
     setDrawerOpen((prev) => !prev);
   };
 
-  // Toggle expansion of a lecture slot in the drawer
+  // Toggle expansion of a lecture slot in the drawer.
   const handleLectureClick = (lectureIndex) => {
     setExpandedLectureIndex(
       expandedLectureIndex === lectureIndex ? null : lectureIndex
     );
   };
 
-  // Set active lecture and show text content
+  // Set active lecture and show text content.
   const handleShowText = (lectureIndex) => {
     setActiveLectureIndex(lectureIndex);
     setActiveTab("Text");
+    setShowQuizPopup(false);
   };
 
-  // Set active lecture, show quiz, and fetch exam id if available
-  const handleShowQuiz = async (lectureIndex) => {
+  // For lectures with quiz questions, trigger the quiz popup (if quiz not taken yet).
+  const handleQuizButton = (lectureIndex) => {
+    setActiveLectureIndex(lectureIndex);
+    setShowQuizPopup(true);
+  };
+
+  // When clicking on a quiz (completed or not) from side drawer or bottom nav,
+  // show the quiz view (TextQuizStu). A "View Text" button inside that component will let you switch back.
+  const handleShowQuiz = (lectureIndex) => {
     setActiveLectureIndex(lectureIndex);
     setActiveTab("Quiz");
-    try {
-      // Fetch all exams from your backend
-      const exams = await apiClient.getexamId();
-      const lectureId = lectures[lectureIndex].id;
-      // Find the exam that corresponds to this lecture id
-      const examForLecture = exams.find(
-        (exam) => exam.lecture_id === lectureId
-      );
+    setShowQuizPopup(false);
+  };
 
-      if (examForLecture) {
-        console.log(
-          "Exam found for lecture:",
-          lectureId,
-          "with exam id:",
-          examForLecture.id
-        );
-        // Save the exam id in the mapping for this lecture id
-        setExamMapping((prev) => ({
-          ...prev,
-          [lectureId]: examForLecture.id,
-        }));
-      } else {
-        console.log("No exam found for lecture:", lectureId);
-      }
-    } catch (error) {
-      console.error("Error fetching exam id:", error);
+  // Navigation handlers always set view to "Text".
+  const handlePrevious = () => {
+    if (activeLectureIndex > 0) {
+      setActiveLectureIndex(activeLectureIndex - 1);
+      setActiveTab("Text");
+      setShowQuizPopup(false);
     }
   };
 
+  const handleNext = () => {
+    if (activeLectureIndex < lectures.length - 1) {
+      setActiveLectureIndex(activeLectureIndex + 1);
+      setActiveTab("Text");
+      setShowQuizPopup(false);
+    }
+  };
+
+  const currentLecture =
+    activeLectureIndex !== null ? lectures[activeLectureIndex] : null;
+
+  // Determine if the current lecture has quiz questions.
+  const hasQuiz =
+    currentLecture &&
+    currentLecture.examDetails &&
+    currentLecture.examDetails.quizQuestions &&
+    currentLecture.examDetails.quizQuestions.length > 0;
+
+  // Check if the current user has already taken the quiz for the active lecture.
+  const examResult =
+    currentLecture?.examDetails?.results?.find(
+      (result) => result.student_id === user?.id
+    ) || null;
+
+  // Bottom navigation: if there's a next lecture, show Next button instead of Quiz Completed.
+  const showNextButton = activeLectureIndex < lectures.length - 1;
+
+  const handleQustionSubmit =async()=>{
+    const response = await apiClient.askQustions(data);
+  }
+ 
+  const handleEditQustionSubmit =async()=>{
+    const response = await apiClient.editQustions(id);
+  }
+  const handleDeleteQustionSubmit =async()=>{
+    const response = await apiClient.deleteQustions(id);
+  }
+
   return (
-    <div className="mt-20 ml-10">
+    <div className="mt-20 ml-10 relative">
       {isLoading && (
         <div className="fixed inset-0 flex justify-center items-center backdrop-blur-md bg-gray-500 bg-opacity-30 z-50">
           <div className="loader border-t-4 border-blue-500 w-16 h-16 rounded-full animate-spin"></div>
@@ -122,29 +172,60 @@ const ViewCourse = () => {
 
         <div className="flex">
           {/* Main content area */}
-          <div className="flex-[3] p-6 bg-white dark:bg-gray-800 shadow-lg border border-gray-400 mb-10 h-[500px] overflow-auto">
-            {activeLectureIndex !== null ? (
+          <div className="flex-[3] p-6 bg-white dark:bg-gray-800 shadow-lg h-[500px] overflow-auto">
+            {activeLectureIndex !== null && currentLecture ? (
               <>
                 <h3 className="text-lg font-bold border-b pb-4">
-                  {lectures[activeLectureIndex].title}
+                  {currentLecture.title}
                 </h3>
                 {activeTab === "Text" && (
-                  <>
-                    <p className="text-md mt-4 border p-4">
-                      {lectures[activeLectureIndex].type} Lecture
-                    </p>
-                    <p className="text-md mt-4 border p-4 whitespace-pre-wrap">
-                      {lectures[activeLectureIndex].content}
-                    </p>
-                  </>
+                  <p className="text-md mt-4 border p-4 whitespace-pre-wrap">
+                    {currentLecture.content}
+                  </p>
                 )}
                 {activeTab === "Quiz" && (
-                  <TextQuizStu
-                    type="quiz"
-                    lectureId={lectures[activeLectureIndex].id}
-                    examId={examMapping[lectures[activeLectureIndex].id]}
-                    onFinishQuiz={() => console.log("Quiz finished")}
-                  />
+                 <TextQuizStu
+                 type="quiz"
+                 lectureId={currentLecture.id}
+                 examId={currentLecture.examDetails?.id}
+                 quizQuestions={currentLecture.examDetails?.quizQuestions}
+                 examDuration={currentLecture.examDetails ? currentLecture.examDetails.duration * 60 : 600}
+                 examTotalMarks={currentLecture.examDetails ? currentLecture.examDetails.totalMarks : 0}
+                 onFinishQuiz={async () => {
+                  console.log("Quiz finished");
+                
+                  // Store the current lecture index before refreshing data
+                  const currentIndex = activeLectureIndex;
+                
+                  await fetchLecturesFromBackend(); // Fetch updated lecture data
+                
+                  // Restore the active lecture after data updates
+                  setTimeout(() => {
+                    setLectures((prevLectures) => {
+                      const updatedLecture = prevLectures[currentIndex]; // Keep the same lecture
+                      const updatedExamResult = updatedLecture?.examDetails?.results?.find(
+                        (result) => result.student_id === user?.id
+                      );
+                
+                      console.log("Updated Exam Result:", updatedExamResult);
+                
+                      // Restore previous lecture and show the quiz results
+                      setActiveLectureIndex(currentIndex);
+                      if (updatedExamResult) {
+                        setActiveTab("Quiz"); // Stay on quiz to show results
+                      }
+                
+                      return prevLectures;
+                    });
+                  }, 500); // Delay to ensure state update
+                }}
+                
+                
+                 user={user}
+                 examResult={examResult}
+               />
+               
+                
                 )}
               </>
             ) : (
@@ -163,8 +244,18 @@ const ViewCourse = () => {
               {lectures.length > 0 ? (
                 lectures.map((lecture, index) => {
                   const isExpanded = expandedLectureIndex === index;
+                  // Check if the quiz for this lecture was already taken.
+                  const alreadyTaken =
+                    lecture.examDetails &&
+                    lecture.examDetails.results &&
+                    lecture.examDetails.results.some(
+                      (result) => result.student_id === user?.id
+                    );
                   return (
-                    <div key={lecture.id || index} className="mb-4 pb-4 border-b">
+                    <div
+                      key={lecture.id || index}
+                      className="mb-4 pb-4 border-b"
+                    >
                       <div className="flex justify-between items-center">
                         <span className="font-bold mr-2">
                           Lecture {index + 1}:
@@ -198,15 +289,33 @@ const ViewCourse = () => {
                             </span>
                             <span>Text</span>
                           </button>
-                          <button
-                            className="flex items-center space-x-2 px-4 py-2 border rounded-md"
-                            onClick={() => handleShowQuiz(index)}
-                          >
-                            <span role="img" aria-label="quiz">
-                              ❓
-                            </span>
-                            <span>Quiz</span>
-                          </button>
+                          {lecture.examDetails &&
+                            lecture.examDetails.quizQuestions &&
+                            lecture.examDetails.quizQuestions.length > 0 && (
+                              <>
+                                {alreadyTaken ? (
+                                  <button
+                                    onClick={() => handleShowQuiz(index)}
+                                    className="flex items-center space-x-2 px-4 py-2 border rounded-md bg-gray-300 text-gray-600"
+                                  >
+                                    <span role="img" aria-label="quiz">
+                                      ✔️
+                                    </span>
+                                    <span>Quiz Completed</span>
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleQuizButton(index)}
+                                    className="flex items-center space-x-2 px-4 py-2 border rounded-md"
+                                  >
+                                    <span role="img" aria-label="quiz">
+                                      ❓
+                                    </span>
+                                    <span>Quiz</span>
+                                  </button>
+                                )}
+                              </>
+                            )}
                         </div>
                       )}
                     </div>
@@ -220,7 +329,100 @@ const ViewCourse = () => {
             </div>
           )}
         </div>
+
+        {/* Bottom Navigation */}
+        {activeLectureIndex !== null && lectures.length > 0 && (
+          <div className="mt-4 flex justify-between">
+            {activeLectureIndex > 0 ? (
+              <button
+                onClick={handlePrevious}
+                className="btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md"
+              >
+                Previous
+              </button>
+            ) : (
+              <div></div>
+            )}
+            {hasQuiz ? (
+              examResult ? (
+                showNextButton ? (
+                  <button
+                    onClick={handleNext}
+                    className="btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="btn bg-gray-300 text-gray-600 px-4 py-2 rounded-lg shadow-md cursor-not-allowed"
+                  >
+                    Quiz Completed
+                  </button>
+                )
+              ) : (
+                <button
+                  onClick={() => setShowQuizPopup(true)}
+                  className="btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md"
+                >
+                  Quiz Info
+                </button>
+              )
+            ) : (
+              showNextButton && (
+                <button
+                  onClick={handleNext}
+                  className="btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md"
+                >
+                  Next
+                </button>
+              )
+            )}
+          </div>
+        )}
       </div>
+
+      
+
+{/* Quiz Info Popup */}
+{showQuizPopup && currentLecture && currentLecture.examDetails && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+    <div className="relative bg-white dark:bg-gray-900 text-center p-8 rounded-lg shadow-lg w-96 max-w-full">
+      
+      {/* Close Button (Icon) */}
+      <button
+        onClick={() => setShowQuizPopup(false)}
+        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <h1 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
+        {currentLecture.examDetails.name}
+      </h1>
+      <p className="text-xl mb-2 text-gray-600 dark:text-gray-300">
+        Duration: {currentLecture.examDetails.duration} minutes
+      </p>
+      <p className="text-xl mb-6 text-gray-600 dark:text-gray-300">
+        Total Marks: {currentLecture.examDetails.totalMarks}
+      </p>
+
+      {/* Start Quiz Button */}
+      <button
+        onClick={() => {
+          setActiveTab("Quiz"); // Switch to quiz
+          setShowQuizPopup(false); // Close the modal
+        }}
+        className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+      >
+        Start Quiz
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

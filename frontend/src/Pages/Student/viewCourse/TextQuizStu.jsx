@@ -1,16 +1,42 @@
 import { useState, useEffect } from "react";
 import apiClient from "../../../api/Api";
 
-const TextQuizStu = ({ type, lectureId, examId, onFinishQuiz }) => {
-  
+const TextQuizStu = ({
+  type,
+  lectureId,
+  examId,
+  quizQuestions,
+  examDuration,
+  examTotalMarks,
+  onFinishQuiz,
+  user,
+  examResult, // New prop for existing result
+}) => {
+  // Mapping from letter to numeric index.
+  const letterToIndex = { A: 0, B: 1, C: 2, D: 3 };
+
+  // If a result already exists, show it immediately.
+  if (type === "quiz" && examResult) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center">
+        <h1 className="text-xl font-bold text-center mb-4">Quiz Results</h1>
+        <p className="mb-4 text-lg">
+          <span className="p-4 border rounded-full w-24 h-24 flex items-center justify-center text-lg font-semibold bg-blue-500 text-white">
+            {examResult.obtained_marks}/{examTotalMarks}
+          </span>
+        </p>
+      </div>
+    );
+  }
+
+  // Initialize timer with examDuration (in seconds) or default to 600.
+  const [timeLeft, setTimeLeft] = useState(examDuration || 600);
   const [quizData, setQuizData] = useState([]); // Always initialize as an array
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // Instead of saving the option text, we store the numeric index (0 to 3).
   const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(600);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [viewAnswers, setViewAnswers] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -30,37 +56,50 @@ const TextQuizStu = ({ type, lectureId, examId, onFinishQuiz }) => {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
-  // Fetch quiz questions
-  const handleStartQuiz = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await apiClient.giveExamBystudent(examId);
-      console.log("API Response:", response); 
-
-      if (!Array.isArray(response)) {
-        throw new Error("Invalid quiz data format");
+  // Fetch or load quiz questions automatically when component mounts
+  useEffect(() => {
+    const startQuizAutomatically = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (
+          quizQuestions &&
+          Array.isArray(quizQuestions) &&
+          quizQuestions.length > 0
+        ) {
+          setQuizData(quizQuestions);
+        } else {
+          const response = await apiClient.giveExamBystudent(examId);
+          console.log("API Response:", response);
+          if (!Array.isArray(response)) {
+            throw new Error("Invalid quiz data format");
+          }
+          setQuizData(response);
+        }
+        setQuizStarted(true);
+      } catch (err) {
+        setError("Failed to fetch quiz questions.");
+        console.error("API error:", err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setQuizData(response);
-      setQuizStarted(true);
-    } catch (err) {
-      setError("Failed to fetch quiz questions.");
-      console.error("API error:", err);
-    } finally {
-      setLoading(false);
+    if (type === "quiz" && !quizStarted) {
+      startQuizAutomatically();
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type, quizQuestions, examId]);
 
-  // Handle answer selection
-  const handleAnswerSelect = (option) => {
+  // Handle answer selection and store the numeric index (0, 1, 2, or 3)
+  const handleAnswerSelect = (optionIndex) => {
     setSelectedAnswers((prev) => ({
       ...prev,
-      [currentQuestionIndex]: option,
+      [currentQuestionIndex]: optionIndex,
     }));
   };
 
-  // Navigation
+  // Navigation within quiz
   const handleNextQuestion = () => {
     if (currentQuestionIndex < quizData.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
@@ -73,64 +112,59 @@ const TextQuizStu = ({ type, lectureId, examId, onFinishQuiz }) => {
     }
   };
 
-  // Submit quiz
-  const handleSubmitQuiz = () => {
-    setQuizSubmitted(true);
-    if (onFinishQuiz) {
-      onFinishQuiz({ quizData, selectedAnswers });
+  // Function to call the API and save the result.
+  // It takes finalScore as a parameter.
+  const handleSubmit = async (finalScore) => {
+    setLoading(true);
+    try {
+      // Ensure student_id and exam_id are provided and cast to integers.
+      if (!user?.id || !examId) {
+        throw new Error("Missing student id or exam id.");
+      }
+      // Determine status based on 40% passing threshold.
+      const passingThreshold = 0.4 * examTotalMarks;
+      const status = finalScore < passingThreshold ? "failed" : "passed";
+      // Prepare data for submission.
+      const resultData = {
+        student_id: parseInt(user.id, 10),
+        exam_id: parseInt(examId, 10),
+        obtained_marks: finalScore,
+        status: status,
+      };
+      console.log("Submitting result data:", resultData);
+      // Submit the result.
+      const response = await apiClient.saveResult(resultData);
+      console.log("Result saved:", response);
+    } catch (error) {
+      console.error("Error during submission", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Safely compute total marks
-  const totalMarks = Array.isArray(quizData)
-    ? quizData.reduce((total, question, index) => {
-        if (selectedAnswers[index] === question.correctAnswer) {
-          return total + (question.marks || 0);
-        }
-        return total;
-      }, 0)
-    : 0;
+  // Submit quiz, calculate score, and call the handleSubmit function.
+  const handleSubmitQuiz = async () => {
+    const marksEach = quizData.length
+      ? parseFloat((examTotalMarks / quizData.length).toFixed(2))
+      : 0;
+    console.log(`Marks per question: ${marksEach}`);
 
-  const totalPossibleMarks = Array.isArray(quizData)
-    ? quizData.reduce((total, q) => total + (q.marks || 0), 0)
-    : 0;
+    const obtainedMarks = quizData.reduce((score, question, index) => {
+      const correctAnswerIndex = letterToIndex[question.correct_option];
+      if (selectedAnswers[index] === correctAnswerIndex) {
+        return score + marksEach;
+      }
+      return score;
+    }, 0);
+    const finalScore = Math.ceil(obtainedMarks);
+    console.log(`Final Score: ${finalScore}/${examTotalMarks}`);
 
-  // Reset quiz
-  const handleBackToStartQuiz = () => {
-    setQuizStarted(false);
-    setQuizSubmitted(false);
-    setCurrentQuestionIndex(0);
-    setSelectedAnswers({});
-    setViewAnswers(false);
-    setTimeLeft(600);
+    await handleSubmit(finalScore);
+    setQuizSubmitted(true);
+    if (onFinishQuiz) {
+      onFinishQuiz({ quizData, selectedAnswers, finalScore });
+    }
   };
-
-  // Render loading and error states
-  if (type === "quiz" && !quizStarted) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-800">
-        <div className="bg-white dark:bg-gray-900 text-center p-8 rounded-lg shadow-lg w-96 max-w-full">
-          <h1 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">Quiz</h1>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          {loading ? (
-            <p>Loading quiz questions...</p>
-          ) : (
-            <>
-              <p className="text-xl mb-6 text-gray-600 dark:text-gray-300">
-                Are you sure you want to start the quiz?
-              </p>
-              <button
-                onClick={handleStartQuiz}
-                className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
-              >
-                Start Quiz
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   // Quiz question display
   if (type === "quiz" && quizStarted && !quizSubmitted) {
@@ -138,26 +172,32 @@ const TextQuizStu = ({ type, lectureId, examId, onFinishQuiz }) => {
       return <p>No quiz questions available.</p>;
     }
     const currentQuestion = quizData[currentQuestionIndex];
+    const options = [
+      currentQuestion.option_a,
+      currentQuestion.option_b,
+      currentQuestion.option_c,
+      currentQuestion.option_d,
+    ];
 
     return (
       <div>
         <div className="flex justify-end mb-4">
           <p className="p-4 border mr-4">Time Left: {formatTime(timeLeft)}</p>
-          <p className="p-4 border">Total Marks: {totalPossibleMarks}</p>
+          <p className="p-4 border">Total Marks: {examTotalMarks}</p>
         </div>
 
         <h1 className="text-xl font-bold mb-4">{currentQuestion.question}</h1>
 
         <div className="grid grid-cols-2 gap-4">
-          {currentQuestion.options.map((option, index) => (
+          {options.map((option, index) => (
             <div
               key={index}
               className={`p-4 border rounded-lg cursor-pointer dark:hover:text-black ${
-                selectedAnswers[currentQuestionIndex] === option
+                selectedAnswers[currentQuestionIndex] === index
                   ? "bg-blue-400 text-black"
                   : "hover:bg-gray-100"
               }`}
-              onClick={() => handleAnswerSelect(option)}
+              onClick={() => handleAnswerSelect(index)}
             >
               {option}
             </div>
@@ -192,14 +232,26 @@ const TextQuizStu = ({ type, lectureId, examId, onFinishQuiz }) => {
     );
   }
 
-  // Quiz results
+  // Display quiz results after submission
   if (type === "quiz" && quizSubmitted) {
+    const marksEach = quizData.length
+      ? parseFloat((examTotalMarks / quizData.length).toFixed(2))
+      : 0;
+    const obtainedMarks = quizData.reduce((score, question, index) => {
+      const correctAnswerIndex = letterToIndex[question.correct_option];
+      if (selectedAnswers[index] === correctAnswerIndex) {
+        return score + marksEach;
+      }
+      return score;
+    }, 0);
+    const finalScore = Math.ceil(obtainedMarks);
+
     return (
-      <div className="p-8 flex flex-col items-center justify-center min-h-screen">
+      <div className="p-8 flex flex-col items-center justify-center">
         <h1 className="text-xl font-bold text-center mb-4">Quiz Results</h1>
         <p className="mb-4 text-lg">
           <span className="p-4 border rounded-full w-24 h-24 flex items-center justify-center text-lg font-semibold bg-blue-500 text-white">
-            {totalMarks}/{totalPossibleMarks}
+            {finalScore}/{examTotalMarks}
           </span>
         </p>
       </div>

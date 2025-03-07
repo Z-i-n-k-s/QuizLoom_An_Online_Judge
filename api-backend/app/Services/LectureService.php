@@ -8,8 +8,15 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class LectureService {
 
-    public function getLecturesByCourseId($courseId) {
-        $course = Course::findOrFail($courseId);
+    public function getLecturesByCourseId($courseId)
+    {
+        $course = Course::with([
+            'lectures.exam.quizQuestions',
+            // 'lectures.exam.codeExamQuestions',
+            'lectures.exam.results',
+            // 'lectures.questions.answers'
+        ])->findOrFail($courseId);
+    
         return $course->lectures;
     }
 

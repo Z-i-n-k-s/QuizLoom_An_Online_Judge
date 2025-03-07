@@ -251,6 +251,49 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
+  async saveResult(data) {
+    try {
+      const response = await this.client.post(`api/results`,data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async askQustions(data) {
+    try {
+      const response = await this.client.post(`api/lecture-questions`,data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async getAllQustions() {
+    try {
+      const response = await this.client.get(`api/lecture-questions`,data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async editQustions(id,data) {
+    try {
+      const response = await this.client.put(`api/lecture-questions/${id}`,data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async deleteQustions(id) {
+    try {
+      const response = await this.client.delete(`api/lecture-questions/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+
+
 }
 
 // Exporting an instance of the client

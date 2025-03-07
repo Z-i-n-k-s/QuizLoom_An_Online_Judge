@@ -19,4 +19,12 @@ class Lecture extends Model
     {
         return $this->hasOne(Exam::class);
     }
+    
+    /**
+     * Get all questions asked by students on this lecture.
+     */
+    public function questions()
+    {
+        return $this->hasMany(LectureQuestion::class);
+    }
 }

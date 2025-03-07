@@ -7,6 +7,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\LectureController;
+use App\Http\Controllers\LectureQuestionController;
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\TestController;
@@ -122,3 +123,14 @@ Route::post('/results', [ResultController::class, 'store']);
 Route::put('/results/{id}', [ResultController::class, 'update']);
 Route::delete('/results/{id}', [ResultController::class, 'destroy']);
 
+// ---------------------
+// lecture Qustions Routes
+// ---------------------
+
+Route::prefix('lecture-questions')->group(function () {
+    Route::get('/', [LectureQuestionController::class, 'index']);
+    Route::post('/', [LectureQuestionController::class, 'store']);
+    Route::get('/{id}', [LectureQuestionController::class, 'show']);
+    Route::put('/{id}', [LectureQuestionController::class, 'update']);
+    Route::delete('/{id}', [LectureQuestionController::class, 'destroy']);
+});
