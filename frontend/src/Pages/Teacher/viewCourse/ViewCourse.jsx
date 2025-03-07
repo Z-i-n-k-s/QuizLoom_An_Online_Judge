@@ -24,10 +24,10 @@ const ViewCourse = () => {
 
   // Initialize with one empty lecture slot
   const [lectures, setLectures] = useState([
-    { title: "", type: "Text", isEditing: false, selected: false }
+    { title: "", type: "Text", content: "", isEditing: false, selected: false }
   ]);
 
-  // State to control expansion (for side drawer options) and content selection (for left panel)
+  // State for expansion and selection in the side drawer
   const [expandedLectureIndex, setExpandedLectureIndex] = useState(null);
   const [selectedLectureIndexForContent, setSelectedLectureIndexForContent] = useState(null);
 
@@ -38,7 +38,6 @@ const ViewCourse = () => {
   useEffect(() => {
     const fetchLecturesFromBackend = async () => {
       try {
-        // Make sure your backend returns { title, content, type, ... }
         const response = await apiClient.getLectureId(courseId);
         console.log("Lectures fetched:", response);
         if (response && response.length > 0) {
@@ -50,8 +49,7 @@ const ViewCourse = () => {
             isEditing: false,
             selected: true,
           }));
-
-          // Ensure an extra blank slot at the end
+          // Add an extra blank slot at the end if needed
           if (mappedLectures[mappedLectures.length - 1]?.title?.trim() !== "") {
             mappedLectures.push({
               title: "",
@@ -61,19 +59,14 @@ const ViewCourse = () => {
               selected: false,
             });
           }
-
           setLectures(mappedLectures);
         } else {
-          // If no lectures in backend, default to one empty slot
-          setLectures([
-            { title: "", type: "Text", content: "", isEditing: false, selected: false },
-          ]);
+          setLectures([{ title: "", type: "Text", content: "", isEditing: false, selected: false }]);
         }
       } catch (error) {
         console.error("Error fetching lectures: ", error);
       }
     };
-
     fetchLecturesFromBackend();
   }, [courseId]);
 
@@ -81,14 +74,11 @@ const ViewCourse = () => {
   useEffect(() => {
     if (processedRef.current || !location.state?.lectureResponse) return;
     processedRef.current = true;
-
     let lectureResponses = Array.isArray(location.state.lectureResponse)
       ? location.state.lectureResponse
       : [location.state.lectureResponse];
-
     setLectures((prevLectures) => {
       const newLectures = [...prevLectures];
-
       lectureResponses.forEach((lectureData) => {
         if (
           newLectures.length > 0 &&
@@ -112,12 +102,7 @@ const ViewCourse = () => {
           });
         }
       });
-
-      // Ensure an extra blank slot at the end
-      if (
-        newLectures.length === 0 ||
-        newLectures[newLectures.length - 1].title.trim() !== ""
-      ) {
+      if (newLectures.length === 0 || newLectures[newLectures.length - 1].title.trim() !== "") {
         newLectures.push({
           title: "",
           type: "Text",
@@ -128,8 +113,6 @@ const ViewCourse = () => {
       }
       return newLectures;
     });
-
-    // Preserve course name when clearing location.state
     const preservedState = { name: location.state?.name };
     navigate(location.pathname, { replace: true, state: preservedState });
   }, [location, navigate]);
@@ -157,6 +140,10 @@ const ViewCourse = () => {
     setShowUploadOptions(false);
   };
 
+  const handleAddCodingQuestionClick = () => {
+    navigate("/teacher-panel/teacher-codeupload");
+  };
+
   // -------------------------------
   // EXAM DETAILS LOGIC
   // -------------------------------
@@ -172,7 +159,6 @@ const ViewCourse = () => {
     try {
       const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
       const teacherId = teacherInfo.teacher.id;
-
       const examData = {
         ...examDetails,
         teacher_id: teacherId,
@@ -199,11 +185,9 @@ const ViewCourse = () => {
       if (response) {
         console.log("Exam added successfully:", response);
         const examId = response.id;
-
         navigate("/teacher-panel/teachers-quizupload", {
           state: { examId, examDetails, courseId, courseName },
         });
-
         setExamDetails({
           name: "",
           date: "",
@@ -226,27 +210,20 @@ const ViewCourse = () => {
     setDrawerOpen((prev) => !prev);
   };
 
-  // Toggle expand/collapse for showing sub-items (Text, Quiz) in the side drawer
   const handleLectureClick = (lectureIndex) => {
     if (!lectures[lectureIndex].isEditing) {
-      setExpandedLectureIndex(
-        expandedLectureIndex === lectureIndex ? null : lectureIndex
-      );
+      setExpandedLectureIndex(expandedLectureIndex === lectureIndex ? null : lectureIndex);
     }
   };
 
-  // When clicking the "Text" button, set the selected lecture for left panel content
   const handleShowText = (lectureIndex) => {
     setSelectedLectureIndexForContent(lectureIndex);
   };
 
-  // Optionally, you can adjust the behavior for "Quiz" button if needed:
   const handleShowQuiz = (lectureIndex) => {
-    // For now, it can be similar to handleShowText or implement different behavior
     setSelectedLectureIndexForContent(lectureIndex);
   };
 
-  // For adding a new text lecture
   const handleTextLectureClick = () => {
     navigate("/teacher-panel/teacher-textupload", { state: { courseId, courseName } });
   };
@@ -265,7 +242,7 @@ const ViewCourse = () => {
           <div className="flex gap-4">
             <button
               onClick={toggleLectureContents}
-              className="btn border-none bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600"
+              className="btn border-none bg-btnbg text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 dark:bg-secondary"
             >
               {drawerOpen ? "Hide Lectures" : "Show Lectures"}
             </button>
@@ -273,25 +250,20 @@ const ViewCourse = () => {
         </div>
 
         <div className="flex">
-          {/* Main content area (left side) */}
+          {/* Main content area */}
           <div className="flex-[3] p-6 bg-white dark:bg-gray-800 shadow-lg border border-gray-400 mb-10 h-[500px] overflow-auto">
             {selectedLectureIndexForContent !== null ? (
               <>
                 <h3 className="text-lg font-bold border-b pb-4">
                   {lectures[selectedLectureIndexForContent].title || "Untitled Lecture"}
                 </h3>
-                {/* Show the type and content of this lecture */}
-                <p className="text-md mt-4 border p-4">
-                  {lectures[selectedLectureIndexForContent].type} Lecture
-                </p>
-                <p className="text-md mt-4 border p-4 whitespace-pre-wrap">
-                  {lectures[selectedLectureIndexForContent].content}
-                </p>
+                <div
+                  className="text-md mt-4 border p-4 whitespace-pre-wrap"
+                  dangerouslySetInnerHTML={{ __html: lectures[selectedLectureIndexForContent].content }}
+                ></div>
               </>
             ) : (
-              <p className="text-md text-gray-500">
-                Select a lecture to view its content.
-              </p>
+              <p className="text-md text-gray-500">Select a lecture to view its content.</p>
             )}
           </div>
 
@@ -299,31 +271,20 @@ const ViewCourse = () => {
           {drawerOpen && (
             <div className="flex-[2] p-6 bg-white dark:bg-gray-800 shadow-lg ml-4">
               <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2">Lectures</h2>
-
               {lectures.length > 0 ? (
                 lectures.map((lecture, index) => {
                   const isExpanded = expandedLectureIndex === index;
                   return (
                     <div key={index} className="mb-4 pb-4 border-b">
-                      {/* Lecture Header Row */}
                       <div className="flex justify-between items-center">
                         <div className="flex items-center">
-                          <span className="font-bold mr-2">
-                            Lecture {index + 1}:
-                          </span>
-
+                          <span className="font-bold mr-2">Lecture {index + 1}:</span>
                           {lecture.isEditing ? (
                             <div className="flex flex-col">
                               <input
                                 type="text"
-                                value={
-                                  lecture.tempTitle !== undefined
-                                    ? lecture.tempTitle
-                                    : lecture.title
-                                }
-                                onChange={(e) =>
-                                  handleLectureTitleChange(index, e.target.value)
-                                }
+                                value={lecture.tempTitle !== undefined ? lecture.tempTitle : lecture.title}
+                                onChange={(e) => handleLectureTitleChange(index, e.target.value)}
                                 placeholder="Enter Lecture Title"
                                 className="w-full mb-2 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
                               />
@@ -332,30 +293,23 @@ const ViewCourse = () => {
                             <>
                               {lecture.title.trim() === "" ? (
                                 lecture.selected ? (
-                                  <span
-                                    className="cursor-pointer"
-                                    onClick={() => handleLectureClick(index)}
-                                  >
+                                  <span className="cursor-pointer" onClick={() => handleLectureClick(index)}>
                                     {lecture.type} Lecture
                                   </span>
                                 ) : (
                                   <button
                                     onClick={handleTextLectureClick}
-                                    className="text-sm text-blue-500 ml-20"
+                                    className="text-2xl font-bold text-btnbg dark:text-secondary ml-5"
                                   >
-                                    + Add Content
+                                    +
                                   </button>
                                 )
                               ) : (
-                                <span className="cursor-pointer font-semibold">
-                                  {lecture.title}
-                                </span>
+                                <span className="cursor-pointer font-semibold">{lecture.title}</span>
                               )}
                             </>
                           )}
                         </div>
-
-                        {/* Right-side buttons */}
                         {!lecture.isEditing && lecture.title.trim() !== "" && (
                           <>
                             <button
@@ -363,42 +317,36 @@ const ViewCourse = () => {
                                 setSelectedLectureId(lecture.id);
                                 handleUploadClick();
                               }}
-                              className="text-sm text-blue-500 ml-4"
+                              className="text-sm text-white p-2 rounded-xl ml-4 bg-btnbg dark:bg-secondary dark:text-black"
                             >
-                              Add quiz
+                              Upload Ques
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleLectureClick(index);
                               }}
-                              className="text-sm text-blue-500 ml-auto"
+                              className="text-sm text-blue-500 ml-auto dark:text-secondary"
                             >
                               {isExpanded ? "Collapse" : "Expand"}
                             </button>
                           </>
                         )}
                       </div>
-
-                      {/* If expanded, show the sub-items (Text, Quiz) */}
                       {isExpanded && !lecture.isEditing && lecture.title.trim() !== "" && (
                         <div className="mt-2 ml-8 space-y-2">
                           <button
                             className="flex items-center space-x-2 px-4 py-2 border rounded-md"
                             onClick={() => handleShowText(index)}
                           >
-                            <span role="img" aria-label="text">
-                              📄
-                            </span>
+                            <span role="img" aria-label="text">📄</span>
                             <span>Text</span>
                           </button>
                           <button
                             className="flex items-center space-x-2 px-4 py-2 border rounded-md"
                             onClick={() => handleShowQuiz(index)}
                           >
-                            <span role="img" aria-label="quiz">
-                              ❓
-                            </span>
+                            <span role="img" aria-label="quiz">❓</span>
                             <span>Quiz</span>
                           </button>
                         </div>
@@ -418,14 +366,18 @@ const ViewCourse = () => {
       {showUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">
-              Select Lecture Type To Upload
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">Select Lecture Type To Upload</h3>
             <button
               onClick={handleQuizUploadClick}
-              className="w-full px-4 py-2 border hover:bg-btnbg text-black dark:hover:bg-secondary dark:text-white rounded-md"
+              className="w-full px-4 py-2 border hover:bg-btnbg text-black hover:text-white dark:hover:bg-secondary dark:text-white rounded-md"
             >
               Quiz
+            </button>
+            <button
+             onClick={handleAddCodingQuestionClick}
+              className="w-full px-4 py-2 mt-2 border hover:bg-btnbg hover:text-white text-black dark:hover:bg-secondary dark:text-white rounded-md"
+            >
+              Coding
             </button>
             <button
               onClick={() => setShowUploadOptions(false)}
@@ -441,9 +393,7 @@ const ViewCourse = () => {
       {QuizUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">
-              Enter Exam Details
-            </h3>
+            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Enter Exam Details</h3>
             <input
               type="text"
               name="name"

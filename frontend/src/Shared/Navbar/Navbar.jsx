@@ -1,54 +1,58 @@
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "./ThemeContext";
 import ReactSwitch from "react-switch";
-//import { useAuth } from "../AuthContext/AuthContext";
-
-
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
- // const { user } = useAuth(); // Access user data
   const location = useLocation();
- ;
-  const isHomePage = location.pathname === "/"; // Check if current page is Home
-  
-  return (
-    <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md">
-      <div className="flex-1">
-        <a className="p-4 text-black dark:text-white text-2xl font-bold ml-12">QuizLoom</a>
-      </div>
 
-      <div className="flex-none gap-6 items-center">
-        {/* Show  About Us links only when logged out and on the Home page */}
-        { isHomePage && (
-          <ul className="flex space-x-4">
-            
-            <li>
-              <Link to="/aboutus" className="hover:underline">
-                About Us
-              </Link>
-              <Link to={"/login"} className="hover:underline btn">
+  const isHomePage = location.pathname === "/";
+
+  return (
+    <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md flex items-center px-12 py-4">
+      {/* Logo (Always Black) - Stays on Left */}
+      <Link to="/" className="text-2xl font-bold text-black dark:text-white">
+        QuizLoom
+      </Link>
+
+      {/* Navigation Links + Dark Mode Toggle (Shifted to Right) */}
+      {isHomePage && (
+        <div className="ml-auto flex items-center space-x-6"> 
+          <Link
+            to="/"
+            className={`${
+              location.pathname === "/" ? "text-blue-600 dark:text-secondary" : "text-black dark:text-white"
+            }`}
+          >
+            Home
+          </Link>
+          <Link
+            to="/aboutus"
+            className={`${
+              location.pathname === "/aboutus" ? "text-blue-600 dark:text-secondary" : "text-black dark:text-white"
+            }`}
+          >
+            About Us
+          </Link>
+          <Link
+            to="/login"
+            className="btn bg-btnbg dark:bg-secondary border-none text-white px-4 py-2 rounded-xl"
+          >
             Sign In
           </Link>
-            </li>
-          </ul>
-        )}
-       
-        {/* Dark Mode Toggle */}
-        <ReactSwitch
-          checked={theme === "dark"}
-          onChange={toggleTheme}
-          offColor="#bbb"
-          onColor="#333"
-          uncheckedIcon={false}
-          checkedIcon={false}
-          className="transition-all"
-        />
 
-        
-         {/* User Profile Avatar */}
-         
-      </div>
+          {/* Dark Mode Toggle */}
+          <ReactSwitch
+            checked={theme === "dark"}
+            onChange={toggleTheme}
+            offColor="#bbb"
+            onColor="#333"
+            uncheckedIcon={false}
+            checkedIcon={false}
+            className="transition-all"
+          />
+        </div>
+      )}
     </div>
   );
 };
