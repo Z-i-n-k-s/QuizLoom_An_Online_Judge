@@ -280,6 +280,7 @@ async getTeacherCourses(teacherId) {
   }
   async editQustions(id,data) {
     try {
+      console.log(id,data)
       const response = await this.client.put(`api/lecture-questions/${id}`,data);
       return response.data;
     } catch (error) {

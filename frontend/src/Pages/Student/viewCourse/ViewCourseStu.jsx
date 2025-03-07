@@ -3,11 +3,13 @@ import { useParams, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import apiClient from "../../../api/Api";
 import TextQuizStu from "./TextQuizStu";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const ViewCourse = () => {
   const { id: courseId } = useParams();
   const location = useLocation();
   const user = useSelector((state) => state?.user?.user);
+  //console.log(user.student.id)
 
   const [isLoading, setIsLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -171,6 +173,7 @@ const ViewCourse = () => {
           id: question.id,
           text: question.question, // Extract the question text
           authorName: question.student?.name || "Unknown", // Handle missing name
+          authorId: question.student?.id, // Handle missing name
           // Ensure answers is always an array (even if undefined or null)
           answers: (question.answers || []).map((ans) => ans.text), // Extract answers
         }));
@@ -190,12 +193,13 @@ const ViewCourse = () => {
   }, [activeLectureIndex, currentLecture]);
 
   const handleAskQuestionSubmit = async (e) => {
+    console.log(user.student.id)
     e.preventDefault();
     if (!newQuestionText.trim()) return;
 
     const data = {
       lecture_id: currentLecture.id,
-      student_id: user.id,
+      student_id: user.student.id,
       question: newQuestionText,
     };
 
@@ -211,12 +215,14 @@ const ViewCourse = () => {
       const newQuestion = {
         id: response.id,
         text: response.question,
-        authorName: studentName, // Use the null-safe student name
+        authorName: studentName,
+        authorId: response.student.id, // Use the null-safe student name
         answers: response.answers || [], // Ensure answers is always an array
       };
 
       // Add the new question to the current list of questions
-      setQuestions((prev) => [...prev, newQuestion]);
+      setQuestions((prev) => [newQuestion, ...prev]);
+
       setNewQuestionText("");
 
       // Optionally, refetch all questions if you want to ensure fresh data
@@ -230,13 +236,14 @@ const ViewCourse = () => {
   const handleEditQuestionSubmit = async (questionId) => {
     if (!editedQuestionText.trim()) return;
     try {
-      const response = await apiClient.editQustions({
-        questionId,
-        text: editedQuestionText,
+      const response = await apiClient.editQustions(
+        questionId,{
+        question: editedQuestionText,
       });
+      console.log(response)
       setQuestions((prev) =>
         prev.map((q) =>
-          q.id === questionId ? { ...q, text: response.text } : q
+          q.id === questionId ? { ...q, text: response.question } : q
         )
       );
       setEditingQuestionId(null);
@@ -249,7 +256,7 @@ const ViewCourse = () => {
   // Handle deleting a question
   const handleDeleteQuestionSubmit = async (questionId) => {
     try {
-      await apiClient.deleteQustions({ questionId });
+      await apiClient.deleteQustions( questionId );
       setQuestions((prev) => prev.filter((q) => q.id !== questionId));
     } catch (error) {
       console.error("Error deleting question:", error);
@@ -525,10 +532,13 @@ const ViewCourse = () => {
                           <small className="text-gray-500">
                             Posted by <strong>{question.authorName}</strong>
                           </small>
+                          {/* {console.log(user?.student.id === question.authorId)}
+                          {console.log(question.authorId)}
+                          {console.log(user?.student.id )}   */}
                         </div>
 
                         {/* Show Edit/Delete only if the logged-in student is the author */}
-                        {user?.id === question.authorId && (
+                        {user?.student.id === question.authorId && (
                           <div className="flex space-x-2">
                             <button
                               onClick={() => {
@@ -537,7 +547,7 @@ const ViewCourse = () => {
                               }}
                               className="text-blue-500"
                             >
-                              Edit
+                              <FaEdit />
                             </button>
                             <button
                               onClick={() =>
@@ -545,7 +555,7 @@ const ViewCourse = () => {
                               }
                               className="text-red-500"
                             >
-                              Delete
+                              <FaTrash />
                             </button>
                           </div>
                         )}

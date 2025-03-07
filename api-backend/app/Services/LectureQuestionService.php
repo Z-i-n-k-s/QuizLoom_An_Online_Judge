@@ -38,9 +38,8 @@ class LectureQuestionService
     {
         $question = LectureQuestion::findOrFail($id);
         $question->update($data);
-        return $question;
+        return $question->load(['student', 'answers.teacher']);
     }
-
     public function deleteQuestion($id)
     {
         $question = LectureQuestion::findOrFail($id);
