@@ -12,16 +12,18 @@ const ViewCourse = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lectures, setLectures] = useState([]);
-  // Controls which lecture slot is expanded in the side drawer
+  // Which lecture slot is expanded in the side drawer
   const [expandedLectureIndex, setExpandedLectureIndex] = useState(null);
-  // Controls which lecture is active in the main panel
+  // Which lecture is active in the main panel
   const [activeLectureIndex, setActiveLectureIndex] = useState(null);
   // Determines whether to show "Text" or "Quiz" in the main panel
   const [activeTab, setActiveTab] = useState("Text");
   // Flag for displaying the quiz info popup
   const [showQuizPopup, setShowQuizPopup] = useState(false);
+  // State for handling questions (list and new question text)
 
   const courseName = location.state?.courseName || "undefined";
+
   const fetchLecturesFromBackend = async () => {
     try {
       setIsLoading(true);
@@ -65,9 +67,20 @@ const ViewCourse = () => {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    
 
+  // When active lecture changes, fetch its questions.
+  useEffect(() => {
+    if (activeLectureIndex !== null) {
+      const currentLecture = lectures[activeLectureIndex];
+      if (currentLecture) {
+        fetchQuestions(currentLecture.id);
+        // Clear any previously entered text when switching lectures.
+        setNewQuestionText("");
+      }
+    }
+  }, [activeLectureIndex, lectures]);
+
+  useEffect(() => {
     fetchLecturesFromBackend();
   }, [courseId]);
 
@@ -90,13 +103,13 @@ const ViewCourse = () => {
     setShowQuizPopup(false);
   };
 
-  // For lectures with quiz questions, trigger the quiz popup (if quiz not taken yet).
+  // For lectures with quiz questions, trigger the quiz popup.
   const handleQuizButton = (lectureIndex) => {
     setActiveLectureIndex(lectureIndex);
     setShowQuizPopup(true);
   };
 
-  // When clicking on a quiz (completed or not) from side drawer or bottom nav,
+  // When clicking on a quiz from the side drawer or bottom nav,
   // show the quiz view (TextQuizStu). A "View Text" button inside that component will let you switch back.
   const handleShowQuiz = (lectureIndex) => {
     setActiveLectureIndex(lectureIndex);
@@ -140,16 +153,108 @@ const ViewCourse = () => {
   // Bottom navigation: if there's a next lecture, show Next button instead of Quiz Completed.
   const showNextButton = activeLectureIndex < lectures.length - 1;
 
-  const handleQustionSubmit =async()=>{
-    const response = await apiClient.askQustions(data);
-  }
- 
-  const handleEditQustionSubmit =async()=>{
-    const response = await apiClient.editQustions(id);
-  }
-  const handleDeleteQustionSubmit =async()=>{
-    const response = await apiClient.deleteQustions(id);
-  }
+  // --- Ask Question Functionality ---
+
+  const [questions, setQuestions] = useState([]);
+  const [newQuestionText, setNewQuestionText] = useState("");
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [editedQuestionText, setEditedQuestionText] = useState("");
+
+  // Function to fetch all questions for the active lecture
+  const fetchQuestions = async () => {
+    if (!currentLecture) return;
+    try {
+      const response = await apiClient.getAllQustions(currentLecture.id);
+      if (response && Array.isArray(response)) {
+        // Transform response to extract required fields
+        const formattedQuestions = response.map((question) => ({
+          id: question.id,
+          text: question.question, // Extract the question text
+          authorName: question.student?.name || "Unknown", // Handle missing name
+          // Ensure answers is always an array (even if undefined or null)
+          answers: (question.answers || []).map((ans) => ans.text), // Extract answers
+        }));
+
+        setQuestions(formattedQuestions);
+      }
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    }
+  };
+
+  // Call fetchQuestions when the active lecture changes (add a useEffect)
+  useEffect(() => {
+    if (activeLectureIndex !== null && currentLecture) {
+      fetchQuestions();
+    }
+  }, [activeLectureIndex, currentLecture]);
+
+  const handleAskQuestionSubmit = async (e) => {
+    e.preventDefault();
+    if (!newQuestionText.trim()) return;
+
+    const data = {
+      lecture_id: currentLecture.id,
+      student_id: user.id,
+      question: newQuestionText,
+    };
+
+    try {
+      // Send the new question to the API
+      const response = await apiClient.askQustions(data);
+      console.log(response);
+
+      // Check if the student exists in the response before trying to access the 'name'
+      const studentName = response.student ? response.student.name : "Unknown";
+
+      // Ensure the new question response has answers as an array (even if empty)
+      const newQuestion = {
+        id: response.id,
+        text: response.question,
+        authorName: studentName, // Use the null-safe student name
+        answers: response.answers || [], // Ensure answers is always an array
+      };
+
+      // Add the new question to the current list of questions
+      setQuestions((prev) => [...prev, newQuestion]);
+      setNewQuestionText("");
+
+      // Optionally, refetch all questions if you want to ensure fresh data
+      // fetchQuestions(); // Uncomment if you prefer refetching after submission
+    } catch (error) {
+      console.error("Error submitting question:", error);
+    }
+  };
+
+  // Handle editing an existing question
+  const handleEditQuestionSubmit = async (questionId) => {
+    if (!editedQuestionText.trim()) return;
+    try {
+      const response = await apiClient.editQustions({
+        questionId,
+        text: editedQuestionText,
+      });
+      setQuestions((prev) =>
+        prev.map((q) =>
+          q.id === questionId ? { ...q, text: response.text } : q
+        )
+      );
+      setEditingQuestionId(null);
+      setEditedQuestionText("");
+    } catch (error) {
+      console.error("Error editing question:", error);
+    }
+  };
+
+  // Handle deleting a question
+  const handleDeleteQuestionSubmit = async (questionId) => {
+    try {
+      await apiClient.deleteQustions({ questionId });
+      setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+    } catch (error) {
+      console.error("Error deleting question:", error);
+    }
+  };
 
   return (
     <div className="mt-20 ml-10 relative">
@@ -184,48 +289,47 @@ const ViewCourse = () => {
                   </p>
                 )}
                 {activeTab === "Quiz" && (
-                 <TextQuizStu
-                 type="quiz"
-                 lectureId={currentLecture.id}
-                 examId={currentLecture.examDetails?.id}
-                 quizQuestions={currentLecture.examDetails?.quizQuestions}
-                 examDuration={currentLecture.examDetails ? currentLecture.examDetails.duration * 60 : 600}
-                 examTotalMarks={currentLecture.examDetails ? currentLecture.examDetails.totalMarks : 0}
-                 onFinishQuiz={async () => {
-                  console.log("Quiz finished");
-                
-                  // Store the current lecture index before refreshing data
-                  const currentIndex = activeLectureIndex;
-                
-                  await fetchLecturesFromBackend(); // Fetch updated lecture data
-                
-                  // Restore the active lecture after data updates
-                  setTimeout(() => {
-                    setLectures((prevLectures) => {
-                      const updatedLecture = prevLectures[currentIndex]; // Keep the same lecture
-                      const updatedExamResult = updatedLecture?.examDetails?.results?.find(
-                        (result) => result.student_id === user?.id
-                      );
-                
-                      console.log("Updated Exam Result:", updatedExamResult);
-                
-                      // Restore previous lecture and show the quiz results
-                      setActiveLectureIndex(currentIndex);
-                      if (updatedExamResult) {
-                        setActiveTab("Quiz"); // Stay on quiz to show results
-                      }
-                
-                      return prevLectures;
-                    });
-                  }, 500); // Delay to ensure state update
-                }}
-                
-                
-                 user={user}
-                 examResult={examResult}
-               />
-               
-                
+                  <TextQuizStu
+                    type="quiz"
+                    lectureId={currentLecture.id}
+                    examId={currentLecture.examDetails?.id}
+                    quizQuestions={currentLecture.examDetails?.quizQuestions}
+                    examDuration={
+                      currentLecture.examDetails
+                        ? currentLecture.examDetails.duration * 60
+                        : 600
+                    }
+                    examTotalMarks={
+                      currentLecture.examDetails
+                        ? currentLecture.examDetails.totalMarks
+                        : 0
+                    }
+                    onFinishQuiz={async () => {
+                      console.log("Quiz finished");
+                      const currentIndex = activeLectureIndex;
+                      await fetchLecturesFromBackend();
+                      setTimeout(() => {
+                        setLectures((prevLectures) => {
+                          const updatedLecture = prevLectures[currentIndex];
+                          const updatedExamResult =
+                            updatedLecture?.examDetails?.results?.find(
+                              (result) => result.student_id === user?.id
+                            );
+                          console.log(
+                            "Updated Exam Result:",
+                            updatedExamResult
+                          );
+                          setActiveLectureIndex(currentIndex);
+                          if (updatedExamResult) {
+                            setActiveTab("Quiz");
+                          }
+                          return prevLectures;
+                        });
+                      }, 500);
+                    }}
+                    user={user}
+                    examResult={examResult}
+                  />
                 )}
               </>
             ) : (
@@ -380,49 +484,185 @@ const ViewCourse = () => {
             )}
           </div>
         )}
+
+        {/* Ask Question Section - Rendered below bottom navigation */}
+        {activeLectureIndex !== null &&
+          currentLecture &&
+          activeTab === "Text" && (
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-md">
+              <h3 className="text-xl font-bold mb-4">Questions</h3>
+
+              {/* New question form */}
+              <form onSubmit={handleAskQuestionSubmit} className="mb-4">
+                <textarea
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Ask a question..."
+                  value={newQuestionText}
+                  onChange={(e) => setNewQuestionText(e.target.value)}
+                  rows={3}
+                ></textarea>
+                <button
+                  type="submit"
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Post Question
+                </button>
+              </form>
+
+              {/* List of questions */}
+              <ul className="space-y-4">
+                {questions.length > 0 ? (
+                  questions.map((question) => (
+                    <li
+                      key={question.id}
+                      className="p-4 bg-white rounded shadow"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-gray-800 font-semibold">
+                            {question.text}
+                          </p>
+                          <small className="text-gray-500">
+                            Posted by <strong>{question.authorName}</strong>
+                          </small>
+                        </div>
+
+                        {/* Show Edit/Delete only if the logged-in student is the author */}
+                        {user?.id === question.authorId && (
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => {
+                                setEditingQuestionId(question.id);
+                                setEditedQuestionText(question.text);
+                              }}
+                              className="text-blue-500"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleDeleteQuestionSubmit(question.id)
+                              }
+                              className="text-red-500"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* If this question is being edited */}
+                      {editingQuestionId === question.id && (
+                        <div className="mt-2">
+                          <textarea
+                            className="w-full p-2 border rounded-md"
+                            value={editedQuestionText}
+                            onChange={(e) =>
+                              setEditedQuestionText(e.target.value)
+                            }
+                            rows={2}
+                          ></textarea>
+                          <div className="mt-2 flex space-x-2">
+                            <button
+                              onClick={() =>
+                                handleEditQuestionSubmit(question.id)
+                              }
+                              className="px-3 py-1 bg-green-500 text-white rounded"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingQuestionId(null)}
+                              className="px-3 py-1 bg-gray-300 text-gray-700 rounded"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Display Answers */}
+                      {question.answers && question.answers.length > 0 ? (
+                        <div className="mt-2">
+                          <p className="font-semibold text-gray-700">
+                            Answers:
+                          </p>
+                          <ul className="mt-1 space-y-1">
+                            {question.answers.map((answer, index) => (
+                              <li
+                                key={index}
+                                className="text-gray-600 pl-4 border-l-2 border-blue-400"
+                              >
+                                {answer}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        <p className="text-gray-400 italic mt-2">
+                          No answers yet.
+                        </p>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-gray-500">
+                    No questions yet. Be the first to ask!
+                  </p>
+                )}
+              </ul>
+            </div>
+          )}
       </div>
 
-      
+      {/* Quiz Info Popup */}
+      {showQuizPopup && currentLecture && currentLecture.examDetails && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+          <div className="relative bg-white dark:bg-gray-900 text-center p-8 rounded-lg shadow-lg w-96 max-w-full">
+            {/* Close Button (Icon) */}
+            <button
+              onClick={() => setShowQuizPopup(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
 
-{/* Quiz Info Popup */}
-{showQuizPopup && currentLecture && currentLecture.examDetails && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-    <div className="relative bg-white dark:bg-gray-900 text-center p-8 rounded-lg shadow-lg w-96 max-w-full">
-      
-      {/* Close Button (Icon) */}
-      <button
-        onClick={() => setShowQuizPopup(false)}
-        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+            <h1 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
+              {currentLecture.examDetails.name}
+            </h1>
+            <p className="text-xl mb-2 text-gray-600 dark:text-gray-300">
+              Duration: {currentLecture.examDetails.duration} minutes
+            </p>
+            <p className="text-xl mb-6 text-gray-600 dark:text-gray-300">
+              Total Marks: {currentLecture.examDetails.totalMarks}
+            </p>
 
-      <h1 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
-        {currentLecture.examDetails.name}
-      </h1>
-      <p className="text-xl mb-2 text-gray-600 dark:text-gray-300">
-        Duration: {currentLecture.examDetails.duration} minutes
-      </p>
-      <p className="text-xl mb-6 text-gray-600 dark:text-gray-300">
-        Total Marks: {currentLecture.examDetails.totalMarks}
-      </p>
-
-      {/* Start Quiz Button */}
-      <button
-        onClick={() => {
-          setActiveTab("Quiz"); // Switch to quiz
-          setShowQuizPopup(false); // Close the modal
-        }}
-        className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
-      >
-        Start Quiz
-      </button>
-    </div>
-  </div>
-)}
-
+            {/* Start Quiz Button */}
+            <button
+              onClick={() => {
+                setActiveTab("Quiz"); // Switch to quiz view
+                setShowQuizPopup(false); // Close the modal
+              }}
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+            >
+              Start Quiz
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

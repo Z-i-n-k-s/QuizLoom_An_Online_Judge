@@ -261,15 +261,18 @@ async getTeacherCourses(teacherId) {
   }
   async askQustions(data) {
     try {
+      console.log(data)
       const response = await this.client.post(`api/lecture-questions`,data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   }
-  async getAllQustions() {
+  async getAllQustions(id) {
     try {
-      const response = await this.client.get(`api/lecture-questions`,data);
+      console.log('id',id)
+      const response = await this.client.get(`api/lecture-questions/${id}/questions-answers`);
+      console.log('all qustions ',response.data)
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
