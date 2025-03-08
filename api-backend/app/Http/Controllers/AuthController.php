@@ -7,6 +7,7 @@ use App\Services\AuthService;
 use App\Services\JwtService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Validation\UnauthorizedException;
 
 class AuthController extends Controller
 {
@@ -19,6 +20,38 @@ class AuthController extends Controller
         $this->authService = $authService;
         $this->jwtService = $jwtService;
     }
+
+
+    public function refreshToken(Request $request)
+    {
+        $refreshToken = $request->header('X-Refresh-Token');
+
+        if (!$refreshToken) {
+            return response()->json(['error' => 'No refresh token provided'], 401);
+        }
+
+        try {
+            $this->jwtService->validateJwtToken($refreshToken);
+            $claims = $this->jwtService->parseJwtToken($refreshToken);
+            if ($claims->type !== 'refresh') {
+                throw new UnauthorizedException("Invalid token type for refresh.");
+            }
+
+            // Issue a new access token.
+            $userId = $claims->uid;
+            $userRole = $claims->user_role;
+            $accessToken = $this->jwtService->issueJwtToken($userId, $userRole, 'access');
+
+            return response()->json(['access_token' => $accessToken]);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return response()->json(['error' => 'Invalid refresh token: ' . $e->getMessage()], 401);
+        }
+    }
+
+
+
+
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -98,19 +131,12 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $token = $request->bearerToken(); // Get token from Authorization header
+        $userId = $request->attributes->get('userId');
+        error_log($userId);
+
+        $res = $this->authService->logout($userId);
     
-        if (!$token) {
-            return response()->json([
-                'success' => false,
-                'error' => true,
-                'message' => 'No token provided',
-            ], 400);
-        }
-    
-        $res = $this->authService->logout($token);
-    
-        if ($res) {
+        if (!$res) {
             return response()->json([
                 'success' => true,
                 'error' => false,

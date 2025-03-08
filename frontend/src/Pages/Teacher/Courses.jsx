@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import apiClient from "../../api/Api";
+import { useSelector } from "react-redux";
 
 const Courses = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [courses, setCourses] = useState([]);
+  const user = useSelector((state) => state?.user?.user);
   const [newCourse, setNewCourse] = useState({
     name: "",
     completion_time: "",
@@ -22,7 +24,7 @@ const Courses = () => {
   const fetchCourses = async () => {
     try {
       
-      const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const teacherInfo = await apiClient.getUserById(user?.id);
       console.log("Teacher Info:", teacherInfo);
       const teacherId = teacherInfo.teacher.id;
 
@@ -50,7 +52,7 @@ const Courses = () => {
 
   const handleAddCourse = async () => {
     try {
-      const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const teacherInfo = await apiClient.getUserById(user?.id);
       
       const teacherId = teacherInfo.teacher.id;
       

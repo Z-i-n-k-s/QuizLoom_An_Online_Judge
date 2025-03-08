@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import apiClient from "../../../api/Api";
+import { useSelector } from "react-redux";
 
 const ViewCourse = () => {
   const { id: courseId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const user = useSelector((state) => state?.user?.user);
 
   const [isLoading, setIsLoading] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
@@ -157,7 +159,7 @@ const ViewCourse = () => {
     setShowUploadOptions(false);
     setIsLoading(true);
     try {
-      const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const teacherInfo = await apiClient.getUserById(user?.id);
       const teacherId = teacherInfo.teacher.id;
       const examData = {
         ...examDetails,

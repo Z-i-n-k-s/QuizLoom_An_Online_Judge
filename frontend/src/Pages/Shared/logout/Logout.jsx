@@ -1,37 +1,39 @@
 import { toast, ToastContainer } from "react-toastify";
-
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
 import apiClient from "../../../api/Api";
-import { useDispatch } from "react-redux";
 import { setUserDetails } from "../../../store/userSlice";
 
 
 const LogOut = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state?.user?.user);
+
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const handleLogout = async () => {
       if (isLoggingOut) return;
-  
+
       setIsLoggingOut(true);
       try {
         setLoading(true);
         const response = await apiClient.logout();
-  
+
         if (response?.success) {
           dispatch(setUserDetails(null));
-          // Remove tokens from local storage if still present
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
-  
-          toast.success("Logged out successfully", { toastId: "logoutSuccess" });
-          setTimeout(() => {
+
+          toast.success("Logged out successfully");
+          
             navigate("/");
-          }, 1000);
+          
         } else {
           const errorMessage = response?.message || "Logout failed!";
           toast.error(errorMessage, { position: "top-center" });
@@ -40,14 +42,15 @@ const LogOut = () => {
         const errorMessage = error.response?.data?.message || "Something went wrong!";
         toast.error(errorMessage, { position: "top-center" });
       } finally {
-        setLoading(false);
+       
+         setLoading(false); 
+        
+        
       }
     };
-  
+
     handleLogout();
-  }, [navigate, isLoggingOut,dispatch]);
-  
-  
+  }, [navigate, isLoggingOut, dispatch]);
 
   return (
     <>

@@ -10,11 +10,24 @@ class LectureQuestionService
     {
         return LectureQuestion::with(['lecture', 'student', 'answers'])->get();
     }
+    public function getQuestionsWithAnswersByLectureId($lectureId)
+    {
+        return LectureQuestion::where('lecture_id', $lectureId)
+            ->with(['student', 'answers.teacher']) // Load student info along with answers and teacher info
+            ->get();
+    }
+    
 
     public function createQuestion($data)
-    {
-        return LectureQuestion::create($data);
-    }
+{
+    $question = LectureQuestion::create($data);
+
+    // Eager load the student info after creating the question
+    $question->load('student');
+
+    return $question;
+}
+
 
     public function getQuestionById($id)
     {
@@ -25,9 +38,8 @@ class LectureQuestionService
     {
         $question = LectureQuestion::findOrFail($id);
         $question->update($data);
-        return $question;
+        return $question->load(['student', 'answers.teacher']);
     }
-
     public function deleteQuestion($id)
     {
         $question = LectureQuestion::findOrFail($id);

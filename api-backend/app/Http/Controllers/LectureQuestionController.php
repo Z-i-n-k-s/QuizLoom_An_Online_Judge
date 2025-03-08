@@ -19,6 +19,10 @@ class LectureQuestionController extends Controller
     {
         return response()->json($this->lectureQuestionService->getAllQuestions());
     }
+    public function getQuestionsWithAnswers($lectureId)
+{
+    return response()->json($this->lectureQuestionService->getQuestionsWithAnswersByLectureId($lectureId));
+}
 
     public function store(Request $request)
     {
