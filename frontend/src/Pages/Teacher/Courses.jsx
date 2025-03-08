@@ -228,7 +228,7 @@ const Courses = () => {
                 value={newCourse.name}
                 onChange={handleInputChange}
                 placeholder="Course Name"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-white"
               />
               <input
                 type="text"
@@ -236,7 +236,7 @@ const Courses = () => {
                 value={newCourse.course_code}
                 onChange={handleInputChange}
                 placeholder="Course Code"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full  text-white"
               />
               <input
                 type="number"
@@ -244,7 +244,7 @@ const Courses = () => {
                 value={newCourse.completion_time}
                 onChange={handleInputChange}
                 placeholder="Completion Time (in days)"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full  text-white"
               />
               <input
                 type="number"
@@ -252,18 +252,18 @@ const Courses = () => {
                 value={newCourse.number_of_lectures}
                 onChange={handleInputChange}
                 placeholder="Number of Lectures"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full  text-white"
               />
               <div className="flex justify-between">
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="btn bg-gray-300 text-black dark:bg-gray-600 dark:text-white"
+                  className="btn bg-gray-300 border-none text-black dark:bg-gray-600 dark:text-white hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddCourse}
-                  className="btn bg-btnbg text-white dark:bg-btnbg dark:text-white"
+                  className="btn border-none bg-btnbg text-white dark:bg-btnbg dark:text-white"
                 >
                   Add Course
                 </button>

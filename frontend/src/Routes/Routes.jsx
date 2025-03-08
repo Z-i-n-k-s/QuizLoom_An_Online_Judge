@@ -29,6 +29,7 @@ import TextQuizStu from "../Pages/Student/viewCourse/TextQuizStu";
 import TextUpload from "../Pages/Teacher/viewCourse/TextUpload";
 
 import TeacherAnnouncements from "../Pages/Teacher/TeacherAnnouncements";
+import CodeUpload from "../Pages/Teacher/viewCourse/CodeUpload";
 
 
 
@@ -142,6 +143,10 @@ export const router = createBrowserRouter([
           {
             path: "teacher-textupload",
             element: <TextUpload />,
+          },
+          {
+            path: "teacher-codeupload",
+            element: <CodeUpload></CodeUpload>
           },
           {
             path: "teachers-results",
