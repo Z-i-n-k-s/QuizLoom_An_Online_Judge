@@ -7,7 +7,12 @@ const MyCourses = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [courses, setCourses] = useState([]);
+
   const user = useSelector((state) => state?.user?.user);
+
+  const [examResults, setExamResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [newCourse, setNewCourse] = useState({
     course_code: "",
   });
@@ -17,17 +22,52 @@ const MyCourses = () => {
   }, []);
 
   const fetchEnrolledCourses = async () => {
+    setLoading(true);
     try {
       const studentInfo = await apiClient.getUserById(user?.id);
       const studentId = studentInfo.student.id;
       const enrolledCourses = await apiClient.getEnrolledCourses(studentId);
-      console.log("Enrolled courses:", enrolledCourses);
+      
+       // Fetch all exam results
+       const resultsResponse = await apiClient.getallResult();
+       const studentResults = resultsResponse.filter(result => result.student_id === studentId);
+       setExamResults(studentResults);
       setCourses(enrolledCourses);
     } catch (error) {
       console.error("Error fetching enrolled courses:", error);
+    }finally {
+      setLoading(false);
     }
   };
+ const handleunenroll = async (course) => {
+  setLoading(true); 
+    try {
+      const courseId=course.id;
+      console.log(courseId);
+      const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const studentId = studentInfo.student.id;
+       // Fetch all enrollments
+    const allEnrollments = await apiClient.getallenrollments();
 
+    // Find the enrollment ID where course_id matches the selected course
+    const enrollment = allEnrollments.find(enrollment => 
+      enrollment.course_id === courseId && enrollment.student_id === studentId
+    );
+
+    if (!enrollment) {
+      console.error("Enrollment not found for the given course.");
+      return;
+    }
+
+    const enrollmentId = enrollment.id;
+    await apiClient.unenrollfromcourse(enrollmentId);
+    } catch (error) {
+      console.error("Error unenrolling in course:", error);
+    }finally {
+      setLoading(false); 
+    }
+
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCourse({ ...newCourse, [name]: value });
@@ -55,7 +95,13 @@ const MyCourses = () => {
       console.error("Error enrolling in course:", error);
     }
   };
-  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+      </div>
+    );
+  }
   return (
     <div className="p-8">
       <div className="flex flex-wrap justify-center mt-10 gap-8">
@@ -64,11 +110,14 @@ const MyCourses = () => {
           <div className="card-inner">
             <div className="card-front bg-green-200 dark:bg-green-200 flex flex-col items-center justify-center text-center p-4 py-8">
               <h2 className="text-xl font-bold dark:text-black">Total Courses taken</h2>
-              <p className="text-md dark:text-black">15 Courses</p>
+              <p className="text-md dark:text-black">{courses.length} courses</p>
             </div>
             <div className="card-back bg-green-300 dark:bg-green-300 flex flex-col items-center justify-center text-center p-4 py-8">
               <h2 className="text-lg font-semibold dark:text-black">Manage Courses</h2>
-              <p className="text-sm dark:text-black">View, update, or delete existing courses.</p>
+              <p className="text-sm dark:text-black">
+                {courses.map((course, index) => (
+                  <li key={index}>{course.name}</li>
+                ))}</p>
             </div>
           </div>
         </div>
@@ -78,21 +127,21 @@ const MyCourses = () => {
           <div className="card-inner">
             <div className="card-front bg-yellow-200 dark:bg-yellow-200 flex flex-col items-center justify-center text-center p-4 py-8">
               <h2 className="text-xl font-bold dark:text-black">Exams given</h2>
-              <p className="text-md dark:text-black">3 Courses</p>
+              <p className="text-md dark:text-black">{examResults.length} Courses</p>
             </div>
             <div className="card-back bg-yellow-300 dark:bg-yellow-300 flex flex-col items-center justify-center text-center p-4 py-8">
               <h2 className="text-lg font-semibold dark:text-black">Exam Schedule</h2>
               <ul className="text-sm dark:text-black">
-                <li><strong>Course:</strong> Math 101</li>
-                <li><strong>Course:</strong> Physics 232</li>
-                <li><strong>Course:</strong> Database 566</li>
+              {examResults.map((result, index) => (
+                  <li key={index}>{result.exam.name}</li>
+                ))}
               </ul>
             </div>
           </div>
         </div>
 
         {/* Card 3 */}
-        <div className="card w-80 h-60 bg-purple-200 shadow-xl flex items-center justify-center p-4 py-8">
+        {/* <div className="card w-80 h-60 bg-purple-200 shadow-xl flex items-center justify-center p-4 py-8">
           <div className="card-inner">
             <div className="card-front bg-purple-200 dark:bg-purple-200 flex flex-col items-center justify-center text-center p-4 py-8">
               <h2 className="text-xl font-bold dark:text-black">Upcoming Exams</h2>
@@ -107,7 +156,7 @@ const MyCourses = () => {
               </ul>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Button Section */}
@@ -155,7 +204,7 @@ const MyCourses = () => {
                   </button>
                   <button
                     className="btn btn-sm btn-error"
-                    onClick={() => console.log("Unenroll clicked for:", course)}
+                    onClick={()=>handleunenroll(course)}
                   >
                     Unenroll
                   </button>

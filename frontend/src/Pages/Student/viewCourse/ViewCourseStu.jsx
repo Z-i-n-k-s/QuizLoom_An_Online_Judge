@@ -318,6 +318,7 @@ const ViewCourse = () => {
                 )}
 
                 {activeTab === "Quiz" && (
+
                   <TextQuizStu
                     type="quiz"
                     lectureId={currentLecture.id}
@@ -359,6 +360,7 @@ const ViewCourse = () => {
                     user={user}
                     examResult={examResult}
                   />
+
                 )}
               </>
             ) : (

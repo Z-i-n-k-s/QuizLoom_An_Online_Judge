@@ -306,6 +306,14 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
+  async getallResult() {
+    try {
+      const response = await this.client.get(`api/results`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
   async askQustions(data) {
     try {
       console.log(data)
@@ -325,6 +333,7 @@ async getTeacherCourses(teacherId) {
     }
   }
   async getAllQustions(id) {
+
     try {
       console.log('id',id)
       const response = await this.client.get(`api/lecture-questions/${id}/questions-answers`);
@@ -351,17 +360,42 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
+
   async codingQustions(data) {
     try {
       console.log(data)
       const response = await this.client.post(`api/code-exam-questions`,data);
-      return response.data;
+         return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   }
 
+  async getenrollStudentinCourse(courseId) {
+    try {
+      const response = await this.client.get(`/api/courses/${courseId}/students`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async getallenrollments(){
+    try {
+      const response = await this.client.get(`/api/enrollments`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async unenrollfromcourse(id){
+    try {
+      const response = await this.client.delete(`/api/enrollments/${id}`);
 
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
 
 }
 
