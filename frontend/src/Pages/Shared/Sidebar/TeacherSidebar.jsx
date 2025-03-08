@@ -75,7 +75,7 @@ export default function Sidebar2() {
             />
             <SidebarItem2
               icon={<FontAwesomeIcon icon={faPenToSquare} />}
-              text="Exams"
+              text="Coding Exams"
               to="teachers-exams"
             />
             <SidebarItem2

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import apiClient from "../../../api/Api";
 import TextQuizStu from "./TextQuizStu";
@@ -8,6 +8,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 const ViewCourse = () => {
   const { id: courseId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const user = useSelector((state) => state?.user?.user);
   //console.log(user.student.id)
 
@@ -102,6 +103,13 @@ const ViewCourse = () => {
   const handleShowText = (lectureIndex) => {
     setActiveLectureIndex(lectureIndex);
     setActiveTab("Text");
+    setShowQuizPopup(false);
+  };
+
+   // Set active lecture and show coding content.
+   const handleShowCoding = (lectureIndex) => {
+    setActiveLectureIndex(lectureIndex);
+    setActiveTab("Coding");
     setShowQuizPopup(false);
   };
 
@@ -277,7 +285,7 @@ const ViewCourse = () => {
           <h2 className="text-2xl font-semibold">Course Name: {courseName}</h2>
           <button
             onClick={toggleLectureContents}
-            className="btn border-none bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600"
+            className="btn border-none bg-btnbg dark:bg-secondary dark:text-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600"
           >
             {drawerOpen ? "Hide Lectures" : "Show Lectures"}
           </button>
@@ -296,6 +304,19 @@ const ViewCourse = () => {
                     {currentLecture.content}
                   </p>
                 )}
+
+                     {activeTab === "Coding" && (
+                <div className="text-md mt-4 border p-4 whitespace-pre-wrap text-center">
+                <p className="mb-4">Are you ready to start coding?</p>
+                <button onClick={() => navigate(`/student-panel/codingstu/${courseId}`)}
+
+                className="btn bg-btnbg border-none dark:bg-secondary dark:text-black text-white px-4 py-2 rounded-lg">
+                  Start Coding
+                </button>
+              </div>
+              
+                )}
+
                 {activeTab === "Quiz" && (
                   <TextQuizStu
                     type="quiz"
@@ -401,6 +422,17 @@ const ViewCourse = () => {
                             </span>
                             <span>Text</span>
                           </button>
+                          <button
+                            className="flex items-center space-x-2 px-4 py-2 border rounded-md"
+                            onClick={() => handleShowCoding(index)}
+                          >
+                            <span role="img" aria-label="coding">
+                              💻
+                            </span>
+                            <span>Coding</span>
+                          </button>
+
+        
                           {lecture.examDetails &&
                             lecture.examDetails.quizQuestions &&
                             lecture.examDetails.quizQuestions.length > 0 && (
@@ -448,7 +480,7 @@ const ViewCourse = () => {
             {activeLectureIndex > 0 ? (
               <button
                 onClick={handlePrevious}
-                className="btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md"
+                className="btn bg-gray-800 hover:bg-btnbg hover:dark:bg-secondary border-none text-white px-4 py-2 rounded-lg shadow-md"
               >
                 Previous
               </button>
@@ -460,7 +492,7 @@ const ViewCourse = () => {
                 showNextButton ? (
                   <button
                     onClick={handleNext}
-                    className="btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md"
+                    className="btn bg-btnbg border-none dark:bg-secondary text-white px-4 py-2 rounded-lg shadow-md"
                   >
                     Next
                   </button>
@@ -484,7 +516,7 @@ const ViewCourse = () => {
               showNextButton && (
                 <button
                   onClick={handleNext}
-                  className="btn bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md"
+                  className="btn bg-btnbg border-none dark:bg-secondary text-white px-4 py-2 rounded-lg shadow-md"
                 >
                   Next
                 </button>
@@ -497,13 +529,13 @@ const ViewCourse = () => {
         {activeLectureIndex !== null &&
           currentLecture &&
           activeTab === "Text" && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-md">
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-md dark:bg-gray-800">
               <h3 className="text-xl font-bold mb-4">Questions</h3>
 
               {/* New question form */}
               <form onSubmit={handleAskQuestionSubmit} className="mb-4">
                 <textarea
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-md bg-gray-200 dark:text-black"
                   placeholder="Ask a question..."
                   value={newQuestionText}
                   onChange={(e) => setNewQuestionText(e.target.value)}
@@ -511,7 +543,7 @@ const ViewCourse = () => {
                 ></textarea>
                 <button
                   type="submit"
-                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                  className="mt-2 px-4 py-2 bg-btnbg dark:bg-secondary text-white rounded"
                 >
                   Post Question
                 </button>
@@ -523,19 +555,17 @@ const ViewCourse = () => {
                   questions.map((question) => (
                     <li
                       key={question.id}
-                      className="p-4 bg-white rounded shadow"
+                      className="p-4 bg-white rounded shadow dark:bg-gray-900"
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="text-gray-800 font-semibold">
+                          <p className="text-gray-800 font-semibold dark:text-white">
                             {question.text}
                           </p>
-                          <small className="text-gray-500">
+                          <small className="text-gray-800 border-b-2 pb-2 dark:text-white">
                             Posted by <strong>{question.authorName}</strong>
                           </small>
-                          {/* {console.log(user?.student.id === question.authorId)}
-                          {console.log(question.authorId)}
-                          {console.log(user?.student.id )}   */}
+                      
                         </div>
 
                         {/* Show Edit/Delete only if the logged-in student is the author */}
@@ -620,7 +650,7 @@ const ViewCourse = () => {
                     </li>
                   ))
                 ) : (
-                  <p className="text-gray-500">
+                  <p className="text-gray-800">
                     No questions yet. Be the first to ask!
                   </p>
                 )}
@@ -667,8 +697,8 @@ const ViewCourse = () => {
             {/* Start Quiz Button */}
             <button
               onClick={() => {
-                setActiveTab("Quiz"); // Switch to quiz view
-                setShowQuizPopup(false); // Close the modal
+                setActiveTab("Quiz"); 
+                setShowQuizPopup(false); 
               }}
               className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
             >
