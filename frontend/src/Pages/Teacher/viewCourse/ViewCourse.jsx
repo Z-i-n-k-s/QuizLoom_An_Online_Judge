@@ -15,26 +15,39 @@ const ViewCourse = () => {
   const [QuizUploadOptions, setQuizUploadOptions] = useState(false);
   const [selectedLectureId, setSelectedLectureId] = useState(null);
   const courseName = location.state?.name;
-  console.log("Course Name:", courseName);
+ 
   const [examDetails, setExamDetails] = useState({
     name: "",
     date: "",
     duration: "",
     total_marks: "",
   });
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  // Set initial state of drawer to open
+  const [drawerOpen, setDrawerOpen] = useState(true);
 
   // Initialize with one empty lecture slot
   const [lectures, setLectures] = useState([
-    { title: "", type: "Text", content: "", isEditing: false, selected: false }
+    { title: "", type: "Text", content: "", isEditing: false, selected: false },
   ]);
 
   // State for expansion and selection in the side drawer
   const [expandedLectureIndex, setExpandedLectureIndex] = useState(null);
-  const [selectedLectureIndexForContent, setSelectedLectureIndexForContent] = useState(null);
+  // Track which lecture is active so we can fetch questions for that lecture
+  const [activeLectureIndex, setActiveLectureIndex] = useState(0);
+  // Show the text of the first lecture by default (if available)
+  const [selectedLectureIndexForContent, setSelectedLectureIndexForContent] =
+    useState(0);
+
+  // State for fetched questions
+  const [questions, setQuestions] = useState([]);
+  // Track which question reply UI is active
+  const [activeReplyQuestionId, setActiveReplyQuestionId] = useState(null);
 
   // Ref to prevent double-processing location.state in Strict Mode
   const processedRef = useRef(false);
+
+  // Derived current lecture based on activeLectureIndex
+  const currentLecture = lectures[activeLectureIndex];
 
   // 1) FETCH EXISTING LECTURES FROM BACKEND ON MOUNT (OR COURSE CHANGE)
   useEffect(() => {
@@ -63,7 +76,15 @@ const ViewCourse = () => {
           }
           setLectures(mappedLectures);
         } else {
-          setLectures([{ title: "", type: "Text", content: "", isEditing: false, selected: false }]);
+          setLectures([
+            {
+              title: "",
+              type: "Text",
+              content: "",
+              isEditing: false,
+              selected: false,
+            },
+          ]);
         }
       } catch (error) {
         console.error("Error fetching lectures: ", error);
@@ -104,7 +125,10 @@ const ViewCourse = () => {
           });
         }
       });
-      if (newLectures.length === 0 || newLectures[newLectures.length - 1].title.trim() !== "") {
+      if (
+        newLectures.length === 0 ||
+        newLectures[newLectures.length - 1].title.trim() !== ""
+      ) {
         newLectures.push({
           title: "",
           type: "Text",
@@ -118,6 +142,43 @@ const ViewCourse = () => {
     const preservedState = { name: location.state?.name };
     navigate(location.pathname, { replace: true, state: preservedState });
   }, [location, navigate]);
+
+  // -------------------------------
+  // FETCH QUESTIONS LOGIC
+  // -------------------------------
+  // Function to fetch all questions for the active lecture
+ // Function to fetch all questions for the active lecture
+const fetchQuestions = async () => {
+  if (!currentLecture) return;
+  try {
+    const response = await apiClient.getAllQustions(currentLecture.id);
+    if (response && Array.isArray(response)) {
+      // Transform response to extract required fields
+      const formattedQuestions = response.map((question) => ({
+        id: question.id,
+        text: question.question, // The question text
+        authorName: question.student?.name || "Unknown",
+        authorId: question.student?.id,
+        // Map answers to include both teacher name and answer text
+        answers: (question.answers || []).map((ans) => ({
+          text: ans.answer,
+          teacherName: ans.teacher?.name || "Unknown",
+        })),
+      }));
+      setQuestions(formattedQuestions);
+    }
+  } catch (error) {
+    console.error("Error fetching questions:", error);
+  }
+};
+
+
+  // Call fetchQuestions when the active lecture changes
+  useEffect(() => {
+    if (activeLectureIndex !== null && currentLecture) {
+      fetchQuestions();
+    }
+  }, [activeLectureIndex, currentLecture]);
 
   // -------------------------------
   // LECTURE EDIT / SAVE LOGIC
@@ -145,6 +206,34 @@ const ViewCourse = () => {
   const handleAddCodingQuestionClick = () => {
     navigate("/teacher-panel/teacher-codeupload");
   };
+  // 1. Add state for the answer text
+  const [answer, setAnswer] = useState("");
+
+
+  // 2. The submit handler for answering a question
+  const handleAnsQuestionSubmit = async (e, question_id) => {
+    e.preventDefault();
+    if (!answer.trim()) return;
+  
+    const data = {
+      question_id: question_id,
+      teacher_id: user.teacher.id,
+      answer: answer,
+    };
+  
+    try {
+      const response = await apiClient.ansQustions(data);
+      console.log(response);
+      // Refresh questions automatically after submission
+      fetchQuestions();
+      // Clear the answer input and hide the reply UI
+      setAnswer("");
+      setActiveReplyQuestionId(null);
+    } catch (error) {
+      console.error("Error submitting answer:", error);
+    }
+  };
+  
 
   // -------------------------------
   // EXAM DETAILS LOGIC
@@ -165,7 +254,7 @@ const ViewCourse = () => {
         ...examDetails,
         teacher_id: teacherId,
         course_id: courseId,
-        lecture_id: selectedLectureId, 
+        lecture_id: selectedLectureId,
       };
 
       if (
@@ -214,7 +303,12 @@ const ViewCourse = () => {
 
   const handleLectureClick = (lectureIndex) => {
     if (!lectures[lectureIndex].isEditing) {
-      setExpandedLectureIndex(expandedLectureIndex === lectureIndex ? null : lectureIndex);
+      setExpandedLectureIndex(
+        expandedLectureIndex === lectureIndex ? null : lectureIndex
+      );
+      // When a lecture is clicked, set it as active so questions can be fetched/displayed.
+      setActiveLectureIndex(lectureIndex);
+      setSelectedLectureIndexForContent(lectureIndex);
     }
   };
 
@@ -227,7 +321,18 @@ const ViewCourse = () => {
   };
 
   const handleTextLectureClick = () => {
-    navigate("/teacher-panel/teacher-textupload", { state: { courseId, courseName } });
+    navigate("/teacher-panel/teacher-textupload", {
+      state: { courseId, courseName },
+    });
+  };
+
+  // Toggle reply UI for a question
+  const toggleReplyUI = (questionId) => {
+    if (activeReplyQuestionId === questionId) {
+      setActiveReplyQuestionId(null);
+    } else {
+      setActiveReplyQuestionId(questionId);
+    }
   };
 
   return (
@@ -257,22 +362,29 @@ const ViewCourse = () => {
             {selectedLectureIndexForContent !== null ? (
               <>
                 <h3 className="text-lg font-bold border-b pb-4">
-                  {lectures[selectedLectureIndexForContent].title || "Untitled Lecture"}
+                  {lectures[selectedLectureIndexForContent].title ||
+                    "Untitled Lecture"}
                 </h3>
                 <div
                   className="text-md mt-4 border p-4 whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ __html: lectures[selectedLectureIndexForContent].content }}
+                  dangerouslySetInnerHTML={{
+                    __html: lectures[selectedLectureIndexForContent].content,
+                  }}
                 ></div>
               </>
             ) : (
-              <p className="text-md text-gray-500">Select a lecture to view its content.</p>
+              <p className="text-md text-gray-500">
+                Select a lecture to view its content.
+              </p>
             )}
           </div>
 
-          {/* Side drawer for lectures */}
+          {/* Side drawer for lectures with same height as main content */}
           {drawerOpen && (
-            <div className="flex-[2] p-6 bg-white dark:bg-gray-800 shadow-lg ml-4">
-              <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2">Lectures</h2>
+            <div className="flex-[2] p-6 bg-white dark:bg-gray-800 shadow-lg ml-4 h-[500px] overflow-auto">
+              <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2">
+                Lectures
+              </h2>
               {lectures.length > 0 ? (
                 lectures.map((lecture, index) => {
                   const isExpanded = expandedLectureIndex === index;
@@ -280,13 +392,24 @@ const ViewCourse = () => {
                     <div key={index} className="mb-4 pb-4 border-b">
                       <div className="flex justify-between items-center">
                         <div className="flex items-center">
-                          <span className="font-bold mr-2">Lecture {index + 1}:</span>
+                          <span className="font-bold mr-2">
+                            Lecture {index + 1}:
+                          </span>
                           {lecture.isEditing ? (
                             <div className="flex flex-col">
                               <input
                                 type="text"
-                                value={lecture.tempTitle !== undefined ? lecture.tempTitle : lecture.title}
-                                onChange={(e) => handleLectureTitleChange(index, e.target.value)}
+                                value={
+                                  lecture.tempTitle !== undefined
+                                    ? lecture.tempTitle
+                                    : lecture.title
+                                }
+                                onChange={(e) =>
+                                  handleLectureTitleChange(
+                                    index,
+                                    e.target.value
+                                  )
+                                }
                                 placeholder="Enter Lecture Title"
                                 className="w-full mb-2 p-2 border rounded-md bg-gray-300 dark:bg-gray-600 dark:text-black"
                               />
@@ -295,7 +418,10 @@ const ViewCourse = () => {
                             <>
                               {lecture.title.trim() === "" ? (
                                 lecture.selected ? (
-                                  <span className="cursor-pointer" onClick={() => handleLectureClick(index)}>
+                                  <span
+                                    className="cursor-pointer"
+                                    onClick={() => handleLectureClick(index)}
+                                  >
                                     {lecture.type} Lecture
                                   </span>
                                 ) : (
@@ -307,7 +433,12 @@ const ViewCourse = () => {
                                   </button>
                                 )
                               ) : (
-                                <span className="cursor-pointer font-semibold">{lecture.title}</span>
+                                <span
+                                  className="cursor-pointer font-semibold"
+                                  onClick={() => handleLectureClick(index)}
+                                >
+                                  {lecture.title}
+                                </span>
                               )}
                             </>
                           )}
@@ -335,31 +466,103 @@ const ViewCourse = () => {
                           </>
                         )}
                       </div>
-                      {isExpanded && !lecture.isEditing && lecture.title.trim() !== "" && (
-                        <div className="mt-2 ml-8 space-y-2">
-                          <button
-                            className="flex items-center space-x-2 px-4 py-2 border rounded-md"
-                            onClick={() => handleShowText(index)}
-                          >
-                            <span role="img" aria-label="text">📄</span>
-                            <span>Text</span>
-                          </button>
-                          <button
-                            className="flex items-center space-x-2 px-4 py-2 border rounded-md"
-                            onClick={() => handleShowQuiz(index)}
-                          >
-                            <span role="img" aria-label="quiz">❓</span>
-                            <span>Quiz</span>
-                          </button>
-                        </div>
-                      )}
+                      {isExpanded &&
+                        !lecture.isEditing &&
+                        lecture.title.trim() !== "" && (
+                          <div className="mt-2 ml-8 space-y-2">
+                            <button
+                              className="flex items-center space-x-2 px-4 py-2 border rounded-md"
+                              onClick={() => handleShowText(index)}
+                            >
+                              <span role="img" aria-label="text">
+                                📄
+                              </span>
+                              <span>Text</span>
+                            </button>
+                            <button
+                              className="flex items-center space-x-2 px-4 py-2 border rounded-md"
+                              onClick={() => handleShowQuiz(index)}
+                            >
+                              <span role="img" aria-label="quiz">
+                                ❓
+                              </span>
+                              <span>Quiz</span>
+                            </button>
+                          </div>
+                        )}
                     </div>
                   );
                 })
               ) : (
-                <p className="text-md text-gray-500">No lectures uploaded yet.</p>
+                <p className="text-md text-gray-500">
+                  No lectures uploaded yet.
+                </p>
               )}
             </div>
+          )}
+        </div>
+
+        {/* Questions Section */}
+        <div className="mt-10">
+          <h2 className="text-2xl font-bold mb-4">Questions</h2>
+          {questions.length > 0 ? (
+            questions.map((q) => (
+              <div key={q.id} className="mb-4 p-4 border rounded-md bg-white dark:bg-gray-700">
+                <p className="font-medium">{q.text}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Asked by: {q.authorName}</p>
+                
+                {/* Render answers if available */}
+                {q.answers.length > 0 && (
+                  <div className="mt-2 pl-4 border-l-2">
+                    {q.answers.map((ans, index) => (
+                      <div key={index} className="mb-1">
+                        <span className="font-semibold">{ans.teacherName}:</span> {ans.text}
+                      </div>
+                    ))}
+                  </div>
+                )}
+            
+                <button
+                  onClick={() => toggleReplyUI(q.id)}
+                  className="mt-2 text-sm text-blue-500 underline"
+                >
+                  Answer the question
+                </button>
+                {activeReplyQuestionId === q.id && (
+                  <div className="mt-2">
+                    <textarea
+                      placeholder="Type your answer..."
+                      className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-600"
+                      rows="3"
+                      value={answer}
+                      onChange={(e) => setAnswer(e.target.value)}
+                    ></textarea>
+                    <div className="mt-2 flex space-x-4">
+                      <button
+                        onClick={(e) => handleAnsQuestionSubmit(e, q.id)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                      >
+                        Answer
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveReplyQuestionId(null);
+                          setAnswer("");
+                        }}
+                        className="px-4 py-2 bg-red-500 text-white rounded-md"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+            
+          ) : (
+            <p className="text-md text-gray-500">
+              No questions available for this lecture.
+            </p>
           )}
         </div>
       </div>
@@ -368,7 +571,9 @@ const ViewCourse = () => {
       {showUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Select Lecture Type To Upload</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Select Lecture Type To Upload
+            </h3>
             <button
               onClick={handleQuizUploadClick}
               className="w-full px-4 py-2 border hover:bg-btnbg text-black hover:text-white dark:hover:bg-secondary dark:text-white rounded-md"
@@ -376,7 +581,7 @@ const ViewCourse = () => {
               Quiz
             </button>
             <button
-             onClick={handleAddCodingQuestionClick}
+              onClick={handleAddCodingQuestionClick}
               className="w-full px-4 py-2 mt-2 border hover:bg-btnbg hover:text-white text-black dark:hover:bg-secondary dark:text-white rounded-md"
             >
               Coding
@@ -395,7 +600,9 @@ const ViewCourse = () => {
       {QuizUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">Enter Exam Details</h3>
+            <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">
+              Enter Exam Details
+            </h3>
             <input
               type="text"
               name="name"

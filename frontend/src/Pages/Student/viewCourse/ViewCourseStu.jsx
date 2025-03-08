@@ -171,11 +171,13 @@ const ViewCourse = () => {
         // Transform response to extract required fields
         const formattedQuestions = response.map((question) => ({
           id: question.id,
-          text: question.question, // Extract the question text
-          authorName: question.student?.name || "Unknown", // Handle missing name
-          authorId: question.student?.id, // Handle missing name
-          // Ensure answers is always an array (even if undefined or null)
-          answers: (question.answers || []).map((ans) => ans.text), // Extract answers
+          text: question.question,
+          authorName: question.student?.name || "Unknown",
+          authorId: question.student?.id,
+          answers: (question.answers || []).map((ans) => ({
+            text: ans.answer, // using "answer" from the API response
+            teacherName: ans.teacher?.name || "Unknown Teacher",
+          })),
         }));
 
         setQuestions(formattedQuestions);
@@ -193,7 +195,7 @@ const ViewCourse = () => {
   }, [activeLectureIndex, currentLecture]);
 
   const handleAskQuestionSubmit = async (e) => {
-    console.log(user.student.id)
+    console.log(user.student.id);
     e.preventDefault();
     if (!newQuestionText.trim()) return;
 
@@ -236,11 +238,10 @@ const ViewCourse = () => {
   const handleEditQuestionSubmit = async (questionId) => {
     if (!editedQuestionText.trim()) return;
     try {
-      const response = await apiClient.editQustions(
-        questionId,{
+      const response = await apiClient.editQustions(questionId, {
         question: editedQuestionText,
       });
-      console.log(response)
+      console.log(response);
       setQuestions((prev) =>
         prev.map((q) =>
           q.id === questionId ? { ...q, text: response.question } : q
@@ -256,7 +257,7 @@ const ViewCourse = () => {
   // Handle deleting a question
   const handleDeleteQuestionSubmit = async (questionId) => {
     try {
-      await apiClient.deleteQustions( questionId );
+      await apiClient.deleteQustions(questionId);
       setQuestions((prev) => prev.filter((q) => q.id !== questionId));
     } catch (error) {
       console.error("Error deleting question:", error);
@@ -603,7 +604,10 @@ const ViewCourse = () => {
                                 key={index}
                                 className="text-gray-600 pl-4 border-l-2 border-blue-400"
                               >
-                                {answer}
+                                {answer.text}{" "}
+                                <span className="text-sm italic text-gray-500">
+                                  - {answer.teacherName}
+                                </span>
                               </li>
                             ))}
                           </ul>

@@ -135,4 +135,5 @@ Route::prefix('lecture-questions')->group(function () {
     Route::get('/{id}', [LectureQuestionController::class, 'show']);
     Route::put('/{id}', [LectureQuestionController::class, 'update']);
     Route::delete('/{id}', [LectureQuestionController::class, 'destroy']);
+    Route::post('/answer', [LectureQuestionController::class, 'storeAnswer']);
 });

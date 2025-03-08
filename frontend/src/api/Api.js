@@ -315,6 +315,15 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
+  async ansQustions(data) {
+    try {
+      console.log(data)
+      const response = await this.client.post(`api/lecture-questions/answer`,data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
   async getAllQustions(id) {
     try {
       console.log('id',id)

@@ -53,4 +53,15 @@ class LectureQuestionController extends Controller
     {
         return response()->json($this->lectureQuestionService->deleteQuestion($id));
     }
+    public function storeAnswer(Request $request)
+{
+    $validated = $request->validate([
+        'question_id' => 'required|exists:lecture_questions,id',
+        'teacher_id' => 'required|exists:teachers,id',
+        'answer' => 'required|string|max:1000',
+    ]);
+
+    return response()->json($this->lectureQuestionService->createAnswer($validated));
+}
+
 }

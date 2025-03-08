@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LectureAnswer;
 use App\Models\LectureQuestion;
 
 class LectureQuestionService
@@ -46,4 +47,8 @@ class LectureQuestionService
         $question->delete();
         return ['message' => 'Deleted successfully'];
     }
+    public function createAnswer($data)
+{
+    return LectureAnswer::create($data);
+}
 }
