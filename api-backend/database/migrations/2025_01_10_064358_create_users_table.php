@@ -6,23 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateUsersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role', ['student', 'teacher', 'admin'])->default('student');
+            $table->string('role'); // student, teacher, admin
             $table->timestamps();
         });
     }
-    
-
 
     public function down()
     {

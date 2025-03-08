@@ -9,16 +9,17 @@ class CreateResultsTable extends Migration
     public function up()
     {
         Schema::create('results', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('student_id');
-            $table->unsignedBigInteger('exam_id');
-            $table->integer('obtained_marks');
-            $table->enum('status', ['passed', 'failed']);
+            $table->increments('id');
+            $table->unsignedInteger('student_id');
+            $table->unsignedInteger('exam_id');
+            $table->integer('obtained_marks')->nullable();
+            $table->string('status')->nullable(); // passed, failed
             $table->timestamps();
 
-            // Foreign Key Constraints
-            $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
-            $table->foreign('exam_id')->references('id')->on('exams')->onDelete('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                  ->onDelete('cascade');
+            $table->foreign('exam_id')->references('id')->on('exams')
+                  ->onDelete('cascade');
         });
     }
 
