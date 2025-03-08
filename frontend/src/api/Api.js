@@ -3,29 +3,49 @@ import axios from "axios";
 class ApiClient {
   constructor(baseURL) {
     this.baseURL = baseURL;
+
+    // Main axios client with interceptors
     this.client = axios.create({
       baseURL,
-      withCredentials: true, // if you need to send cookies along with requests
+      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    // Request interceptor: attach tokens to each request.
+    // Separate axios instance for refreshing token (no interceptors)
+    this.refreshClient = axios.create({
+      baseURL,
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Request interceptor: Attach tokens and attempt refresh if access token is missing
     this.client.interceptors.request.use(
-      (config) => {
-        // Get tokens from local storage.
-        const accessToken = localStorage.getItem("access_token");
+      async (config) => {
+        let accessToken = localStorage.getItem("access_token");
         const refreshToken = localStorage.getItem("refresh_token");
 
-        // Attach the access token (if available) in the Authorization header.
-        if (accessToken) {
-          config.headers["Authorization"] = `Bearer ${accessToken}`;
+        // If no access token is available but a refresh token exists, try to refresh it.
+        if (!accessToken && refreshToken) {
+          try {
+            accessToken = await this.refreshAccessToken();
+          } catch (err) {
+            // If refresh fails, reject the request with an error
+            return Promise.reject(err);
+          }
         }
 
-        // Always attach the refresh token (if available) in the Refresh-Token header.
+        // Attach the access token if available.
+        if (accessToken) {
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
+        // Always attach the refresh token if available.
         if (refreshToken) {
-          config.headers["Refresh-Token"] = refreshToken;
+          config.headers["X-Refresh-Token"] = refreshToken;
         }
 
         return config;
@@ -33,13 +53,51 @@ class ApiClient {
       (error) => Promise.reject(error)
     );
 
-    // (Optional) Response interceptor: you can handle response errors here if needed.
+    // Response interceptor as a fallback: if a 401 is received, try refreshing once.
     this.client.interceptors.response.use(
       (response) => response,
-      (error) => {
+      async (error) => {
+        const originalRequest = error.config;
+        if (
+          error.response &&
+          error.response.status === 401 &&
+          !originalRequest._retry
+        ) {
+          originalRequest._retry = true;
+          try {
+            const newAccessToken = await this.refreshAccessToken();
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            return this.client(originalRequest);
+          } catch (refreshError) {
+            console.log(refreshError)
+            // If refresh fails, clear tokens and propagate the error.
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            return Promise.reject(refreshError);
+          }
+        }
         return Promise.reject(error);
       }
     );
+  }
+
+  // Call the dedicated refresh endpoint using the separate axios instance.
+  async refreshAccessToken() {
+    const refreshToken = localStorage.getItem("refresh_token");
+    console.log(refreshToken)
+    if (!refreshToken) {
+      throw new Error("Refresh token not available");
+    }
+    try {
+      const response = await this.refreshClient.get("api/token/refresh", {
+        headers: { "X-Refresh-Token": refreshToken },
+      });
+      const newAccessToken = response.data.access_token;
+      localStorage.setItem("access_token", newAccessToken);
+      return newAccessToken;
+    } catch (error) {
+      throw error;
+    }
   }
 
   // Registers a new user.
@@ -64,25 +122,14 @@ class ApiClient {
 
   async logout() {
     try {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) throw new Error("No access token found.");
-
-      const response = await this.client.get("api/logout", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      // Clear local storage on successful logout
-      // localStorage.removeItem("access_token");
-      // localStorage.removeItem("refresh_token");
-      // localStorage.removeItem("user_id");
-      localStorage.clear();
+      const response = await this.client.post("api/logout");
+      console.log("response logout", response.data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   }
+
   async getUserById() {
     //   console.log("Fetching user data for id:", id);
     try {
@@ -269,15 +316,28 @@ async getTeacherCourses(teacherId) {
   }
   async askQustions(data) {
     try {
+      console.log(data)
       const response = await this.client.post(`api/lecture-questions`,data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   }
-  async getAllQustions(data) {
+  async ansQustions(data) {
     try {
-      const response = await this.client.get(`api/lecture-questions`,data);
+      console.log(data)
+      const response = await this.client.post(`api/lecture-questions/answer`,data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async getAllQustions(id) {
+
+    try {
+      console.log('id',id)
+      const response = await this.client.get(`api/lecture-questions/${id}/questions-answers`);
+      console.log('all qustions ',response.data)
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -285,6 +345,7 @@ async getTeacherCourses(teacherId) {
   }
   async editQustions(id,data) {
     try {
+      console.log(id,data)
       const response = await this.client.put(`api/lecture-questions/${id}`,data);
       return response.data;
     } catch (error) {
@@ -299,6 +360,17 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
+
+  async codingQustions(data) {
+    try {
+      console.log(data)
+      const response = await this.client.post(`api/code-exam-questions`,data);
+         return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
   async getenrollStudentinCourse(courseId) {
     try {
       const response = await this.client.get(`/api/courses/${courseId}/students`);
@@ -318,11 +390,13 @@ async getTeacherCourses(teacherId) {
   async unenrollfromcourse(id){
     try {
       const response = await this.client.delete(`/api/enrollments/${id}`);
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   }
+
 }
 
 // Exporting an instance of the client

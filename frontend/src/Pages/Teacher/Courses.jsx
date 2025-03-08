@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import apiClient from "../../api/Api";
+import { useSelector } from "react-redux";
 
 const Courses = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [courses, setCourses] = useState([]);
+  const user = useSelector((state) => state?.user?.user);
   const [newCourse, setNewCourse] = useState({
     name: "",
     completion_time: "",
@@ -22,7 +24,7 @@ const Courses = () => {
   const fetchCourses = async () => {
     try {
       
-      const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const teacherInfo = await apiClient.getUserById(user?.id);
       console.log("Teacher Info:", teacherInfo);
       const teacherId = teacherInfo.teacher.id;
 
@@ -50,7 +52,7 @@ const Courses = () => {
 
   const handleAddCourse = async () => {
     try {
-      const teacherInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const teacherInfo = await apiClient.getUserById(user?.id);
       
       const teacherId = teacherInfo.teacher.id;
       
@@ -226,7 +228,7 @@ const Courses = () => {
                 value={newCourse.name}
                 onChange={handleInputChange}
                 placeholder="Course Name"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-white"
               />
               <input
                 type="text"
@@ -234,7 +236,7 @@ const Courses = () => {
                 value={newCourse.course_code}
                 onChange={handleInputChange}
                 placeholder="Course Code"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full  text-white"
               />
               <input
                 type="number"
@@ -242,7 +244,7 @@ const Courses = () => {
                 value={newCourse.completion_time}
                 onChange={handleInputChange}
                 placeholder="Completion Time (in days)"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full  text-white"
               />
               <input
                 type="number"
@@ -250,18 +252,18 @@ const Courses = () => {
                 value={newCourse.number_of_lectures}
                 onChange={handleInputChange}
                 placeholder="Number of Lectures"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full  text-white"
               />
               <div className="flex justify-between">
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="btn bg-gray-300 text-black dark:bg-gray-600 dark:text-white"
+                  className="btn bg-gray-300 border-none text-black dark:bg-gray-600 dark:text-white hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddCourse}
-                  className="btn bg-btnbg text-white dark:bg-btnbg dark:text-white"
+                  className="btn border-none bg-btnbg text-white dark:bg-btnbg dark:text-white"
                 >
                   Add Course
                 </button>

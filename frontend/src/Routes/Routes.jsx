@@ -29,6 +29,9 @@ import TextQuizStu from "../Pages/Student/viewCourse/TextQuizStu";
 import TextUpload from "../Pages/Teacher/viewCourse/TextUpload";
 
 import TeacherAnnouncements from "../Pages/Teacher/TeacherAnnouncements";
+import CodeUpload from "../Pages/Teacher/viewCourse/CodeUpload";
+import CodingStu from "../Pages/Student/viewCourse/CodingStu";
+import EvaluateCode from "../Pages/Teacher/EvaluateCode";
 
 
 
@@ -89,6 +92,10 @@ export const router = createBrowserRouter([
             element:<ViewCourseStu></ViewCourseStu>
           },
           {
+            path:'codingstu/:id',
+            element:<CodingStu></CodingStu>
+          },
+          {
 
             path:'text-quiz-stu/:id',
             element: <TextQuizStu></TextQuizStu>
@@ -136,12 +143,20 @@ export const router = createBrowserRouter([
             element: <TeacherExams />,
           },
           {
+            path: "evaluate-code",
+            element: <EvaluateCode></EvaluateCode>
+          },
+          {
             path: "teachers-quizupload",
             element: <QuizUpload></QuizUpload>
           },
           {
             path: "teacher-textupload",
             element: <TextUpload />,
+          },
+          {
+            path: "teacher-codeupload",
+            element: <CodeUpload></CodeUpload>
           },
           {
             path: "teachers-results",

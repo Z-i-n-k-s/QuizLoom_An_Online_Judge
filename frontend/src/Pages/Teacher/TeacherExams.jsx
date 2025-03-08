@@ -1,102 +1,129 @@
 import { useState } from "react";
-import "./TeacherExams.css";
+import { useNavigate } from "react-router-dom";
 
+// Coding exam evaluate table page
 const TeacherExams = () => {
-  const [examList, setExamList] = useState([]);
+  // Dummy data for demo
+  const navigate = useNavigate();
+  const [studentExamList, setStudentExamList] = useState([
+    {
+      id: 1,
+      studentName: "John Doe",
+      courseName: "Computer Science",
+      examDetails: "Coding Exam 1 - 2025-03-01",
+      marks: 85,
+      evaluated: false,
+    },
+    {
+      id: 2,
+      studentName: "Jane Smith",
+      courseName: "Mathematics",
+      examDetails: "Math Exam 1 - 2025-03-02",
+      marks: 92,
+      evaluated: true,
+    },
+    {
+      id: 3,
+      studentName: "Alice Johnson",
+      courseName: "Computer Science",
+      examDetails: "Coding Exam 1 - 2025-03-01",
+      marks: 78,
+      evaluated: false,
+    },
+  ]);
 
-  const handleAddExam = (newExam) => {
-    setExamList([...examList, newExam]);
-  };
+  // Filter states
+  const [filterStudentName, setFilterStudentName] = useState("");
+  const [filterCourseName, setFilterCourseName] = useState("");
+
+  // Filter the list based on input values
+  const filteredExamList = studentExamList.filter((exam) => {
+    return (
+      exam.studentName.toLowerCase().includes(filterStudentName.toLowerCase()) &&
+      exam.courseName.toLowerCase().includes(filterCourseName.toLowerCase())
+    );
+  });
 
   return (
-    <div className="px-4">
-      {/* Cards */}
-      <div className="flex justify-center mt-20">
-        {/* Card 1 */}
-        <div className="card-container m-4">
-          <div className="card w-96 shadow-xl m-4 flex items-center justify-center">
-            <div className="card-inner">
-              {/* Front Side */}
-              <div className="card-front bg-pink-200 dark:bg-pink-200 flex flex-col items-center justify-center text-center p-6 py-10">
-                <h2 className="text-2xl font-bold dark:text-black">Total Exams Created</h2>
-                <p className="text-lg dark:text-black">12 Exams</p>
-              </div>
-              {/* Back Side */}
-              <div className="card-back bg-pink-300 dark:bg-pink-300 flex flex-col items-center justify-center text-center p-6 py-10">
-                <h2 className="text-xl font-semibold dark:text-black">Manage Exams</h2>
-                <p className="text-sm dark:text-black">View, edit, or delete existing exams.</p>
-              </div>
-            </div>
+    <div className="px-4 ml-10">
+      <div className="mt-20">
+        <h2 className="text-3xl font-bold mb-4 pt-4 text-center">
+          Student Evaluation
+        </h2>
+
+        {/* Filter Section */}
+        <form className="flex flex-wrap gap-4 items-center mb-6">
+          <div className="flex flex-col">
+            <label className="text-lg font-semibold">Student Name</label>
+            <input
+              type="text"
+              value={filterStudentName}
+              onChange={(e) => setFilterStudentName(e.target.value)}
+              placeholder="Enter student name"
+              className="p-2 border rounded-md bg-white dark:bg-gray-600"
+            />
           </div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="card-container m-4">
-          <div className="card w-96 shadow-xl m-4 flex items-center justify-center">
-            <div className="card-inner">
-              {/* Front Side */}
-              <div className="card-front bg-blue-200 dark:bg-blue-200 flex flex-col items-center justify-center text-center p-6 py-10">
-                <h2 className="text-2xl font-bold dark:text-black">Upcoming Exams</h2>
-                <p className="text-lg dark:text-black">5 Scheduled</p>
-              </div>
-              {/* Back Side */}
-              <div className="card-back bg-blue-300 dark:bg-blue-300 flex flex-col items-center justify-center text-center p-6 py-10">
-                <h2 className="text-xl font-semibold dark:text-black">Prepare for Exams</h2>
-                <p className="text-sm dark:text-black">View details and prepare for upcoming exams.</p>
-              </div>
-            </div>
+          <div className="flex flex-col">
+            <label className="text-lg font-semibold">Course Name</label>
+            <input
+              type="text"
+              value={filterCourseName}
+              onChange={(e) => setFilterCourseName(e.target.value)}
+              placeholder="Enter course name"
+              className="p-2 border rounded-md bg-white dark:bg-gray-600"
+            />
           </div>
-        </div>
-      </div>
+        </form>
 
-      {/* Button Section */}
-      <div className="flex justify-between items-center mt-10 p-4 rounded-lg">
-        <h3 className="text-2xl font-bold">Exam List</h3>
-        <button
-          className="btn border-none bg-btnbg text-white px-4 py-2 rounded-lg shadow-md hover:bg-secondary dark:bg-secondary dark:hover:bg-btnbg"
-          onClick={() => {
-          }}
-        >
-          Add New Exam
-        </button>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto mt-8 ml-8">
-        <table className="table w-full border rounded-lg">
-          {/* Table Head */}
-          <thead>
-            <tr className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white">
-              <th className="px-4 py-2">Sl No</th>
-              <th className="px-4 py-2">Course Name</th>
-              <th className="px-4 py-2">Exam Name</th>
-              <th className="px-4 py-2">Date</th>
-              <th className="px-4 py-2">Questions</th>
-              <th className="px-4 py-2">Total Marks</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {examList.map((exam, index) => (
-              <tr className="hover:bg-gray-100 dark:hover:bg-gray-600" key={index}>
-                <td className="px-4 py-2 text-center">{index + 1}</td>
-                <td className="px-4 py-2 text-center">{exam.courseName}</td>
-                <td className="px-4 py-2 text-center">{exam.examName}</td>
-                <td className="px-4 py-2 text-center">{exam.date}</td>
-                <td className="px-4 py-2 text-center">{exam.questions}</td>
-                <td className="px-4 py-2 text-center">{exam.totalMarks}</td>
-                <td className="px-4 py-2 text-center">{exam.status}</td>
-                <td className="px-4 py-2 text-center">
-                  <button className="btn btn-sm bg-btnbg text-white mr-2 borded-none dark:bg-secondary dark:hover:bg-btnbg">
-                    Edit
-                  </button>
-                  <button className="btn btn-sm btn-error">Del</button>
-                </td>
+        {/* Table for Student Coding Exam List */}
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border-collapse">
+            <thead className="bg-gray-200 dark:bg-gray-700">
+              <tr className="text-black dark:text-white">
+                <th className="p-2 border">Si No</th>
+                <th className="p-2 border">Student Name</th>
+                <th className="p-2 border">Course Name</th>
+                <th className="p-2 border">Exam Details</th>
+                <th className="p-2 border">Marks</th>
+                <th className="p-2 border">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredExamList.length > 0 ? (
+                filteredExamList.map((exam, index) => (
+                  <tr
+                    key={exam.id}
+                    className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <td className="p-2 border text-center">{index + 1}</td>
+                    <td className="p-2 border text-center">{exam.studentName}</td>
+                    <td className="p-2 border text-center">{exam.courseName}</td>
+                    <td className="p-2 border text-center">{exam.examDetails}</td>
+                    <td className="p-2 border text-center">{exam.marks}</td>
+                    <td className="p-2 border text-center">
+                      {exam.evaluated ? (
+                        <button className="px-4 py-2 text-green-800 font-bold rounded-md">
+                          Evaluated
+                        </button>
+                      ) : (
+                        <button   onClick={() => navigate("/teacher-panel/evaluate-code")}
+                         className="px-4 py-2 bg-btnbg text-white dark:bg-secondary dark:text-black rounded-md">
+                          Evaluate
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="p-2 border text-center">
+                    No exams found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

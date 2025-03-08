@@ -12,6 +12,7 @@ const TextQuizStu = ({
   user,
   examResult, // New prop for existing result
 }) => {
+  console.log("results ",examResult)
   // Mapping from letter to numeric index.
   const letterToIndex = { A: 0, B: 1, C: 2, D: 3 };
 
@@ -234,6 +235,7 @@ const TextQuizStu = ({
 
   // Display quiz results after submission
   if (type === "quiz" && quizSubmitted) {
+    console.log('submit ',type === "quiz" && quizSubmitted)
     const marksEach = quizData.length
       ? parseFloat((examTotalMarks / quizData.length).toFixed(2))
       : 0;
