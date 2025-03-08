@@ -12,13 +12,14 @@ class LectureService {
     {
         $course = Course::with([
             'lectures.exam.quizQuestions',
-            // 'lectures.exam.codeExamQuestions',
             'lectures.exam.results',
-            // 'lectures.questions.answers'
+            'lectures.exam.codeExamQuestions', // Include CodeExamQuestion
         ])->findOrFail($courseId);
     
         return $course->lectures;
     }
+    
+    
 
     public function getLectureById($id) {
         return Lecture::findOrFail($id);

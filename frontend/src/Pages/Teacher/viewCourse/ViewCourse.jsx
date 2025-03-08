@@ -11,11 +11,15 @@ const ViewCourse = () => {
   const user = useSelector((state) => state?.user?.user);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isQuizViewActive, setIsQuizViewActive] = useState(false);
+  const [selectedUploadType, setSelectedUploadType] = useState("");
+
+
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const [QuizUploadOptions, setQuizUploadOptions] = useState(false);
   const [selectedLectureId, setSelectedLectureId] = useState(null);
   const courseName = location.state?.name;
- 
+
   const [examDetails, setExamDetails] = useState({
     name: "",
     date: "",
@@ -61,10 +65,11 @@ const ViewCourse = () => {
             title: lecture.title,
             type: lecture.type || "Text",
             content: lecture.lecture_data || "",
+            exam: lecture.exam, // include exam data with quiz_questions
             isEditing: false,
             selected: true,
           }));
-          // Add an extra blank slot at the end if needed
+          // Add an extra blank slot if needed
           if (mappedLectures[mappedLectures.length - 1]?.title?.trim() !== "") {
             mappedLectures.push({
               title: "",
@@ -90,8 +95,20 @@ const ViewCourse = () => {
         console.error("Error fetching lectures: ", error);
       }
     };
+
     fetchLecturesFromBackend();
   }, [courseId]);
+  const handleShowQuiz = (lectureIndex) => {
+    setSelectedLectureIndexForContent(lectureIndex);
+    setIsQuizViewActive(true);
+  };
+
+  const handleUploadOptionClick = (type) => {
+    setSelectedUploadType(type);
+    setQuizUploadOptions(true); // Open the "Enter Exam Details" modal
+    setShowUploadOptions(false); // Close the current upload options popup
+  };
+  
 
   // 2) PROCESS LECTURE(S) PASSED IN location.state EXACTLY ONCE
   useEffect(() => {
@@ -147,31 +164,30 @@ const ViewCourse = () => {
   // FETCH QUESTIONS LOGIC
   // -------------------------------
   // Function to fetch all questions for the active lecture
- // Function to fetch all questions for the active lecture
-const fetchQuestions = async () => {
-  if (!currentLecture) return;
-  try {
-    const response = await apiClient.getAllQustions(currentLecture.id);
-    if (response && Array.isArray(response)) {
-      // Transform response to extract required fields
-      const formattedQuestions = response.map((question) => ({
-        id: question.id,
-        text: question.question, // The question text
-        authorName: question.student?.name || "Unknown",
-        authorId: question.student?.id,
-        // Map answers to include both teacher name and answer text
-        answers: (question.answers || []).map((ans) => ({
-          text: ans.answer,
-          teacherName: ans.teacher?.name || "Unknown",
-        })),
-      }));
-      setQuestions(formattedQuestions);
+  // Function to fetch all questions for the active lecture
+  const fetchQuestions = async () => {
+    if (!currentLecture) return;
+    try {
+      const response = await apiClient.getAllQustions(currentLecture.id);
+      if (response && Array.isArray(response)) {
+        // Transform response to extract required fields
+        const formattedQuestions = response.map((question) => ({
+          id: question.id,
+          text: question.question, // The question text
+          authorName: question.student?.name || "Unknown",
+          authorId: question.student?.id,
+          // Map answers to include both teacher name and answer text
+          answers: (question.answers || []).map((ans) => ({
+            text: ans.answer,
+            teacherName: ans.teacher?.name || "Unknown",
+          })),
+        }));
+        setQuestions(formattedQuestions);
+      }
+    } catch (error) {
+      console.error("Error fetching questions:", error);
     }
-  } catch (error) {
-    console.error("Error fetching questions:", error);
-  }
-};
-
+  };
 
   // Call fetchQuestions when the active lecture changes
   useEffect(() => {
@@ -209,18 +225,17 @@ const fetchQuestions = async () => {
   // 1. Add state for the answer text
   const [answer, setAnswer] = useState("");
 
-
   // 2. The submit handler for answering a question
   const handleAnsQuestionSubmit = async (e, question_id) => {
     e.preventDefault();
     if (!answer.trim()) return;
-  
+
     const data = {
       question_id: question_id,
       teacher_id: user.teacher.id,
       answer: answer,
     };
-  
+
     try {
       const response = await apiClient.ansQustions(data);
       console.log(response);
@@ -233,7 +248,6 @@ const fetchQuestions = async () => {
       console.error("Error submitting answer:", error);
     }
   };
-  
 
   // -------------------------------
   // EXAM DETAILS LOGIC
@@ -256,7 +270,7 @@ const fetchQuestions = async () => {
         course_id: courseId,
         lecture_id: selectedLectureId,
       };
-
+  
       if (
         !examDetails.name ||
         !examDetails.date ||
@@ -271,14 +285,24 @@ const fetchQuestions = async () => {
         });
         return;
       }
-
+  
       const response = await apiClient.addExam(examData);
       if (response) {
         console.log("Exam added successfully:", response);
         const examId = response.id;
-        navigate("/teacher-panel/teachers-quizupload", {
-          state: { examId, examDetails, courseId, courseName },
-        });
+  
+        // Redirect based on the previously selected upload type
+        if (selectedUploadType === "quiz") {
+          navigate("/teacher-panel/teachers-quizupload", {
+            state: { examId, examDetails, courseId, courseName },
+          });
+        } else if (selectedUploadType === "coding") {
+          navigate("/teacher-panel/teacher-codeupload", {
+            state: { examId, examDetails, courseId, courseName },
+          });
+        }
+  
+        // Reset exam details and any loading state as needed
         setExamDetails({
           name: "",
           date: "",
@@ -293,6 +317,7 @@ const fetchQuestions = async () => {
       setIsLoading(false);
     }
   };
+  
 
   // -------------------------------
   // UI INTERACTION
@@ -313,10 +338,6 @@ const fetchQuestions = async () => {
   };
 
   const handleShowText = (lectureIndex) => {
-    setSelectedLectureIndexForContent(lectureIndex);
-  };
-
-  const handleShowQuiz = (lectureIndex) => {
     setSelectedLectureIndexForContent(lectureIndex);
   };
 
@@ -359,7 +380,37 @@ const fetchQuestions = async () => {
         <div className="flex">
           {/* Main content area */}
           <div className="flex-[3] p-6 bg-white dark:bg-gray-800 shadow-lg border border-gray-400 mb-10 h-[500px] overflow-auto">
-            {selectedLectureIndexForContent !== null ? (
+            {isQuizViewActive &&
+            currentLecture?.exam &&
+            currentLecture.exam.quiz_questions ? (
+              <div>
+                <h3 className="text-lg font-bold border-b pb-4">
+                  {currentLecture.exam.name}
+                </h3>
+                <ol className="list-decimal ml-6">
+                  {currentLecture.exam.quiz_questions.map((q) => (
+                    <li key={q.id} className="mb-4">
+                      <p className="font-medium">{q.question}</p>
+                      <ul className="list-disc ml-4">
+                        <li>A: {q.option_a}</li>
+                        <li>B: {q.option_b}</li>
+                        <li>C: {q.option_c}</li>
+                        <li>D: {q.option_d}</li>
+                      </ul>
+                      <p className="text-sm text-green-600">
+                        <strong>Correct Answer:</strong> {q.correct_option}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+                <button
+                  onClick={() => setIsQuizViewActive(false)}
+                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md"
+                >
+                  Back to Text
+                </button>
+              </div>
+            ) : (
               <>
                 <h3 className="text-lg font-bold border-b pb-4">
                   {lectures[selectedLectureIndexForContent].title ||
@@ -372,10 +423,6 @@ const fetchQuestions = async () => {
                   }}
                 ></div>
               </>
-            ) : (
-              <p className="text-md text-gray-500">
-                Select a lecture to view its content.
-              </p>
             )}
           </div>
 
@@ -472,22 +519,26 @@ const fetchQuestions = async () => {
                           <div className="mt-2 ml-8 space-y-2">
                             <button
                               className="flex items-center space-x-2 px-4 py-2 border rounded-md"
-                              onClick={() => handleShowText(index)}
+                              onClick={() => setIsQuizViewActive(false)}
                             >
                               <span role="img" aria-label="text">
                                 📄
                               </span>
                               <span>Text</span>
                             </button>
-                            <button
-                              className="flex items-center space-x-2 px-4 py-2 border rounded-md"
-                              onClick={() => handleShowQuiz(index)}
-                            >
-                              <span role="img" aria-label="quiz">
-                                ❓
-                              </span>
-                              <span>Quiz</span>
-                            </button>
+                            {lecture.exam &&
+                              lecture.exam.quiz_questions &&
+                              lecture.exam.quiz_questions.length > 0 && (
+                                <button
+                                  className="flex items-center space-x-2 px-4 py-2 border rounded-md"
+                                  onClick={() => handleShowQuiz(index)}
+                                >
+                                  <span role="img" aria-label="quiz">
+                                    ❓
+                                  </span>
+                                  <span>Quiz</span>
+                                </button>
+                              )}
                           </div>
                         )}
                     </div>
@@ -507,21 +558,29 @@ const fetchQuestions = async () => {
           <h2 className="text-2xl font-bold mb-4">Questions</h2>
           {questions.length > 0 ? (
             questions.map((q) => (
-              <div key={q.id} className="mb-4 p-4 border rounded-md bg-white dark:bg-gray-700">
+              <div
+                key={q.id}
+                className="mb-4 p-4 border rounded-md bg-white dark:bg-gray-700"
+              >
                 <p className="font-medium">{q.text}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Asked by: {q.authorName}</p>
-                
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Asked by: {q.authorName}
+                </p>
+
                 {/* Render answers if available */}
                 {q.answers.length > 0 && (
                   <div className="mt-2 pl-4 border-l-2">
                     {q.answers.map((ans, index) => (
                       <div key={index} className="mb-1">
-                        <span className="font-semibold">{ans.teacherName}:</span> {ans.text}
+                        <span className="font-semibold">
+                          {ans.teacherName}:
+                        </span>{" "}
+                        {ans.text}
                       </div>
                     ))}
                   </div>
                 )}
-            
+
                 <button
                   onClick={() => toggleReplyUI(q.id)}
                   className="mt-2 text-sm text-blue-500 underline"
@@ -558,7 +617,6 @@ const fetchQuestions = async () => {
                 )}
               </div>
             ))
-            
           ) : (
             <p className="text-md text-gray-500">
               No questions available for this lecture.
@@ -570,29 +628,30 @@ const fetchQuestions = async () => {
       {/* Modal for selecting lecture type */}
       {showUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">
-              Select Lecture Type To Upload
-            </h3>
-            <button
-              onClick={handleQuizUploadClick}
-              className="w-full px-4 py-2 border hover:bg-btnbg text-black hover:text-white dark:hover:bg-secondary dark:text-white rounded-md"
-            >
-              Quiz
-            </button>
-            <button
-              onClick={handleAddCodingQuestionClick}
-              className="w-full px-4 py-2 mt-2 border hover:bg-btnbg hover:text-white text-black dark:hover:bg-secondary dark:text-white rounded-md"
-            >
-              Coding
-            </button>
-            <button
-              onClick={() => setShowUploadOptions(false)}
-              className="w-full mt-4 px-4 py-2 bg-red-500 text-white dark:hover:bg-secondary rounded-md"
-            >
-              Close
-            </button>
-          </div>
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
+  <h3 className="text-lg font-semibold mb-4">
+    Select Lecture Type To Upload
+  </h3>
+  <button
+    onClick={() => handleUploadOptionClick("quiz")}
+    className="w-full px-4 py-2 border hover:bg-btnbg text-black hover:text-white dark:hover:bg-secondary dark:text-white rounded-md"
+  >
+    Quiz
+  </button>
+  <button
+    onClick={() => handleUploadOptionClick("coding")}
+    className="w-full px-4 py-2 mt-2 border hover:bg-btnbg hover:text-white text-black dark:hover:bg-secondary dark:text-white rounded-md"
+  >
+    Coding
+  </button>
+  <button
+    onClick={() => setShowUploadOptions(false)}
+    className="w-full mt-4 px-4 py-2 bg-red-500 text-white dark:hover:bg-secondary rounded-md"
+  >
+    Close
+  </button>
+</div>
+
         </div>
       )}
 

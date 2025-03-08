@@ -1,28 +1,77 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import apiClient from "../../../api/Api";
 
 const CodeUpload = () => {
+const navigate = useNavigate();
+  const location = useLocation();
+  const courseId = location.state?.courseId;
+  const courseName = location.state?.courseName;
+  
+    const examDetails = location.state?.examDetails;
+  
+    // Load saved data from localStorage
+    const savedQuizSettings = JSON.parse(localStorage.getItem("quizSettings")) || { totalQuestions: "" };
+    const savedQuestions = JSON.parse(localStorage.getItem("questions")) || [{ question: "", options: ["", "", "", ""], correctAnswer: "" }];
+  
+    const [quizSettings, setQuizSettings] = useState(savedQuizSettings);
+    const [questions, setQuestions] = useState(savedQuestions);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    //const examId = localStorage.getItem("exam_id");
+    const examId = location.state?.examId;
+   
+    // Save to localStorage whenever quizSettings or questions change
+    useEffect(() => {
+      localStorage.setItem("quizSettings", JSON.stringify(quizSettings));
+    }, [quizSettings]);
+  
+    
+  
+    const handleSettingsChange = (e) => {
+      setQuizSettings({ ...quizSettings, [e.target.name]: e.target.value });
+    };
+  
+
+
+
   const [codeQuestion, setCodeQuestion] = useState("");
   const [marks, setMarks] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const courseId = location.state?.courseId;
-  const courseName = location.state?.courseName;
+  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!marks || !codeQuestion.trim()) {
-      alert("Please fill in all fields before submitting.");
-      return;
+  
+    try {
+      const questionData = {
+        exam_id: examId, // must exist in exams table per your validation
+        question: codeQuestion, // the coding question string from ReactQuill
+        max_marks: parseInt(marks, 10), // converting marks to an integer
+      };
+  
+      await apiClient.codingQustions(questionData);
+  
+      // Remove any stored quiz settings and questions after successful submission
+      localStorage.removeItem("quizSettings");
+      localStorage.removeItem("questions");
+  
+      // Optionally, show a success modal
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error uploading quiz:", error);
+      Swal.fire({
+        title: "Error!",
+        text: "An error occurred while uploading the quiz.",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
+      });
     }
-
-    setShowSuccessModal(true);
   };
+  
 
   const handleCloseModal = () => {
     setShowSuccessModal(false);

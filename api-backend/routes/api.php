@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CodeExamQuestionController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamController;
@@ -10,7 +11,7 @@ use App\Http\Controllers\LectureController;
 use App\Http\Controllers\LectureQuestionController;
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\ResultController;
-use App\Http\Controllers\TestController;
+
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\TokenMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -136,4 +137,18 @@ Route::prefix('lecture-questions')->group(function () {
     Route::put('/{id}', [LectureQuestionController::class, 'update']);
     Route::delete('/{id}', [LectureQuestionController::class, 'destroy']);
     Route::post('/answer', [LectureQuestionController::class, 'storeAnswer']);
+});
+
+
+// ---------------------
+// code Qustions Routes
+// ---------------------
+
+
+Route::prefix('code-exam-questions')->group(function () {
+    Route::get('/', [CodeExamQuestionController::class, 'index']); // Get all code exam questions
+    Route::post('/', [CodeExamQuestionController::class, 'store']); // Create a new code exam question
+    Route::get('/{id}', [CodeExamQuestionController::class, 'show']); // Get a specific code exam question
+    Route::put('/{id}', [CodeExamQuestionController::class, 'update']); // Update a code exam question
+    Route::delete('/{id}', [CodeExamQuestionController::class, 'destroy']); // Delete a code exam question
 });
