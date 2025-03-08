@@ -370,7 +370,7 @@ const ViewCourse = () => {
           <div className="flex gap-4">
             <button
               onClick={toggleLectureContents}
-              className="btn border-none bg-btnbg text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 dark:bg-secondary"
+              className="btn border-none bg-btnbg text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 dark:bg-secondary mr-5"
             >
               {drawerOpen ? "Hide Lectures" : "Show Lectures"}
             </button>
@@ -555,12 +555,12 @@ const ViewCourse = () => {
 
         {/* Questions Section */}
         <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-4">Questions</h2>
+          <h2 className="text-3xl font-bold mb-4 ml-5">Questions</h2>
           {questions.length > 0 ? (
             questions.map((q) => (
               <div
                 key={q.id}
-                className="mb-4 p-4 border rounded-md bg-white dark:bg-gray-700"
+                className="mb-4 m-4 p-4 border rounded-md bg-white dark:bg-gray-700"
               >
                 <p className="font-medium">{q.text}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -599,7 +599,7 @@ const ViewCourse = () => {
                     <div className="mt-2 flex space-x-4">
                       <button
                         onClick={(e) => handleAnsQuestionSubmit(e, q.id)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                        className="px-4 py-2 bg-btnbg dark:bg-secondary text-white rounded-md"
                       >
                         Answer
                       </button>

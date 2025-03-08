@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Coding exam evaluate table page
 const TeacherExams = () => {
   // Dummy data for demo
   const navigate = useNavigate();
@@ -77,15 +76,15 @@ const TeacherExams = () => {
 
         {/* Table for Student Coding Exam List */}
         <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse">
-            <thead className="bg-gray-200 dark:bg-gray-700">
-              <tr className="text-black dark:text-white">
-                <th className="p-2 border">Si No</th>
-                <th className="p-2 border">Student Name</th>
-                <th className="p-2 border">Course Name</th>
-                <th className="p-2 border">Exam Details</th>
-                <th className="p-2 border">Marks</th>
-                <th className="p-2 border">Action</th>
+          <table className="table w-full border rounded-lg mb-20">
+            <thead className="bg-gray-600  dark:bg-gray-700">
+              <tr className="text-white">
+                <th className="px-4 py-2 text-center">Si No</th>
+                <th className="px-4 py-2 text-center">Student Name</th>
+                <th className="px-4 py-2 text-center">Course Name</th>
+                <th className="px-4 py-2 text-center">Exam Details</th>
+                <th className="px-4 py-2 text-center">Marks</th>
+                <th className="px-4 py-2 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -95,19 +94,21 @@ const TeacherExams = () => {
                     key={exam.id}
                     className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
-                    <td className="p-2 border text-center">{index + 1}</td>
-                    <td className="p-2 border text-center">{exam.studentName}</td>
-                    <td className="p-2 border text-center">{exam.courseName}</td>
-                    <td className="p-2 border text-center">{exam.examDetails}</td>
-                    <td className="p-2 border text-center">{exam.marks}</td>
-                    <td className="p-2 border text-center">
+                    <td className="px-4 py-2 text-center">{index + 1}</td>
+                    <td className="px-4 py-2 text-center">{exam.studentName}</td>
+                    <td className="px-4 py-2 text-center">{exam.courseName}</td>
+                    <td className="px-4 py-2 text-center">{exam.examDetails}</td>
+                    <td className="px-4 py-2 text-center">{exam.marks}</td>
+                    <td className="px-4 py-2 text-center">
                       {exam.evaluated ? (
                         <button className="px-4 py-2 text-green-800 font-bold rounded-md">
                           Evaluated
                         </button>
                       ) : (
-                        <button   onClick={() => navigate("/teacher-panel/evaluate-code")}
-                         className="px-4 py-2 bg-btnbg text-white dark:bg-secondary dark:text-black rounded-md">
+                        <button
+                          onClick={() => navigate("/teacher-panel/evaluate-code")}
+                          className="px-4 py-2 bg-btnbg text-white dark:bg-secondary dark:text-black rounded-md"
+                        >
                           Evaluate
                         </button>
                       )}
@@ -116,7 +117,7 @@ const TeacherExams = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="p-2 border text-center">
+                  <td colSpan="6" className="px-4 py-2 text-center">
                     No exams found.
                   </td>
                 </tr>

@@ -67,7 +67,7 @@ const TeacherResult = () => {
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       <div className="w-full p-10">
         <div className="flex items-center justify-between mt-16">
-          <h1 className="text-3xl font-bold mb-0">Exam Results</h1>
+          <h1 className="text-3xl font-bold mb-0 ml-5">Exam Results</h1>
           <div className="flex items-center justify-end mb-3">
             <input
               type="text"

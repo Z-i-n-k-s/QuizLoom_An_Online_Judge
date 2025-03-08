@@ -106,8 +106,8 @@ const ViewCourse = () => {
     setShowQuizPopup(false);
   };
 
-   // Set active lecture and show coding content.
-   const handleShowCoding = (lectureIndex) => {
+  // Set active lecture and show coding content.
+  const handleShowCoding = (lectureIndex) => {
     setActiveLectureIndex(lectureIndex);
     setActiveTab("Coding");
     setShowQuizPopup(false);
@@ -300,25 +300,27 @@ const ViewCourse = () => {
                   {currentLecture.title}
                 </h3>
                 {activeTab === "Text" && (
-                  <p className="text-md mt-4 border p-4 whitespace-pre-wrap">
-                    {currentLecture.content}
-                  </p>
+                  <div
+                    className="text-md mt-4 border p-4 whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{ __html: currentLecture.content }}
+                  />
                 )}
 
-                     {activeTab === "Coding" && (
-                <div className="text-md mt-4 border p-4 whitespace-pre-wrap text-center">
-                <p className="mb-4">Are you ready to start coding?</p>
-                <button onClick={() => navigate(`/student-panel/codingstu/${courseId}`)}
-
-                className="btn bg-btnbg border-none dark:bg-secondary dark:text-black text-white px-4 py-2 rounded-lg">
-                  Start Coding
-                </button>
-              </div>
-              
+                {activeTab === "Coding" && (
+                  <div className="text-md mt-4 border p-4 whitespace-pre-wrap text-center">
+                    <p className="mb-4">Are you ready to start coding?</p>
+                    <button
+                      onClick={() =>
+                        navigate(`/student-panel/codingstu/${courseId}`)
+                      }
+                      className="btn bg-btnbg border-none dark:bg-secondary dark:text-black text-white px-4 py-2 rounded-lg"
+                    >
+                      Start Coding
+                    </button>
+                  </div>
                 )}
 
                 {activeTab === "Quiz" && (
-
                   <TextQuizStu
                     type="quiz"
                     lectureId={currentLecture.id}
@@ -360,7 +362,6 @@ const ViewCourse = () => {
                     user={user}
                     examResult={examResult}
                   />
-
                 )}
               </>
             ) : (
@@ -434,7 +435,6 @@ const ViewCourse = () => {
                             <span>Coding</span>
                           </button>
 
-        
                           {lecture.examDetails &&
                             lecture.examDetails.quizQuestions &&
                             lecture.examDetails.quizQuestions.length > 0 && (
@@ -567,7 +567,6 @@ const ViewCourse = () => {
                           <small className="text-gray-800 border-b-2 pb-2 dark:text-white">
                             Posted by <strong>{question.authorName}</strong>
                           </small>
-                      
                         </div>
 
                         {/* Show Edit/Delete only if the logged-in student is the author */}
@@ -699,8 +698,8 @@ const ViewCourse = () => {
             {/* Start Quiz Button */}
             <button
               onClick={() => {
-                setActiveTab("Quiz"); 
-                setShowQuizPopup(false); 
+                setActiveTab("Quiz");
+                setShowQuizPopup(false);
               }}
               className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
             >

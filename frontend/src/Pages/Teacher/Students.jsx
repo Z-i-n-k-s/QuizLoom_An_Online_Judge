@@ -66,11 +66,11 @@ const Students = () => {
   );
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div className="flex ml-8 h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       <div className="w-full p-10 bg-gray-100 dark:bg-gray-900">
-        <div className="flex items-center justify-between mt-16">
-          <h1 className="text-3xl font-bold mb-0">Students</h1>
-          <div className="flex items-center justify-end mb-3">
+        <div className="flex items-center justify-between mt-16 ">
+          <h1 className="text-3xl font-bold mb-0 ml-5">Students</h1>
+          <div className="flex items-center justify-end mb-3 ">
             <input
               type="text"
               placeholder="Search"
