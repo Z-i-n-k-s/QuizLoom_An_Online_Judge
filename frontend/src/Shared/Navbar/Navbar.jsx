@@ -11,11 +11,11 @@ const Navbar = () => {
   return (
     <div className="navbar bg-white text-black dark:bg-gray-800 dark:text-white fixed top-0 left-0 right-0 z-50 shadow-md flex items-center px-12 py-4">
       {/* Logo (Always Black) - Stays on Left */}
-      <Link to="/" className="text-2xl font-bold text-black dark:text-white">
+      <Link to="/" className="text-2xl font-bold text-black dark:text-white ml-10">
         QuizLoom
       </Link>
 
-      {/* Navigation Links + Dark Mode Toggle (Shifted to Right) */}
+      {/* Navigation Links (Only for Home Page) */}
       {isHomePage && (
         <div className="ml-auto flex items-center space-x-6"> 
           <Link
@@ -40,19 +40,21 @@ const Navbar = () => {
           >
             Sign In
           </Link>
-
-          {/* Dark Mode Toggle */}
-          <ReactSwitch
-            checked={theme === "dark"}
-            onChange={toggleTheme}
-            offColor="#bbb"
-            onColor="#333"
-            uncheckedIcon={false}
-            checkedIcon={false}
-            className="transition-all"
-          />
         </div>
       )}
+
+      {/* Dark Mode Toggle (Always Visible) */}
+      <div className="ml-auto">
+        <ReactSwitch
+          checked={theme === "dark"}
+          onChange={toggleTheme}
+          offColor="#bbb"
+          onColor="#333"
+          uncheckedIcon={false}
+          checkedIcon={false}
+          className="transition-all"
+        />
+      </div>
     </div>
   );
 };
