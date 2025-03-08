@@ -360,7 +360,7 @@ const ViewCourse = () => {
                     lecture.examDetails &&
                     lecture.examDetails.results &&
                     lecture.examDetails.results.some(
-                      (result) => result.student_id === user?.id
+                      (result) => result.student_id === user?.student.id
                     );
                   return (
                     <div

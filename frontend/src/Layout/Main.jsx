@@ -32,6 +32,7 @@ const Main = () => {
       console.error("Error fetching user details:", error);
     } finally {
       setFetching(false); // End loading after fetching
+      
     }
   };
 
@@ -44,6 +45,7 @@ const Main = () => {
       fetchUserDetails();
     } else {
       setFetching(false);
+      navigate("/");
     }
   }, []);
 

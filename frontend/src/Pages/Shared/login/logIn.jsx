@@ -43,7 +43,7 @@ const LogIn = () => {
         const { access_token, refresh_token } = response.tokens;
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("refresh_token", refresh_token);
-        localStorage.setItem("user_id", response.user_info.id);
+     //   localStorage.setItem("user_id", response.user_info.id);
         const { role } = response.user_info;
   
         switch (role) {

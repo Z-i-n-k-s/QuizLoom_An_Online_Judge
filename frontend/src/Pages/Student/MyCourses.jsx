@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../api/Api";
+import { useSelector } from "react-redux";
 
 const MyCourses = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [courses, setCourses] = useState([]);
+  const user = useSelector((state) => state?.user?.user);
   const [newCourse, setNewCourse] = useState({
     course_code: "",
   });
@@ -16,7 +18,7 @@ const MyCourses = () => {
 
   const fetchEnrolledCourses = async () => {
     try {
-      const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const studentInfo = await apiClient.getUserById(user?.id);
       const studentId = studentInfo.student.id;
       const enrolledCourses = await apiClient.getEnrolledCourses(studentId);
       console.log("Enrolled courses:", enrolledCourses);
@@ -38,7 +40,7 @@ const MyCourses = () => {
 
   const handleAddCourse = async () => {
     try {
-      const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
+      const studentInfo = await apiClient.getUserById(user?.id);
       const studentId = studentInfo.student.id;
       const courseCode = newCourse.course_code;
       if (!courseCode) {

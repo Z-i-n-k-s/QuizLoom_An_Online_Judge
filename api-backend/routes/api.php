@@ -19,10 +19,11 @@ use Illuminate\Support\Facades\Route;
 // Auth Routes
 // ---------------------
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/token/refresh', [AuthController::class, 'refreshToken']);
 
 Route::post('/login', [AuthController::class, 'login']);// Limit to 5 attempts per minute
 
-Route::get('/logout', [AuthController::class, 'logout']);
+Route::post('/logout', [AuthController::class, 'logout']) ->middleware(TokenMiddleware::class);
 
 // ---------------------
 // User Routes
