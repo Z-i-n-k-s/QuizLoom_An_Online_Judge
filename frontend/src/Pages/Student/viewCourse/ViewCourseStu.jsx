@@ -149,7 +149,7 @@ const ViewCourse = () => {
   // Check if the current user has already taken the quiz for the active lecture.
   const examResult =
     currentLecture?.examDetails?.results?.find(
-      (result) => result.student_id === user?.id
+      (result) => result.student_id === user?.student.id
     ) || null;
 
   // Bottom navigation: if there's a next lecture, show Next button instead of Quiz Completed.
@@ -320,7 +320,7 @@ const ViewCourse = () => {
                           const updatedLecture = prevLectures[currentIndex];
                           const updatedExamResult =
                             updatedLecture?.examDetails?.results?.find(
-                              (result) => result.student_id === user?.id
+                              (result) => result.student_id === user?.student.id
                             );
                           console.log(
                             "Updated Exam Result:",

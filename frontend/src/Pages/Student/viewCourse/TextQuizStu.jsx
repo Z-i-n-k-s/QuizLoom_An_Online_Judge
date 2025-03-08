@@ -12,6 +12,7 @@ const TextQuizStu = ({
   user,
   examResult, // New prop for existing result
 }) => {
+  console.log("results ",examResult)
   // Mapping from letter to numeric index.
   const letterToIndex = { A: 0, B: 1, C: 2, D: 3 };
 
@@ -118,7 +119,7 @@ const TextQuizStu = ({
     setLoading(true);
     try {
       // Ensure student_id and exam_id are provided and cast to integers.
-      if (!user?.id || !examId) {
+      if (!user?.student.id || !examId) {
         throw new Error("Missing student id or exam id.");
       }
       // Determine status based on 40% passing threshold.
@@ -126,7 +127,7 @@ const TextQuizStu = ({
       const status = finalScore < passingThreshold ? "failed" : "passed";
       // Prepare data for submission.
       const resultData = {
-        student_id: parseInt(user.id, 10),
+        student_id: parseInt(user.student.id, 10),
         exam_id: parseInt(examId, 10),
         obtained_marks: finalScore,
         status: status,
@@ -234,6 +235,7 @@ const TextQuizStu = ({
 
   // Display quiz results after submission
   if (type === "quiz" && quizSubmitted) {
+    console.log('submit ',type === "quiz" && quizSubmitted)
     const marksEach = quizData.length
       ? parseFloat((examTotalMarks / quizData.length).toFixed(2))
       : 0;
