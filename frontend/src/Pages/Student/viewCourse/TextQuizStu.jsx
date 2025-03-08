@@ -118,7 +118,7 @@ const TextQuizStu = ({
     setLoading(true);
     try {
       // Ensure student_id and exam_id are provided and cast to integers.
-      if (!user?.id || !examId) {
+      if (!user?.student.id || !examId) {
         throw new Error("Missing student id or exam id.");
       }
       // Determine status based on 40% passing threshold.
@@ -126,7 +126,7 @@ const TextQuizStu = ({
       const status = finalScore < passingThreshold ? "failed" : "passed";
       // Prepare data for submission.
       const resultData = {
-        student_id: parseInt(user.id, 10),
+        student_id: parseInt(user.student.id, 10),
         exam_id: parseInt(examId, 10),
         obtained_marks: finalScore,
         status: status,
