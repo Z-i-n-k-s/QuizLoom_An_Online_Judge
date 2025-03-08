@@ -44,7 +44,7 @@ const MyCourses = () => {
     setLoading(true); 
     try {
       const courseId = course.id;
-      console.log(courseId);
+ 
       const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
       const studentId = studentInfo.student.id;
       // Fetch all enrollments

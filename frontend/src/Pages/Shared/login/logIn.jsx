@@ -36,7 +36,7 @@ const LogIn = () => {
         password: data.password,
       });
   
-      console.log("response", response);
+      
       if (response.success) {
         fetchUserDetails();
         // Save tokens to local storage
@@ -69,7 +69,7 @@ const LogIn = () => {
             console.error("Invalid role");
         }
       } else {
-        console.log("login failed", response);
+        
         const errorMessage = response.message || "wrong!";
         toast.error(errorMessage, { position: "top-center" });
       }

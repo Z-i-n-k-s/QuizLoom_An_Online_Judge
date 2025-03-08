@@ -21,11 +21,11 @@ const TeacherResult = () => {
 
       // Fetch courses for the teacher
       const coursesResponse = await apiClient.getCourses(teacherId);
-      console.log("Response from fetchCourses:", coursesResponse);
+      
 
       // Fetch all exam results
       const resultsResponse = await apiClient.getallResult();
-      console.log("Results response:", resultsResponse);
+    
 
       // Prepare an array to hold the combined exam result data
       const combinedResultData = [];

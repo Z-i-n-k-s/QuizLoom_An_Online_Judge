@@ -17,11 +17,11 @@ const Students = () => {
 
       // Fetch courses for the teacher
       const coursesResponse = await apiClient.getCourses(teacherId);
-      console.log("Response from fetchCourses:", coursesResponse);
+      
      
       // Fetch all exam results
       const resultsResponse = await apiClient.getallResult();
-      console.log("Results response:", resultsResponse);
+     
 
       // Prepare an array to hold combined student data
       const combinedStudentData = [];
@@ -30,7 +30,7 @@ const Students = () => {
       for (const course of coursesResponse) {
         try {
           const enrolledStudents = await apiClient.getenrollStudentinCourse(course.id);
-          console.log(`Students for course ${course.id}:`, enrolledStudents);
+         
 
           enrolledStudents.forEach((student) => {
             // Count the number of exam results matching the student id

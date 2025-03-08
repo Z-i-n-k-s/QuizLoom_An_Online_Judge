@@ -6,7 +6,7 @@ import apiClient from "../../api/Api";
 
 const TeacherAnnouncements = () => {
   const user = useSelector((state) => state?.user?.user);
-  // console.log("Teacher ID:", user);
+
 
   // Announcements will be fetched from the backend.
   const [announcements, setAnnouncements] = useState([]);
@@ -51,7 +51,7 @@ const TeacherAnnouncements = () => {
     const fetchTeacherAnnouncements = async () => {
       try {
         const response = await apiClient.getTeacherAnnouncements(user.teacher.id);
-        console.log("Fetched Announcements:", response);
+       
         // Adjust based on your response structure.
         const fetchedAnnouncements = response.announcements || response;
         // Sort announcements by created_at in descending order.

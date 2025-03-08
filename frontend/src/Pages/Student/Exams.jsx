@@ -42,7 +42,7 @@ const Exams = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCourse({ ...newCourse, [name]: value });
-    console.log("Input Changed:", { ...newCourse, [name]: value });
+    
   };
 
   const handleViewCourse = (id) => {
@@ -51,7 +51,7 @@ const Exams = () => {
 
   // Add course and update the course list
   const handleAddCourse = async () => {
-    console.log("Attempting to add course:", newCourse);
+   
 
     try {
       // POST request to the backend
@@ -68,7 +68,7 @@ const Exams = () => {
       }
 
       const result = await response.json();
-      console.log("Course added successfully (response):", result);
+   
 
       // Update the courses state
       setCourses((prevCourses) => {
@@ -83,7 +83,7 @@ const Exams = () => {
             status: "Ongoing",
           },
         ];
-        console.log("Updated courses list:", updatedCourses);
+       
         return updatedCourses;
       });
 

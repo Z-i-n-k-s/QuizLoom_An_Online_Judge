@@ -29,11 +29,11 @@ const StudentDashboard = () => {
       // Fetch student info to obtain the student id
       const studentInfo = await apiClient.getUserById(localStorage.getItem("user_id"));
       const studentId = studentInfo.student.id;
-      console.log("Student info:", studentInfo);
+      
       
       // Fetch student announcements 
       const annData = await apiClient.getStudentAnnouncements(studentId);
-      console.log("student ann data ", annData);
+     
       // Sort announcements descending by created_at date (newest first)
       const sortedAnnouncements = annData.sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)

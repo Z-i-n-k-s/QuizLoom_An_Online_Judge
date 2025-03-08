@@ -23,15 +23,15 @@ const Courses = () => {
   const fetchCourses = async () => {
     try {
       const teacherInfo = await apiClient.getUserById(user?.id);
-      console.log("Teacher Info:", teacherInfo);
+      
       const teacherId = teacherInfo.teacher.id;
      
       const response = await apiClient.getCourses(teacherId);
-      console.log("Response from fetchCourses:", response);
+      
       
       const fetchedCourses = Array.isArray(response) ? response : response?.courses || [];
       setCourses(fetchedCourses);
-      console.log("Fetched Courses Data:", fetchedCourses);
+      
     } catch (error) {
       console.error("Error fetching courses:", error);
     }
@@ -59,7 +59,7 @@ const Courses = () => {
       const response = await apiClient.addCourse(courseData);
 
       if (response) {
-        console.log("Course added successfully:", response);
+       
         
         setCourses((prevCourses) => [
           ...prevCourses,
@@ -131,7 +131,10 @@ const Courses = () => {
                 {/* Back Side */}
                 <div className="card-back bg-green-300 dark:bg-green-300 flex flex-col items-center justify-center text-center p-4 py-8">
                   <h2 className="text-lg font-semibold dark:text-black">Manage Courses</h2>
-                  <p className="text-sm dark:text-black">View, update, or delete existing courses.</p>
+                  <p className="text-sm dark:text-black">{courses.map((course, index) => (
+                    <li key={index}>{course.name}</li>
+                  ))}
+                  </p>
                 </div>
               </div>
             </div>
@@ -165,21 +168,21 @@ const Courses = () => {
           </div>
 
           {/* Card 3 */}
-          <div className="card-container m-4">
+          {/* <div className="card-container m-4">
             <div className="card w-80 h-60 shadow-xl m-4 flex items-center justify-center">
               <div className="card-inner">
                 <div className="card-front bg-purple-200 dark:bg-purple-200 flex flex-col items-center justify-center text-center p-4 py-8">
                   <h2 className="text-xl font-bold dark:text-black">Pending Assignments</h2>
                   <p className="text-md dark:text-black">4 Assignments</p>
                 </div>
-                {/* Back Side */}
+                
                 <div className="card-back bg-purple-300 dark:bg-purple-300 flex flex-col items-center justify-center text-center p-4 py-8">
                   <h2 className="text-lg font-semibold dark:text-black">Review Assignments</h2>
                   <p className="text-sm dark:text-black">Check pending assignments submitted by students.</p>
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Courses Header */}

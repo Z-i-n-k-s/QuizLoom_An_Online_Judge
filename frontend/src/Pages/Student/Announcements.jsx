@@ -25,7 +25,7 @@ const Announcements = () => {
     const fetchStudentAnnouncements = async () => {
       try {
         const data = await apiClient.getStudentAnnouncements(studentId);
-        console.log("student ann data ", data);
+        
         // Assuming data is an array of announcements, sort descending by created_at.
         data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         setAnnouncements(data);
