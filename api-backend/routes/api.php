@@ -149,6 +149,8 @@ Route::prefix('code-exam-questions')->group(function () {
     Route::get('/', [CodeExamQuestionController::class, 'index']); // Get all code exam questions
     Route::post('/', [CodeExamQuestionController::class, 'store']); // Create a new code exam question
     Route::post('/ansCode', [CodeExamQuestionController::class, 'storeAnsOfCode']); // Create a new code exam question
+    Route::get('/allAnsCode', [CodeExamQuestionController::class, 'getAllSubmissions']);
+
     Route::get('/{id}', [CodeExamQuestionController::class, 'show']); // Get a specific code exam question
     Route::put('/{id}', [CodeExamQuestionController::class, 'update']); // Update a code exam question
     Route::delete('/{id}', [CodeExamQuestionController::class, 'destroy']); // Delete a code exam question

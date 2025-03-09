@@ -23,6 +23,11 @@ class CodeExamQuestionController extends Controller
         return response()->json($this->codeExamQuestionService->getAll());
     }
 
+    public function getAllSubmissions()
+    {
+        return response()->json($this->codeExamQuestionService->getAllSubmissions());
+    }
+
     public function storeAnsOfCode(Request $request)
     {
         $validated = $request->validate([

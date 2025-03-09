@@ -17,6 +17,10 @@ class CodeExamQuestionService
             'exam.lecture' // Load the lecture through the exam relationship
         ])->get();
     }
+    public function getAllSubmissions()
+    {
+        return CodeSubmission::with(['student', 'codeExamQuestion'])->get();
+    }
     public function createAns(array $data)
 {
     // Check if the student has already submitted for this question

@@ -379,6 +379,15 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
+  async codingAnswerAll(data) {
+    try {
+      console.log(data)
+      const response = await this.client.get(`api/code-exam-questions/allAnsCode`);
+         return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
   async getCodingQustions() {
     try {
       console.log()
