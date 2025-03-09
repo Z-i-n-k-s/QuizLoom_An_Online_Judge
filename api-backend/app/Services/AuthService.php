@@ -72,19 +72,8 @@ class AuthService
  
     }
 
-    public function logout($token)
+    public function logout($userId)
     {
-        try {
-            $decodedToken = $this->jwtService->parseJwtToken($token);
-            
-            if (!$decodedToken) {
-                return false;
-            }
-
-            // Add logic to blacklist token if needed (database or cache)
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $userId ? true : false;
     }
 }

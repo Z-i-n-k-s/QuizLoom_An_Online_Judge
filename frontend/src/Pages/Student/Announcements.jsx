@@ -25,7 +25,7 @@ const Announcements = () => {
     const fetchStudentAnnouncements = async () => {
       try {
         const data = await apiClient.getStudentAnnouncements(studentId);
-        console.log("student ann data ", data);
+        
         // Assuming data is an array of announcements, sort descending by created_at.
         data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         setAnnouncements(data);
@@ -86,13 +86,13 @@ const Announcements = () => {
             placeholder="Search by title or message..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
           />
           {/* Course Filter Dropdown */}
           <select
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
           >
             <option value="">All Courses</option>
             {courses.map((course) => (
@@ -107,7 +107,7 @@ const Announcements = () => {
             onChange={(date) => setStartDate(date)}
             placeholderText="Start Date"
             dateFormat="dd/MM/yyyy"
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200  dark:bg-gray-800 dark:border-gray-700"
             isClearable
             clearIcon={
               <span className="text-red-500 font-bold text-xl cursor-pointer hover:text-red-700">
@@ -120,7 +120,7 @@ const Announcements = () => {
             onChange={(date) => setEndDate(date)}
             placeholderText="End Date"
             dateFormat="dd/MM/yyyy"
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
             isClearable
             clearIcon={
               <span className="text-red-500 font-bold text-xl cursor-pointer hover:text-red-700">

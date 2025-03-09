@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import apiClient from "../../../api/Api";
 
 const TextUpload = () => {
@@ -14,12 +16,14 @@ const TextUpload = () => {
   const courseName = location.state?.courseName;
   console.log("Course ID from storage:", courseId);
   console.log("Course Name from storages:", courseName);
+
   const handleTitleChange = (e) => {
     setLectureTitle(e.target.value);
   };
 
-  const handleContentChange = (e) => {
-    setLectureContent(e.target.value);
+  // ReactQuill returns content as an HTML string
+  const handleContentChange = (content) => {
+    setLectureContent(content);
   };
 
   const handleSubmit = async (e) => {
@@ -36,18 +40,13 @@ const TextUpload = () => {
     };
 
     try {
-       await apiClient.addLecture(courseId, lectureData);
-       const response1 = await apiClient.getLectureId(courseId);
+      await apiClient.addLecture(courseId, lectureData);
+      const response1 = await apiClient.getLectureId(courseId);
       console.log("Response1:", response1);
       console.log("Lecture submitted:", lectureData);
-      // Store the response so that we can pass it to the ViewCourse page.
       setLectureResponse(response1);
-
-      // Reset the form
       setLectureTitle("");
       setLectureContent("");
-
-      // Show success modal
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error uploading lecture:", error);
@@ -56,11 +55,34 @@ const TextUpload = () => {
 
   const handleCloseModal = () => {
     setShowSuccessModal(false);
-    // Pass the lectureResponse to the ViewCourse page via navigate state.
     navigate(`/teacher-panel/teachers-courses/${courseId}`, {
-      state: { lectureResponse , name: courseName }
+      state: { lectureResponse, name: courseName },
     });
   };
+
+  // ReactQuill toolbar configuration
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "link",
+    "image",
+  ];
 
   return (
     <div className="p-6 min-h-screen bg-white dark:bg-gray-800 flex justify-center items-center mt-10">
@@ -81,19 +103,19 @@ const TextUpload = () => {
               required
             />
           </div>
-          {/* Lecture Content Textarea */}
+          {/* Rich Text Editor for Lecture Content */}
           <div className="mb-6">
             <label className="block text-gray-700 dark:text-white font-semibold mb-2">
               Lecture Content:
             </label>
-            <textarea
+            <ReactQuill
               value={lectureContent}
               onChange={handleContentChange}
+              modules={modules}
+              formats={formats}
               placeholder="Enter the lecture content"
-              rows="10"
-              className="w-full p-4 border rounded-md bg-gray-200 dark:bg-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            ></textarea>
+              className="bg-gray-200 dark:text-black" // Applies the bg-gray-200 styling
+            />
           </div>
           {/* Submit Button */}
           <button

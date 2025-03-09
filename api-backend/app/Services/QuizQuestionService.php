@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class QuizQuestionService {
 
-    public function getQuestionsByExamId($examId) {
-        $exam = Exam::findOrFail($examId);
-        return $exam->questions;
+    public function getQuestionsByExamId($examId)
+    {
+        $exam = Exam::with('quizQuestions')->findOrFail($examId);
+        return $exam->quizQuestions;
     }
+    
 
     public function getQuestionById($id) {
         return QuizQuestion::findOrFail($id);

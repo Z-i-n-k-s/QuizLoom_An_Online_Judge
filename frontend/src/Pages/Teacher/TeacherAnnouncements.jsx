@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
@@ -6,7 +6,7 @@ import apiClient from "../../api/Api";
 
 const TeacherAnnouncements = () => {
   const user = useSelector((state) => state?.user?.user);
-  // console.log("Teacher ID:", user);
+
 
   // Announcements will be fetched from the backend.
   const [announcements, setAnnouncements] = useState([]);
@@ -51,7 +51,7 @@ const TeacherAnnouncements = () => {
     const fetchTeacherAnnouncements = async () => {
       try {
         const response = await apiClient.getTeacherAnnouncements(user.teacher.id);
-        console.log("Fetched Announcements:", response);
+       
         // Adjust based on your response structure.
         const fetchedAnnouncements = response.announcements || response;
         // Sort announcements by created_at in descending order.
@@ -154,7 +154,7 @@ const TeacherAnnouncements = () => {
         <div className="flex items-center justify-between mt-16">
           <h1 className="text-3xl font-bold mb-6">Teacher Announcements</h1>
           <button
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+            className="bg-btnbg hover:bg-blue-600 text-white font-bold py-2 px-4 rounded dark:bg-secondary"
             onClick={() => setShowModal(true)}
           >
             Add New Announcement
@@ -168,13 +168,13 @@ const TeacherAnnouncements = () => {
             placeholder="Search by title or body..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200 border-gray-300 dark:bg-gray-800"
           />
 
           <select
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200 border-gray-300 dark:bg-gray-800"
           >
             <option value="">All Courses</option>
             {courses.map((course) => (
@@ -189,7 +189,7 @@ const TeacherAnnouncements = () => {
             onChange={(date) => setStartDate(date)}
             placeholderText="Start Date"
             dateFormat="dd/MM/yyyy"
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200 border-gray-300 dark:bg-gray-800"
             isClearable
             clearIcon={
               <span className="text-red-500 font-bold text-xl cursor-pointer hover:text-red-700">×</span>
@@ -201,7 +201,7 @@ const TeacherAnnouncements = () => {
             onChange={(date) => setEndDate(date)}
             placeholderText="End Date"
             dateFormat="dd/MM/yyyy"
-            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+            className="p-2 border rounded-md bg-gray-200 border-gray-300 dark:bg-gray-800"
             isClearable
             clearIcon={
               <span className="text-red-500 font-bold text-xl cursor-pointer hover:text-red-700">×</span>

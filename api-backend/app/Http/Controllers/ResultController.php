@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ResultService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ResultController extends Controller {
     protected $resultService;
@@ -21,16 +22,22 @@ class ResultController extends Controller {
         return response()->json($this->resultService->getResultById($id));
     }
 
+   
+
     public function store(Request $request) {
         $data = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'exam_id' => 'required|exists:exams,id',
+            'student_id' => 'required|integer', // existence checked in service
+            'exam_id' => 'required|integer',      // existence checked in service
             'obtained_marks' => 'required|integer',
             'status' => 'required|in:passed,failed',
         ]);
+    
         return response()->json($this->resultService->createResult($data));
     }
-
+    
+    
+    
+    
     public function update(Request $request, $id) {
         $data = $request->validate([
             'obtained_marks' => 'sometimes|integer',

@@ -36,14 +36,14 @@ const LogIn = () => {
         password: data.password,
       });
   
-      console.log("response", response);
+      
       if (response.success) {
         fetchUserDetails();
         // Save tokens to local storage
         const { access_token, refresh_token } = response.tokens;
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("refresh_token", refresh_token);
-        localStorage.setItem("user_id", response.user_info.id);
+     //   localStorage.setItem("user_id", response.user_info.id);
         const { role } = response.user_info;
   
         switch (role) {
@@ -69,7 +69,7 @@ const LogIn = () => {
             console.error("Invalid role");
         }
       } else {
-        console.log("login failed", response);
+        
         const errorMessage = response.message || "wrong!";
         toast.error(errorMessage, { position: "top-center" });
       }

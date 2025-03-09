@@ -1,17 +1,66 @@
-import  { useState } from "react";
+import  { useEffect, useState } from "react";
+import apiClient from "../../api/Api";
 
 const Results = () => {
   const [query, setQuery] = useState("");
 
-  
-  const resultsData = [
-    { course: "Bangla", exam: "Quiz-1", teacher: "Md salauddin", total: 20, obtained: 5, status: "Fail" },
-    { course: "English", exam: "Midterm", teacher: "Saharira shibli", total: 30, obtained: 20, status: "Pass" },
-  ];
+  const [resultData, setResultData] = useState([]);
+
+
+
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    
+    try {
+      // Get student info and student id
+      const studentInfo = await apiClient.getUserById(
+        localStorage.getItem("user_id")
+      );
+      const studentId = studentInfo.student.id;
+
+      const coursesResponse = await apiClient.getEnrolledCourses(studentId);
+
+      // Fetch all exam results
+      const resultsResponse = await apiClient.getallResult();
+     
+
+      // Prepare an array to hold the combined exam result data
+      const combinedResultData = [];
+
+      // For each course, filter exam results matching the course id
+      for (const course of coursesResponse) {
+        const resultsForCourse = resultsResponse.filter(
+          (result) => result.student_id === course.id
+        );
+
+        resultsForCourse.forEach((result) => {
+          combinedResultData.push({
+            course: course.name,
+            exam: result.exam?.name || "N/A",
+            totalMarks: result.exam?.total_marks || "N/A",
+            obtainedMarks: result.obtained_marks,
+            status: result.status,
+          });
+        });
+      }
+      setResultData(combinedResultData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
 
   // Filter logic based on query
-  const filteredResults = resultsData.filter((item) =>
+  const filteredResults = resultData.filter((item) =>
     item.course.toLowerCase().includes(query.toLowerCase())
+  ||
+    item.exam.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
@@ -42,7 +91,6 @@ const Results = () => {
               <tr className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-bold text-left border-b">
                 <th className="p-2 text-center">Course Name</th>
                 <th className="p-2 text-center">Exam Name</th>
-                <th className="p-2 text-center">Teacher Name</th>
                 <th className="p-2 text-center">Total Mark</th>
                 <th className="p-2 text-center">Obtained Mark</th>
                 <th className="p-2 text-center">PassFail Status</th>
@@ -53,9 +101,8 @@ const Results = () => {
                 <tr key={index} className="text-gray-800 dark:text-gray-200 border-b">
                   <td className="p-2 text-center">{item.course}</td>
                   <td className="p-2 text-center">{item.exam}</td>
-                  <td className="p-2 text-center">{item.teacher}</td>
-                  <td className="p-2 text-center">{item.total}</td>
-                  <td className="p-2 text-center">{item.obtained}</td>
+                  <td className="p-2 text-center">{item.totalMarks}</td>
+                  <td className="p-2 text-center">{item.obtainedMarks}</td>
                   <td className="p-2 text-center">
                     <span
                       className={`font-medium ${
