@@ -1,4 +1,4 @@
-import React from "react";
+
 import { motion } from "framer-motion";
 import Student from "../../../assets/student.jpg";
 import AboutUs5 from "../../../assets/About Us5.webp";

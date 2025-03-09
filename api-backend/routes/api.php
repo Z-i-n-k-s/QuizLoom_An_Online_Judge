@@ -3,13 +3,15 @@
 
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CodeExamQuestionController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\LectureController;
+use App\Http\Controllers\LectureQuestionController;
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\ResultController;
-use App\Http\Controllers\TestController;
+
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\TokenMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -18,10 +20,11 @@ use Illuminate\Support\Facades\Route;
 // Auth Routes
 // ---------------------
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/token/refresh', [AuthController::class, 'refreshToken']);
 
 Route::post('/login', [AuthController::class, 'login']);// Limit to 5 attempts per minute
 
-Route::get('/logout', [AuthController::class, 'logout']);
+Route::post('/logout', [AuthController::class, 'logout']) ->middleware(TokenMiddleware::class);
 
 // ---------------------
 // User Routes
@@ -122,3 +125,33 @@ Route::post('/results', [ResultController::class, 'store']);
 Route::put('/results/{id}', [ResultController::class, 'update']);
 Route::delete('/results/{id}', [ResultController::class, 'destroy']);
 
+// ---------------------
+// lecture Qustions Routes
+// ---------------------
+
+Route::prefix('lecture-questions')->group(function () {
+    Route::get('/', [LectureQuestionController::class, 'index']);
+    Route::get('/{id}/questions-answers', [LectureQuestionController::class, 'getQuestionsWithAnswers']);
+    Route::post('/', [LectureQuestionController::class, 'store']);
+    Route::get('/{id}', [LectureQuestionController::class, 'show']);
+    Route::put('/{id}', [LectureQuestionController::class, 'update']);
+    Route::delete('/{id}', [LectureQuestionController::class, 'destroy']);
+    Route::post('/answer', [LectureQuestionController::class, 'storeAnswer']);
+});
+
+
+// ---------------------
+// code Qustions Routes
+// ---------------------
+
+
+Route::prefix('code-exam-questions')->group(function () {
+    Route::get('/', [CodeExamQuestionController::class, 'index']); // Get all code exam questions
+    Route::post('/', [CodeExamQuestionController::class, 'store']); // Create a new code exam question
+    Route::post('/ansCode', [CodeExamQuestionController::class, 'storeAnsOfCode']); // Create a new code exam question
+    Route::get('/allAnsCode', [CodeExamQuestionController::class, 'getAllSubmissions']);
+
+    Route::get('/{id}', [CodeExamQuestionController::class, 'show']); // Get a specific code exam question
+    Route::put('/{id}', [CodeExamQuestionController::class, 'update']); // Update a code exam question
+    Route::delete('/{id}', [CodeExamQuestionController::class, 'destroy']); // Delete a code exam question
+});
