@@ -13,6 +13,7 @@ class CodeSubmission extends Model
         'student_id',
         'code_exam_question_id',
         'submitted_code',
+        'language',
         'teacher_comment',
         'marks_awarded',
     ];

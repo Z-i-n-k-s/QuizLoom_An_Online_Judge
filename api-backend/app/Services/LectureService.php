@@ -13,7 +13,7 @@ class LectureService {
         $course = Course::with([
             'lectures.exam.quizQuestions',
             'lectures.exam.results',
-            'lectures.exam.codeExamQuestions', // Include CodeExamQuestion
+           // 'lectures.exam.codeExamQuestions', // Include CodeExamQuestion
         ])->findOrFail($courseId);
     
         return $course->lectures;

@@ -14,7 +14,6 @@ const ViewCourse = () => {
   const [isQuizViewActive, setIsQuizViewActive] = useState(false);
   const [selectedUploadType, setSelectedUploadType] = useState("");
 
-
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const [QuizUploadOptions, setQuizUploadOptions] = useState(false);
   const [selectedLectureId, setSelectedLectureId] = useState(null);
@@ -108,7 +107,6 @@ const ViewCourse = () => {
     setQuizUploadOptions(true); // Open the "Enter Exam Details" modal
     setShowUploadOptions(false); // Close the current upload options popup
   };
-  
 
   // 2) PROCESS LECTURE(S) PASSED IN location.state EXACTLY ONCE
   useEffect(() => {
@@ -270,7 +268,7 @@ const ViewCourse = () => {
         course_id: courseId,
         lecture_id: selectedLectureId,
       };
-  
+
       if (
         !examDetails.name ||
         !examDetails.date ||
@@ -285,12 +283,12 @@ const ViewCourse = () => {
         });
         return;
       }
-  
+
       const response = await apiClient.addExam(examData);
       if (response) {
         console.log("Exam added successfully:", response);
         const examId = response.id;
-  
+
         // Redirect based on the previously selected upload type
         if (selectedUploadType === "quiz") {
           navigate("/teacher-panel/teachers-quizupload", {
@@ -301,7 +299,7 @@ const ViewCourse = () => {
             state: { examId, examDetails, courseId, courseName },
           });
         }
-  
+
         // Reset exam details and any loading state as needed
         setExamDetails({
           name: "",
@@ -317,7 +315,6 @@ const ViewCourse = () => {
       setIsLoading(false);
     }
   };
-  
 
   // -------------------------------
   // UI INTERACTION
@@ -628,30 +625,29 @@ const ViewCourse = () => {
       {/* Modal for selecting lecture type */}
       {showUploadOptions && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
-  <h3 className="text-lg font-semibold mb-4">
-    Select Lecture Type To Upload
-  </h3>
-  <button
-    onClick={() => handleUploadOptionClick("quiz")}
-    className="w-full px-4 py-2 border hover:bg-btnbg text-black hover:text-white dark:hover:bg-secondary dark:text-white rounded-md"
-  >
-    Quiz
-  </button>
-  <button
-    onClick={() => handleUploadOptionClick("coding")}
-    className="w-full px-4 py-2 mt-2 border hover:bg-btnbg hover:text-white text-black dark:hover:bg-secondary dark:text-white rounded-md"
-  >
-    Coding
-  </button>
-  <button
-    onClick={() => setShowUploadOptions(false)}
-    className="w-full mt-4 px-4 py-2 bg-red-500 text-white dark:hover:bg-secondary rounded-md"
-  >
-    Close
-  </button>
-</div>
-
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-96 shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">
+              Select Lecture Type To Upload
+            </h3>
+            <button
+              onClick={() => handleUploadOptionClick("quiz")}
+              className="w-full px-4 py-2 border hover:bg-btnbg text-black hover:text-white dark:hover:bg-secondary dark:text-white rounded-md"
+            >
+              Quiz
+            </button>
+            <button
+              onClick={() => handleUploadOptionClick("coding")}
+              className="w-full px-4 py-2 mt-2 border hover:bg-btnbg hover:text-white text-black dark:hover:bg-secondary dark:text-white rounded-md"
+            >
+              Coding
+            </button>
+            <button
+              onClick={() => setShowUploadOptions(false)}
+              className="w-full mt-4 px-4 py-2 bg-red-500 text-white dark:hover:bg-secondary rounded-md"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
 

@@ -370,6 +370,24 @@ async getTeacherCourses(teacherId) {
       throw error.response?.data || error.message;
     }
   }
+  async codingAnswer(data) {
+    try {
+      console.log(data)
+      const response = await this.client.post(`api/code-exam-questions/ansCode`,data);
+         return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async getCodingQustions() {
+    try {
+      console.log()
+      const response = await this.client.get(`api/code-exam-questions`);
+         return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
 
   async getenrollStudentinCourse(courseId) {
     try {

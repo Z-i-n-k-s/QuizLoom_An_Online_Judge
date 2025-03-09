@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CodeExamQuestion;
+use App\Models\CodeSubmission;
 
 class CodeExamQuestionService
 {
@@ -11,8 +12,26 @@ class CodeExamQuestionService
      */
     public function getAll()
     {
-        return CodeExamQuestion::all();
+        return CodeExamQuestion::with([
+            'submissions',
+            'exam.lecture' // Load the lecture through the exam relationship
+        ])->get();
     }
+    public function createAns(array $data)
+{
+    // Check if the student has already submitted for this question
+    $existingSubmission = CodeSubmission::where('student_id', $data['student_id'])
+        ->where('code_exam_question_id', $data['code_exam_question_id'])
+        ->exists();
+
+    if ($existingSubmission) {
+        return response()->json(['message' => 'You have already submitted an answer for this question.'], 409);
+    }
+
+    // If no submission exists, create a new one
+    return CodeSubmission::create($data);
+}
+
 
     /**
      * Get a single code exam question by ID.

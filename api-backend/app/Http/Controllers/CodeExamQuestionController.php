@@ -23,6 +23,22 @@ class CodeExamQuestionController extends Controller
         return response()->json($this->codeExamQuestionService->getAll());
     }
 
+    public function storeAnsOfCode(Request $request)
+    {
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'code_exam_question_id' => 'required|exists:code_exam_questions,id',
+            'submitted_code' => 'required|string',
+            'language' => 'required|string',
+            'teacher_comment' => 'nullable|string',
+            'marks_awarded' => 'nullable|integer|min:0',
+        ]);
+
+        $submission = $this->codeExamQuestionService->createAns($validated);
+
+        return response()->json($submission, 201);
+    }
+
     /**
      * Store a newly created code exam question.
      */

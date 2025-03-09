@@ -70,6 +70,52 @@ const ViewCourse = () => {
       setIsLoading(false);
     }
   };
+  // Ensure you have a state to store coding questions:
+  const [codingQuestions, setCodingQuestions] = useState([]);
+
+  // Your fetchCodeQustions function should update this state:
+  const fetchCodeQustions = async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.getCodingQustions();
+      console.log("res for code qus  ", response);
+      if (response && Array.isArray(response)) {
+        setCodingQuestions(response);
+      }
+    } catch (error) {
+      console.error("Error fetching coding questions:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Create a handler to navigate and pass coding questions for the current lecture.
+  const handleStartCoding = () => {
+    if (!currentLecture) return;
+    // Filter coding questions that belong to the current lecture.
+    const codingQuestionsForCurrentLecture = codingQuestions.filter(
+      (question) =>
+        question.exam &&
+        question.exam.lecture &&
+        question.exam.lecture.id === currentLecture.id
+    );
+    // Navigate to the coding page, passing the questions via state.
+    navigate(`/student-panel/codingstu/${courseId}`, {
+      state: { codingQuestions: codingQuestionsForCurrentLecture },
+    });
+  };
+
+  const codingForLecture = codingQuestions.filter(
+    (cq) => cq.exam && cq.exam.lecture && cq.exam.lecture_id === lectures.id
+  );
+
+  const alreadyCodingTaken = codingForLecture.some(
+    (cq) =>
+      cq.submissions &&
+      cq.submissions.some(
+        (submission) => submission.student_id === user?.student.id
+      )
+  );
 
   // When active lecture changes, fetch its questions.
   useEffect(() => {
@@ -77,6 +123,7 @@ const ViewCourse = () => {
       const currentLecture = lectures[activeLectureIndex];
       if (currentLecture) {
         fetchQuestions(currentLecture.id);
+
         // Clear any previously entered text when switching lectures.
         setNewQuestionText("");
       }
@@ -84,6 +131,7 @@ const ViewCourse = () => {
   }, [activeLectureIndex, lectures]);
 
   useEffect(() => {
+    fetchCodeQustions();
     fetchLecturesFromBackend();
   }, [courseId]);
 
@@ -310,9 +358,7 @@ const ViewCourse = () => {
                   <div className="text-md mt-4 border p-4 whitespace-pre-wrap text-center">
                     <p className="mb-4">Are you ready to start coding?</p>
                     <button
-                      onClick={() =>
-                        navigate(`/student-panel/codingstu/${courseId}`)
-                      }
+                      onClick={handleStartCoding}
                       className="btn bg-btnbg border-none dark:bg-secondary dark:text-black text-white px-4 py-2 rounded-lg"
                     >
                       Start Coding
@@ -373,20 +419,41 @@ const ViewCourse = () => {
 
           {/* Side drawer for lectures */}
           {drawerOpen && (
-            <div className="flex-[2] p-6 bg-white dark:bg-gray-800 shadow-lg ml-4">
+            <div className="flex-[2] p-6 bg-white h-[500px] overflow-auto dark:bg-gray-800 shadow-lg ml-4">
               <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2">
                 Lectures
               </h2>
               {lectures.length > 0 ? (
                 lectures.map((lecture, index) => {
                   const isExpanded = expandedLectureIndex === index;
-                  // Check if the quiz for this lecture was already taken.
+
+                  // Check if there is any coding question related to this lecture
+                  const codingForLecture =
+                    codingQuestions?.filter(
+                      (cq) =>
+                        cq.exam &&
+                        cq.exam.lecture &&
+                        cq.exam.lecture.id === lecture.id
+                    ) || [];
+
+                  // Determine if the current user has submitted code for any of these coding questions
+                  const alreadyCodingTaken = codingForLecture.some(
+                    (cq) =>
+                      cq.submissions &&
+                      cq.submissions.some(
+                        (submission) =>
+                          submission.student_id === user?.student.id
+                      )
+                  );
+
+                  // Check for quiz status (if needed) -- your existing logic may be used here.
                   const alreadyTaken =
                     lecture.examDetails &&
                     lecture.examDetails.results &&
                     lecture.examDetails.results.some(
                       (result) => result.student_id === user?.student.id
                     );
+
                   return (
                     <div
                       key={lecture.id || index}
@@ -413,7 +480,6 @@ const ViewCourse = () => {
                         </button>
                       </div>
 
-                      {/* Expanded lecture options */}
                       {isExpanded && (
                         <div className="mt-2 ml-8 space-y-2">
                           <button
@@ -425,16 +491,35 @@ const ViewCourse = () => {
                             </span>
                             <span>Text</span>
                           </button>
-                          <button
-                            className="flex items-center space-x-2 px-4 py-2 border rounded-md"
-                            onClick={() => handleShowCoding(index)}
-                          >
-                            <span role="img" aria-label="coding">
-                              💻
-                            </span>
-                            <span>Coding</span>
-                          </button>
 
+                          {/* Conditionally render the Coding button */}
+                          {codingQuestions &&
+                            codingQuestions.some(
+                              (cq) =>
+                                cq.exam &&
+                                cq.exam.lecture &&
+                                cq.exam.lecture.id === lecture.id
+                            ) &&
+                            (alreadyCodingTaken ? (
+                              <button className="flex items-center space-x-2 px-4 py-2 border rounded-md bg-green-500 text-white">
+                                <span role="img" aria-label="submitted">
+                                  ✅
+                                </span>
+                                <span>Submitted Code</span>
+                              </button>
+                            ) : (
+                              <button
+                                className="flex items-center space-x-2 px-4 py-2 border rounded-md"
+                                onClick={() => handleShowCoding(index)}
+                              >
+                                <span role="img" aria-label="coding">
+                                  💻
+                                </span>
+                                <span>Coding</span>
+                              </button>
+                            ))}
+
+                          {/* Quiz button rendering */}
                           {lecture.examDetails &&
                             lecture.examDetails.quizQuestions &&
                             lecture.examDetails.quizQuestions.length > 0 && (
