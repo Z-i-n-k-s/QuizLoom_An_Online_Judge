@@ -128,7 +128,7 @@ function SidebarItem1({ icon, text, to }) {
       >
         <span
           className={`transition-all ${
-            isActive ? " bg-gray-800 text-gray-300" : "" // Apply blue color to the icon if active
+            isActive ? " bg-gray-800 text-gray-300" : "" 
           }`}
         >
           {icon}
